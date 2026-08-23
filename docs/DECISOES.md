@@ -359,11 +359,35 @@ com lança, escudo e coruja**, não a sentada que serviu de referência:
    escuro a apagava — sutil não é invisível.
 5. Fica atrás do cartão de vidro de propósito: é o que o vidro difunde (D-15).
 
-**Motion `vigil`** — quinta primitiva, e de categoria diferente das quatro de
-interação: `rise`, `sheen`, `settle` e `bloom` respondem a algo que aconteceu;
-`vigil` não responde a nada, é a respiração do fundo. 24s por ciclo,
-deslocamento de 1,4%, seis pontos de opacidade. Se dá para ver a animação
-acontecendo, está forte demais.
+**Enquadramento: cintura para cima.** A figura inteira ficava pequena demais
+para o espaço. Cortada em 56% da altura (a cintura está em 48%), com os
+últimos 22% dissolvendo em rampa — ela termina em névoa, não em corte reto.
+Perde-se o escudo com a coruja, mas o elmo tem uma coruja gravada, então o
+símbolo permanece.
+
+**O vento é um shader, não CSS.** Ela é uma textura dentro de um fragment
+shader, não uma `<img>`. Motivo: CSS move a imagem inteira; não move o cabelo
+sem mover o rosto junto. Deslocando a coordenada de leitura por região —
+máscara forte no penacho e nas bordas, quase zero no rosto e no peitoral — o
+penacho ondula e a face fica parada, que é como vento se comporta. Amplitude
+de 0,6% da textura; acima de 1% vira água. Mais uma respiração de 1,2% de
+escala em ciclo de 24s.
+
+Medido, não presumido: 12.068 pixels da região do penacho mudam em 1,8s.
+
+### Três bugs que custaram tempo aqui, para não repetir
+
+1. **`img.src` antes de `img.onload`.** Com a imagem em cache o evento dispara
+   antes de o listener existir e a textura nunca chega. Handler primeiro, e
+   `img.complete` como rede.
+2. **`uResolution` em pixels CSS.** `gl_FragCoord` é em pixels do *buffer*.
+   Com dpr 2, `uv` ia de 0 a 2 e a figura era desenhada num quarto do canvas.
+   O mesmo bug estava na Aurora — ela renderizava diferente em retina e em
+   monitor comum. Corrigido nos dois.
+3. **Duas convenções de alpha misturadas.** Contexto `premultipliedAlpha:false`
+   com saída não pré-multiplicada *parece* consistente, mas o canvas compunha
+   errado e a figura não aparecia. Agora tudo pré-multiplicado, igual à Aurora,
+   que já funcionava.
 
 ## D-29 · A marca tem duas variantes, e escolher errado some com ela
 

@@ -152,7 +152,10 @@ export function Aurora({
             return [c.r, c.g, c.b]
           }),
         },
-        uResolution: { value: [node.offsetWidth, node.offsetHeight] },
+        // Em pixels do buffer: gl_FragCoord também é. Com uResolution em
+        // pixels CSS, uv ia de 0 a dpr — e a aurora saía diferente entre um
+        // monitor retina e um comum.
+        uResolution: { value: [1, 1] },
         uBlend: { value: blend },
       },
     })
@@ -163,7 +166,7 @@ export function Aurora({
     function resize() {
       if (!node) return
       renderer.setSize(node.offsetWidth, node.offsetHeight)
-      program.uniforms.uResolution.value = [node.offsetWidth, node.offsetHeight]
+      program.uniforms.uResolution.value = [gl.canvas.width, gl.canvas.height]
     }
     resize()
     window.addEventListener('resize', resize)

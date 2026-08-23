@@ -30,7 +30,7 @@ export default async function EntrarPage({
           e vidro sem luz atrás é só um retângulo escuro. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-[14vh] h-[86vh] opacity-80"
+        className="pointer-events-none absolute inset-x-0 top-[6vh] h-[94vh]"
         style={{
           // Máscara em style inline, não em classe: a borda do canvas precisa
           // sumir de verdade, e um utilitário que não compile deixa uma linha
@@ -41,7 +41,7 @@ export default async function EntrarPage({
             'linear-gradient(180deg, transparent 0%, #000 24%, #000 70%, transparent 100%)',
         }}
       >
-        <Aurora className="size-full" />
+        <Aurora className="size-full" amplitude={1.15} blend={0.62} />
       </div>
 
       <div
@@ -54,11 +54,15 @@ export default async function EntrarPage({
         className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(5,7,20,0.35)_0%,rgba(5,7,20,0.75)_45%,var(--color-navy-deep)_88%)]"
       />
 
-      {/* Athena vem DEPOIS da vinheta, de propósito. Antes dela, o degradê
+      {/* Athena vem DEPOIS da vinheta, de propósito: antes dela, o degradê
           escuro apagava a figura — e o pedido era sutil, não invisível.
-          Fica no terço direito, alta o bastante para o cartão de vidro pousar
-          sobre ela: é o que o vidro tem para difundir. */}
-      <Athena className="inset-y-0 right-[-10%] w-[86%] lg:right-[-3%] lg:w-[54%]" />
+          Grande e ancorada embaixo à direita, ela preenche a metade inferior
+          que antes era só escuro, e o cartão de vidro pousa sobre o peitoral
+          dela — é o que o vidro tem para difundir. */}
+      <Athena
+        opacity={0.26}
+        className="top-[2vh] right-[-14%] h-[112vh] w-[104%] sm:right-[-8%] sm:w-[88%] lg:top-[-4vh] lg:right-[-2%] lg:h-[122vh] lg:w-[62%]"
+      />
 
       {/* --- Conteúdo ------------------------------------------------------ */}
       <div className="relative mx-auto flex min-h-dvh w-full max-w-6xl flex-col justify-between gap-16 px-6 py-10 lg:py-16">
