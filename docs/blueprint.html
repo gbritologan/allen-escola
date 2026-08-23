@@ -1,0 +1,978 @@
+<title>Blueprint da Allen Escola</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,500&display=swap">
+
+<style>
+:root{
+  --bg:#050714;
+  --surface:#0A0F2E;
+  --surface-2:#12173D;
+  --ink:#F3F5FC;
+  --ink-2:#B9C0DC;
+  --ink-3:#7E87AB;
+  --line:rgba(243,245,252,.09);
+  --line-2:rgba(243,245,252,.18);
+  --blue:#1201F5;
+  --blue-light:#4C41FF;
+  --glow:rgba(76,65,255,.30);
+  --ok:#48D6A8;
+  --warn:#E8B14C;
+  --font-display:"Inter Tight","Inter",system-ui,-apple-system,sans-serif;
+  --font-body:"Inter",system-ui,-apple-system,sans-serif;
+  --font-editorial:"Fraunces",Georgia,serif;
+  --font-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --r:14px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:32px}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink-2);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.68;
+  -webkit-font-smoothing:antialiased;
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none !important;transition:none !important}
+}
+
+/* ---------- atmosphere ---------- */
+.aura{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(760px 420px at 76% -6%, rgba(18,1,245,.30), transparent 70%),
+    radial-gradient(620px 380px at 4% 34%, rgba(76,65,255,.11), transparent 72%);
+}
+
+/* ---------- shell ---------- */
+.shell{position:relative;z-index:1;max-width:1220px;margin:0 auto;padding:0 28px 120px}
+.grid{display:grid;grid-template-columns:230px minmax(0,1fr);gap:72px;align-items:start}
+@media (max-width:980px){ .grid{grid-template-columns:1fr;gap:0} .toc{display:none} }
+
+/* ---------- masthead ---------- */
+.masthead{padding:76px 0 40px;display:flex;flex-direction:column;gap:26px;max-width:820px}
+.brandline{display:flex;align-items:center;gap:14px}
+.mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(145deg,var(--blue-light),var(--blue));box-shadow:0 0 0 1px rgba(255,255,255,.14) inset,0 8px 26px var(--glow);flex:none}
+.brandline b{font-family:var(--font-display);font-weight:600;color:var(--ink);letter-spacing:-.01em;font-size:15px}
+.brandline span{color:var(--ink-3);font-size:13.5px}
+h1{
+  font-family:var(--font-display);font-weight:600;color:var(--ink);
+  font-size:clamp(34px,5.6vw,58px);line-height:1.02;letter-spacing:-.033em;
+  margin:0;text-wrap:balance;
+}
+h1 em{font-family:var(--font-editorial);font-style:italic;font-weight:400;color:var(--blue-light);letter-spacing:-.01em}
+.deck{font-size:19px;line-height:1.6;color:var(--ink-2);max-width:62ch;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px;padding-top:6px}
+.meta span{
+  font-size:12px;letter-spacing:.03em;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:rgba(10,15,46,.6)
+}
+.meta span b{color:var(--ink-2);font-weight:500}
+
+/* ---------- toc ---------- */
+.toc{position:sticky;top:32px;padding-top:82px;display:flex;flex-direction:column;gap:2px}
+.toc .lbl{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);padding:0 0 12px 11px}
+.toc a{
+  display:grid;grid-template-columns:24px 1fr;gap:8px;align-items:baseline;
+  text-decoration:none;color:var(--ink-3);font-size:13.5px;line-height:1.35;
+  padding:6px 10px;border-radius:8px;border-left:2px solid transparent;transition:color .18s,background .18s,border-color .18s
+}
+.toc a i{font-style:normal;font-variant-numeric:tabular-nums;font-size:11px;opacity:.7}
+.toc a:hover{color:var(--ink-2);background:rgba(243,245,252,.04)}
+.toc a.on{color:var(--ink);border-left-color:var(--blue-light);background:rgba(76,65,255,.08)}
+.toc a:focus-visible{outline:2px solid var(--blue-light);outline-offset:2px}
+
+/* ---------- sections ---------- */
+main{display:flex;flex-direction:column;gap:88px;padding-top:82px;max-width:none}
+section{display:flex;flex-direction:column;gap:22px;scroll-margin-top:28px}
+.head{display:flex;flex-direction:column;gap:10px}
+.eyebrow{
+  font-size:10.5px;letter-spacing:.17em;text-transform:uppercase;color:var(--ink-3);
+  display:flex;align-items:center;gap:10px
+}
+.eyebrow::before{content:"";width:20px;height:1px;background:var(--line-2)}
+h2{
+  font-family:var(--font-display);font-weight:600;color:var(--ink);
+  font-size:clamp(25px,3.1vw,33px);line-height:1.12;letter-spacing:-.026em;margin:0;text-wrap:balance
+}
+h3{
+  font-family:var(--font-display);font-weight:600;color:var(--ink);
+  font-size:17px;letter-spacing:-.012em;margin:0;line-height:1.35
+}
+h4{font-family:var(--font-display);font-weight:600;color:var(--ink-2);font-size:13px;letter-spacing:.02em;margin:0;text-transform:uppercase}
+p{margin:0;max-width:70ch}
+a{color:var(--blue-light)}
+strong{color:var(--ink);font-weight:600}
+code{font-family:var(--font-mono);font-size:.87em;color:#C9CEEF;background:rgba(76,65,255,.13);border:1px solid rgba(76,65,255,.18);padding:1px 5px;border-radius:5px;white-space:nowrap}
+
+ul{margin:0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:9px;max-width:70ch}
+ul li{position:relative;padding-left:19px}
+ul li::before{content:"";position:absolute;left:2px;top:11px;width:5px;height:5px;border-radius:50%;background:var(--line-2)}
+ul li strong{color:var(--ink)}
+
+/* ---------- blocks ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px;display:flex;flex-direction:column;gap:12px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:14px}
+.cols-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+
+.glass{
+  background:rgba(18,23,61,.55);
+  backdrop-filter:blur(22px) saturate(140%);
+  -webkit-backdrop-filter:blur(22px) saturate(140%);
+  border:1px solid rgba(243,245,252,.13);
+  border-top-color:rgba(243,245,252,.22);
+  border-radius:var(--r);
+  box-shadow:0 22px 60px rgba(2,3,12,.6), 0 0 60px -30px var(--glow);
+  padding:22px 24px;display:flex;flex-direction:column;gap:12px
+}
+
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 9px;border:1px solid var(--line-2);color:var(--ink-3);font-weight:500;white-space:nowrap}
+.pill.mvp{color:var(--ok);border-color:rgba(72,214,168,.34);background:rgba(72,214,168,.09)}
+.pill.next{color:var(--blue-light);border-color:rgba(76,65,255,.4);background:rgba(76,65,255,.11)}
+.pill.later{color:var(--ink-3)}
+.pill.warn{color:var(--warn);border-color:rgba(232,177,76,.34);background:rgba(232,177,76,.09)}
+
+.quote{
+  font-family:var(--font-editorial);font-style:italic;font-weight:400;
+  font-size:clamp(21px,2.6vw,27px);line-height:1.32;color:var(--ink);
+  border-left:2px solid var(--blue-light);padding-left:22px;max-width:26ch;letter-spacing:-.01em
+}
+
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:560px}
+th,td{text-align:left;padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{font-family:var(--font-display);font-weight:600;color:var(--ink);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;background:rgba(243,245,252,.03);white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+td b{color:var(--ink);font-weight:600}
+td.n{font-variant-numeric:tabular-nums;color:var(--ink-3);white-space:nowrap}
+.yes{color:var(--ok);font-weight:600}
+.no{color:#6A7196}
+.part{color:var(--warn);font-weight:600}
+
+pre{
+  font-family:var(--font-mono);font-size:12.5px;line-height:1.62;color:var(--ink-2);
+  margin:0;padding:20px 22px;overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  white-space:pre;tab-size:2
+}
+pre b{color:var(--ink);font-weight:600}
+pre i{color:var(--ink-3);font-style:normal}
+pre u{color:var(--blue-light);text-decoration:none}
+
+/* ---------- wireframes ---------- */
+.wire{border:1px solid var(--line);border-radius:var(--r);background:#070B1E;overflow:hidden}
+.wire .bar{height:30px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:6px;padding:0 12px;background:rgba(243,245,252,.02)}
+.wire .bar i{width:7px;height:7px;border-radius:50%;background:var(--line-2);flex:none}
+.wire .bar em{font-style:normal;font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3);margin-left:8px}
+.wf{padding:16px;display:flex;gap:14px}
+.wf .rail{width:96px;flex:none;display:flex;flex-direction:column;gap:7px}
+.wf .body{flex:1;display:flex;flex-direction:column;gap:12px;min-width:0}
+.b{background:rgba(243,245,252,.055);border:1px solid rgba(243,245,252,.06);border-radius:7px}
+.b.t{background:transparent;border-style:dashed}
+.b.a{background:linear-gradient(135deg,rgba(76,65,255,.85),rgba(18,1,245,.85));border-color:transparent;box-shadow:0 6px 20px -8px var(--glow)}
+.b.g{background:rgba(18,23,61,.7);backdrop-filter:blur(10px);border-color:rgba(243,245,252,.13)}
+.lab{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);padding:6px 9px;line-height:1.4}
+.lab.on{color:var(--ink)}
+.lab.acc{color:#EEF0FF}
+.row{display:flex;gap:10px}
+.h-sm{height:26px}.h-md{height:52px}.h-lg{height:100px}.h-xl{height:150px}
+.f1{flex:1;min-width:0}
+
+/* ---------- flow ---------- */
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.step{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:8px 13px;font-size:13px;color:var(--ink-2)}
+.step b{color:var(--ink);font-weight:600}
+.step.acc{border-color:rgba(76,65,255,.45);background:rgba(76,65,255,.1);color:var(--ink)}
+.arw{color:var(--ink-3);font-size:13px}
+
+/* ---------- swatches ---------- */
+.sw{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px}
+.sw div{border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--surface)}
+.sw div span{display:block;height:56px}
+.sw div p{font-family:var(--font-mono);font-size:10.5px;padding:8px 10px;color:var(--ink-3);line-height:1.5}
+.sw div p b{display:block;font-family:var(--font-display);font-size:11.5px;color:var(--ink-2);letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+
+.q{display:flex;flex-direction:column;gap:5px;padding:14px 0;border-bottom:1px solid var(--line)}
+.q:last-child{border-bottom:none;padding-bottom:0}
+.q b{font-family:var(--font-display);color:var(--ink);font-size:15px;font-weight:600}
+.q span{font-size:14px;color:var(--ink-3);max-width:66ch}
+
+footer{margin-top:96px;padding-top:34px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+footer p{font-size:14px;color:var(--ink-3)}
+</style>
+
+<div class="aura"></div>
+
+<div class="shell">
+  <header class="masthead">
+    <div class="brandline">
+      <div class="mark"></div>
+      <b>ALLEN</b><span>Escola de habilidades corporativas</span>
+    </div>
+    <h1>Blueprint da <em>Allen Escola</em></h1>
+    <p class="deck">Arquitetura de produto, informação, dados e implementação da plataforma <code>app.allenescola.com</code>. Documento de decisão — nada de código de produto antes da sua validação.</p>
+    <div class="meta">
+      <span>Versão <b>0.2</b></span>
+      <span>22 ago 2026</span>
+      <span>Status: <b>fases 1–4 construídas</b></span>
+      <span>Próxima: <b>autenticação e permissões</b></span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <nav class="toc" aria-label="Índice">
+      <div class="lbl">Índice</div>
+      <a href="#tese"><i>00</i><span>A tese</span></a>
+      <a href="#produto"><i>01</i><span>Arquitetura de produto</span></a>
+      <a href="#ia"><i>02</i><span>Arquitetura de informação</span></a>
+      <a href="#sitemap"><i>03</i><span>Sitemap</span></a>
+      <a href="#nav"><i>04</i><span>Navegação</span></a>
+      <a href="#flows"><i>05</i><span>Fluxos</span></a>
+      <a href="#wireframes"><i>06</i><span>Wireframes</span></a>
+      <a href="#dados"><i>07</i><span>Modelo de dados</span></a>
+      <a href="#permissoes"><i>08</i><span>Permissões</span></a>
+      <a href="#design"><i>09</i><span>Design system</span></a>
+      <a href="#componentes"><i>10</i><span>Componentes</span></a>
+      <a href="#tecnica"><i>11</i><span>Arquitetura técnica</span></a>
+      <a href="#escopo"><i>12</i><span>Escopo do MVP</span></a>
+      <a href="#plano"><i>13</i><span>Plano de execução</span></a>
+      <a href="#divergencias"><i>14</i><span>Divergências</span></a>
+      <a href="#decisoes"><i>15</i><span>O que preciso de você</span></a>
+    </nav>
+
+    <main>
+
+      <!-- 00 -->
+      <section id="tese">
+        <div class="head">
+          <div class="eyebrow">00 · Leitura do briefing</div>
+          <h2>A tese que governa todas as decisões abaixo</h2>
+        </div>
+        <p>Um LMS organiza <strong>conteúdo</strong>. A Allen precisa organizar <strong>aplicação</strong>. Essa diferença não é de tom nem de UI — ela muda o modelo de dados, o que a Home mostra primeiro, o que conta como "concluído" e o que a plataforma consegue medir daqui a dois anos.</p>
+        <p class="quote">A unidade mínima da Allen não é a aula assistida. É a aplicação feita.</p>
+        <p>Por isso <code>applications</code> nasce como entidade de primeira classe no MVP — não como um checkbox dentro de <code>lesson_progress</code>. E por isso a plataforma começa a gravar <strong>sinais de habilidade</strong> desde o primeiro aluno, mesmo sem nenhuma IA no ar: quando o Skill Engine chegar, ele precisa de passado para ler. Passado não se cria retroativamente.</p>
+
+        <div class="cols">
+          <div class="card">
+            <h4>Contexto de negócio</h4>
+            <p style="font-size:14px">Assinatura, 100% online, arena e não arquibancada. Não vira feature.</p>
+          </div>
+          <div class="card">
+            <h4>Experiência</h4>
+            <p style="font-size:14px">Continuar · Aprender · Fazer · Evoluir. Governa hierarquia e navegação.</p>
+          </div>
+          <div class="card">
+            <h4>MVP</h4>
+            <p style="font-size:14px">O ciclo completo: publicar → assistir → aplicar → progredir.</p>
+          </div>
+          <div class="card">
+            <h4>Futuro</h4>
+            <p style="font-size:14px">Skills, agentes, evidências, B2B. Hoje só reservam espaço no schema.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 01 -->
+      <section id="produto">
+        <div class="head">
+          <div class="eyebrow">01 · Product architecture</div>
+          <h2>Uma plataforma, múltiplas experiências</h2>
+        </div>
+        <p>Três camadas, com uma regra dura: <strong>nenhuma regra de negócio vive dentro de um componente React</strong>. É isso que torna o app nativo possível depois sem reescrever a escola.</p>
+
+        <pre>
+┌─────────────────────────────────────────────────────────────────┐
+│  <b>EXPERIÊNCIAS</b>                                                    │
+│                                                                 │
+│   Web Aluno        Allen Admin       <i>iOS / Android (Expo)</i>        │
+│   Next.js RSC      Next.js RSC       <i>fase futura</i>                 │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │  consomem o mesmo core tipado
+┌───────────────────────────┴─────────────────────────────────────┐
+│  <b>CORE DE DOMÍNIO</b>  <u>src/core/  — TypeScript puro, zero React</u>       │
+│                                                                 │
+│   catalog/   progress/   applications/   identity/   skills/    │
+│   ─ tipos do domínio  ─ queries  ─ regras  ─ políticas          │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │
+┌───────────────────────────┴─────────────────────────────────────┐
+│  <b>PLATAFORMA</b>                                                      │
+│                                                                 │
+│   Supabase Postgres + <u>RLS = fonte de verdade de permissão</u>       │
+│   Supabase Auth · Storage (capas, materiais)                    │
+│   Provider de vídeo (HLS assinado) · Edge Functions             │
+└─────────────────────────────────────────────────────────────────┘</pre>
+
+        <div class="cols-2">
+          <div class="card">
+            <h3>Decisão: monorepo só quando o mobile existir</h3>
+            <p style="font-size:14.5px">Começar com <code>packages/</code> hoje é cerimônia sem retorno. A garantia de portabilidade vem de uma <strong>regra de lint</strong>: <code>src/core/**</code> não pode importar <code>react</code>, <code>next/*</code> nem nada de <code>src/app/**</code>. Quando o Expo entrar, <code>src/core</code> vira <code>packages/core</code> em um dia.</p>
+          </div>
+          <div class="card">
+            <h3>Decisão: o app nativo consome o Supabase direto</h3>
+            <p style="font-size:14.5px">Nada de construir uma API REST intermediária "para o mobile". Com RLS correta, o cliente nativo usa o mesmo SDK, a mesma sessão e as mesmas políticas. A API própria só aparece se o vídeo ou a IA exigirem segredo de servidor — e aí é uma Route Handler pontual, não uma camada.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 -->
+      <section id="ia">
+        <div class="head">
+          <div class="eyebrow">02 · Information architecture</div>
+          <h2>Como o conteúdo se organiza</h2>
+        </div>
+
+        <pre>
+<b>TEMA</b>  ────────────╮  (N:N)
+ Dados e Tecnologia │
+ Marketing          ├──▶  <b>CURSO</b>  ──▶  <b>MÓDULO</b>  ──▶  <b>AULA</b>
+ Ferramentas        │      format:          ordem         ┌ vídeo
+ Inteligência Art.  │      • curso                        ├ <u>PARA SABER</u>
+ Vendas             │      • masterclass                  ├ <u>PARA FAZER</u> ──▶ <b>APLICAÇÃO</b>
+ <i>…criáveis no Admin</i>╯      instrutor                       └ materiais         │
+                                                                              ▼
+                          <b>SKILL</b> ◀── peso ──────────────────────────────  <b>SINAL</b>
+                          <i>camada preparada, sem UI no MVP</i></pre>
+
+        <ul>
+          <li><strong>Tema é dado, não código.</strong> Criar, editar, reordenar e arquivar pelo Admin. A Home e o Explorar renderizam N temas sem tocar em nada — testo com 50 temas antes de entregar.</li>
+          <li><strong>Curso pertence a vários temas</strong> via <code>course_themes</code>, com posição por tema (um curso pode ser o 1º de "Vendas" e o 7º de "IA").</li>
+          <li><strong>Masterclass é formato, não lugar.</strong> Muda a apresentação e ganha superfície própria, mas continua indexada nos temas e na busca como qualquer curso.</li>
+          <li><strong>Aula é a unidade de valor.</strong> Vídeo, Para Saber, Para Fazer. Sem Para Fazer, a aula pode ser publicada — mas o Content Studio avisa, porque é a exceção e não a regra.</li>
+        </ul>
+      </section>
+
+      <!-- 03 -->
+      <section id="sitemap">
+        <div class="head">
+          <div class="eyebrow">03 · Sitemap</div>
+          <h2>Rotas</h2>
+        </div>
+        <div class="cols-2">
+          <div>
+            <pre>
+<b>ALUNO</b>   app.allenescola.com
+
+/                      <i>Home da jornada</i>
+/explorar              <i>todos os temas</i>
+/tema/[slug]           <i>curadoria do tema</i>
+/masterclass           <i>vitrine editorial</i>
+/curso/[slug]          <i>sumário + módulos</i>
+/curso/[slug]/[aula]   <i>experiência da aula</i>
+/jornada               <i>progresso e aplicações</i>
+/buscar                <i>overlay + rota real</i>
+/conta                 <i>perfil, sessão, plano</i>
+
+<b>AUTENTICAÇÃO</b>
+/entrar
+/auth/callback
+/primeiro-acesso       <i>3 telas, pulável</i></pre>
+          </div>
+          <div>
+            <pre>
+<b>ALLEN ADMIN</b>   /admin
+
+/admin                 <i>o que precisa de você</i>
+/admin/temas
+/admin/cursos
+/admin/cursos/[id]     <b>CONTENT STUDIO</b>
+   ├ visão geral       <i>capa, temas, formato</i>
+   ├ currículo         <i>módulos e aulas</i>
+   └ aula/[id]         <i>editor da aula</i>
+/admin/instrutores
+/admin/pessoas         <i>alunos e equipe</i>
+/admin/midia           <i>uploads e materiais</i>
+
+<i>Rota isolada: layout, navegação e
+bundle próprios. O aluno nunca
+baixa um byte do Admin.</i></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 -->
+      <section id="nav">
+        <div class="head">
+          <div class="eyebrow">04 · Navegação</div>
+          <h2>Seis áreas conceituais, quatro destinos reais</h2>
+        </div>
+        <p>O briefing lista Home, Explorar, Masterclass, Minha Jornada, Perfil e Busca — e pede julgamento em vez de transcrição. Meu julgamento:</p>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Área</th><th>Desktop</th><th>Mobile</th><th>Por quê</th></tr></thead>
+            <tbody>
+              <tr><td><b>Home</b></td><td>Barra superior</td><td>Dock 1</td><td>Destino permanente.</td></tr>
+              <tr><td><b>Explorar</b></td><td>Barra superior</td><td>Dock 2</td><td>Destino permanente.</td></tr>
+              <tr><td><b>Minha Jornada</b></td><td>Barra superior</td><td>Dock 3</td><td>Destino permanente.</td></tr>
+              <tr><td><b>Busca</b></td><td>Barra + <code>⌘K</code></td><td>Dock 4</td><td>No mobile é destino; no desktop, atalho — nunca o único caminho.</td></tr>
+              <tr><td><b>Masterclass</b></td><td>Bloco na Home + faixa no topo do Explorar</td><td>idem</td><td><b>Não é um lugar, é conteúdo.</b> Virar 5º destino enfraquece os outros quatro e finge um catálogo que ainda não existe.</td></tr>
+              <tr><td><b>Perfil</b></td><td>Avatar à direita da barra</td><td>Avatar no header</td><td>Ninguém navega para o perfil. Vai-se lá por um motivo.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="glass">
+          <h3>Decisão revista: sem sidebar na área do aluno <span class="pill next">22 ago</span></h3>
+          <p style="font-size:14.5px">A primeira versão deste documento propunha um rail fixo à esquerda. Ele foi descartado, e a objeção do Gabriel estava certa: um rail reserva 240px permanentes de <em>chrome de aplicativo</em> e espreme todo o conteúdo numa coluna estreita. É esse gesto — não os ícones — que faz um produto parecer painel de controle. A Allen é editorial.</p>
+          <p style="font-size:14.5px">No lugar dele: <strong>barra superior fina no desktop</strong> com conteúdo full-bleed, <strong>dock de vidro flutuante no mobile</strong>, e <strong>chrome que desaparece dentro da aula</strong>, voltando como overlay ao primeiro movimento do mouse. O vidro passa a ser vidro de verdade: há conteúdo correndo por trás dele.</p>
+          <p style="font-size:14.5px"><strong>O Admin mantém o rail.</strong> Ali é ferramenta, usada horas seguidas, e estrutura persistente ajuda — o que ainda reforça o §19: aluno e Admin devem parecer dois mundos.</p>
+          <p style="font-size:14.5px"><strong>Requisito que acompanha a decisão:</strong> rápido de aprender, zero risco de descoberta. Os quatro destinos ficam sempre visíveis, com rótulo em texto e não só ícone; o dock mobile também leva rótulo; nada existe apenas atrás de <code>⌘K</code>; e o único movimento é a barra sumir ao rolar para baixo e voltar ao rolar para cima.</p>
+        </div>
+        <p><strong>Sem parede de escolha na entrada.</strong> O primeiro acesso pergunta no máximo três coisas — o que você quer desenvolver, seu contexto de trabalho, quanto tempo por semana — todas puláveis, todas apenas ordenando a Home. Nunca trancando conteúdo.</p>
+      </section>
+
+      <!-- 05 -->
+      <section id="flows">
+        <div class="head">
+          <div class="eyebrow">05 · User flows</div>
+          <h2>Os dois fluxos que precisam estar perfeitos</h2>
+        </div>
+
+        <h3>Core journey — o ciclo do aluno</h3>
+        <div class="flow">
+          <span class="step">Entra</span><span class="arw">→</span>
+          <span class="step acc"><b>Home</b> responde "onde eu parei"</span><span class="arw">→</span>
+          <span class="step">Continuar</span><span class="arw">→</span>
+          <span class="step">Aula retoma no segundo exato</span><span class="arw">→</span>
+          <span class="step">Para Saber</span><span class="arw">→</span>
+          <span class="step acc"><b>Para Fazer</b></span><span class="arw">→</span>
+          <span class="step">Marca aplicação</span><span class="arw">→</span>
+          <span class="step">Próxima aula sugerida</span><span class="arw">→</span>
+          <span class="step">Jornada atualiza</span>
+        </div>
+        <div class="glass">
+          <h3>O momento de maior atrito do produto inteiro</h3>
+          <p style="font-size:14.5px">É a passagem <strong>vídeo terminou → e agora?</strong> Todo LMS empurra "próxima aula" e ensina o aluno a acumular. A Allen precisa parar ali: o fim do vídeo revela o <strong>Para Fazer</strong> em foco, com a próxima aula visivelmente em segundo plano. Um gesto de UI — e é a diferença entre uma escola de aplicação e uma videoteca.</p>
+        </div>
+
+        <h3 style="margin-top:14px">Admin journey — do zero ao ar</h3>
+        <div class="flow">
+          <span class="step">Cria tema</span><span class="arw">→</span>
+          <span class="step">Novo curso <i style="color:var(--ink-3);font-style:normal">(rascunho)</i></span><span class="arw">→</span>
+          <span class="step">Módulos</span><span class="arw">→</span>
+          <span class="step">Aulas</span><span class="arw">→</span>
+          <span class="step acc">Upload do vídeo <b>em background</b></span><span class="arw">→</span>
+          <span class="step">Para Saber · Para Fazer</span><span class="arw">→</span>
+          <span class="step">Pré-visualiza como aluno</span><span class="arw">→</span>
+          <span class="step acc"><b>Publicar</b></span>
+        </div>
+        <ul>
+          <li><strong>Rascunho é o estado natural.</strong> Tudo nasce invisível para o aluno. Publicar é um ato deliberado, com checagem do que falta (vídeo pronto? capa? Para Fazer?).</li>
+          <li><strong>Upload nunca prende a tela.</strong> Envia direto do navegador para o provedor de vídeo, com progresso persistente — você continua escrevendo o Para Saber enquanto o vídeo processa.</li>
+          <li><strong>Publicação em cascata é explícita.</strong> Publicar o curso pergunta se leva junto os módulos e aulas prontos. Nada some por acidente, nada vaza por acidente.</li>
+        </ul>
+      </section>
+
+      <!-- 06 -->
+      <section id="wireframes">
+        <div class="head">
+          <div class="eyebrow">06 · Wireframes</div>
+          <h2>Estrutura antes de estética</h2>
+        </div>
+        <p>Sem cor, sem tipografia, sem vidro — só hierarquia. É isso que precisa ser validado antes de qualquer pixel.</p>
+
+        <div class="cols-2">
+          <div class="card" style="padding:0;overflow:hidden">
+            <div class="wire" style="border:none">
+              <div class="bar"><i></i><i></i><i></i><em>Home · desktop</em></div>
+              <div class="wf" style="flex-direction:column">
+                <div class="row" style="align-items:center;gap:14px">
+                  <div class="lab on" style="padding:0">◆ allen</div>
+                  <div class="lab on" style="padding:0">Início</div>
+                  <div class="lab" style="padding:0">Explorar</div>
+                  <div class="lab" style="padding:0">Jornada</div>
+                  <div style="flex:1"></div>
+                  <div class="lab" style="padding:0">⌘K</div>
+                  <div class="b" style="height:13px;width:13px;border-radius:50%"></div>
+                </div>
+                <div class="body">
+                  <div class="b h-xl" style="position:relative">
+                    <div class="lab">Continue de onde parou</div>
+                    <div style="padding:0 9px;display:flex;flex-direction:column;gap:7px">
+                      <div class="b" style="height:14px;width:52%;background:rgba(243,245,252,.14)"></div>
+                      <div class="b" style="height:9px;width:34%"></div>
+                      <div class="b" style="height:4px;width:68%;background:linear-gradient(90deg,var(--blue-light) 68%,rgba(243,245,252,.08) 68%);border:none"></div>
+                      <div class="row" style="padding-top:4px">
+                        <div class="b a" style="height:24px;width:104px"><div class="lab acc">Continuar</div></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="b h-md"><div class="lab">Masterclass em destaque · 1 card largo</div></div>
+                  <div><div class="lab" style="padding-left:0">Recomendado para você</div>
+                    <div class="row"><div class="b h-lg f1"></div><div class="b h-lg f1"></div><div class="b h-lg f1"></div></div>
+                  </div>
+                  <div><div class="lab" style="padding-left:0">Explorar por tema · N temas</div>
+                    <div class="row"><div class="b h-sm f1"></div><div class="b h-sm f1"></div><div class="b h-sm f1"></div><div class="b h-sm f1"></div></div>
+                  </div>
+                  <div class="b h-md t"><div class="lab">Sua jornada · resumo em 1 linha</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:0;overflow:hidden">
+            <div class="wire" style="border:none">
+              <div class="bar"><i></i><i></i><i></i><em>Aula · desktop</em></div>
+              <div class="wf" style="flex-direction:column">
+                <div class="row">
+                  <div class="b" style="height:11px;width:38%"><div class="lab" style="padding:0 6px">Curso › Módulo 02 › Aula 04</div></div>
+                </div>
+                <div class="row">
+                  <div class="f1" style="display:flex;flex-direction:column;gap:10px">
+                    <div class="b h-xl" style="display:flex;align-items:flex-end;padding:8px">
+                      <div class="b g" style="height:22px;width:100%"><div class="lab">⏵ ━━━━━━━━━━━━ controles em vidro</div></div>
+                    </div>
+                    <div class="b" style="height:13px;width:64%;background:rgba(243,245,252,.14)"></div>
+                    <div class="b" style="height:8px;width:40%"></div>
+                    <div class="b h-lg" style="border-left:2px solid rgba(243,245,252,.3)"><div class="lab on">Para saber</div><div style="padding:0 9px;display:flex;flex-direction:column;gap:5px"><div class="b" style="height:6px"></div><div class="b" style="height:6px;width:86%"></div><div class="b" style="height:6px;width:72%"></div></div></div>
+                    <div class="b h-lg" style="border-left:2px solid var(--blue-light);background:rgba(76,65,255,.09)">
+                      <div class="lab on">Para fazer</div>
+                      <div style="padding:0 9px;display:flex;flex-direction:column;gap:6px">
+                        <div class="b" style="height:6px;width:78%"></div>
+                        <div class="b" style="height:6px;width:56%"></div>
+                        <div class="b a" style="height:22px;width:150px"><div class="lab acc">Marcar como aplicada</div></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="width:118px;flex:none;display:flex;flex-direction:column;gap:6px">
+                    <div class="lab" style="padding:0">Neste módulo</div>
+                    <div class="b" style="height:18px;background:rgba(76,65,255,.16)"></div>
+                    <div class="b" style="height:18px"></div>
+                    <div class="b" style="height:18px"></div>
+                    <div class="b" style="height:18px"></div>
+                    <div class="b h-md t"><div class="lab">Materiais</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:0;overflow:hidden">
+            <div class="wire" style="border:none">
+              <div class="bar"><i></i><i></i><i></i><em>Content Studio · editor da aula</em></div>
+              <div class="wf">
+                <div class="rail" style="width:112px">
+                  <div class="lab" style="padding:0 0 2px">Currículo</div>
+                  <div class="b" style="height:13px"><div class="lab" style="padding:2px 6px">Módulo 01</div></div>
+                  <div class="b" style="height:12px;margin-left:8px"></div>
+                  <div class="b" style="height:12px;margin-left:8px;background:rgba(76,65,255,.18)"></div>
+                  <div class="b" style="height:13px"><div class="lab" style="padding:2px 6px">Módulo 02</div></div>
+                  <div class="b" style="height:12px;margin-left:8px"></div>
+                  <div class="b h-sm t"><div class="lab">+ módulo</div></div>
+                </div>
+                <div class="body">
+                  <div class="row">
+                    <div class="b f1" style="height:22px"><div class="lab">Título da aula</div></div>
+                    <div class="b t" style="height:22px;width:76px"><div class="lab">Rascunho</div></div>
+                    <div class="b a" style="height:22px;width:76px"><div class="lab acc">Publicar</div></div>
+                  </div>
+                  <div class="b h-lg" style="border-style:dashed"><div class="lab">Vídeo — arraste ou selecione · <span style="color:var(--ok)">processando 62%</span></div></div>
+                  <div class="row">
+                    <div class="b f1 h-md"><div class="lab">Para saber · editor rico</div></div>
+                    <div class="b f1 h-md" style="background:rgba(76,65,255,.09)"><div class="lab">Para fazer · editor rico</div></div>
+                  </div>
+                  <div class="row">
+                    <div class="b f1" style="height:24px"><div class="lab">Materiais</div></div>
+                    <div class="b f1" style="height:24px"><div class="lab">Duração · auto</div></div>
+                    <div class="b f1" style="height:24px"><div class="lab">Skills</div></div>
+                  </div>
+                  <div class="b t" style="height:18px"><div class="lab">salvo automaticamente · ver como aluno</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:0;overflow:hidden">
+            <div class="wire" style="border:none">
+              <div class="bar"><i></i><i></i><i></i><em>Mobile · Home e Aula</em></div>
+              <div class="wf" style="justify-content:center;gap:18px">
+                <div style="width:132px;display:flex;flex-direction:column;gap:8px">
+                  <div class="row"><div class="b f1" style="height:14px"><div class="lab">Allen</div></div><div class="b" style="height:14px;width:14px;border-radius:50%"></div></div>
+                  <div class="b h-lg">
+                    <div class="lab">Continue</div>
+                    <div style="padding:0 8px;display:flex;flex-direction:column;gap:5px">
+                      <div class="b" style="height:9px;width:80%;background:rgba(243,245,252,.14)"></div>
+                      <div class="b" style="height:3px;width:66%;background:linear-gradient(90deg,var(--blue-light) 66%,rgba(243,245,252,.08) 66%);border:none"></div>
+                      <div class="b a" style="height:18px;width:74px"><div class="lab acc">Continuar</div></div>
+                    </div>
+                  </div>
+                  <div class="b h-md"><div class="lab">Masterclass</div></div>
+                  <div class="row"><div class="b f1" style="height:44px"></div><div class="b f1" style="height:44px"></div></div>
+                  <div style="flex:1"></div>
+                  <div class="b g" style="height:30px;display:flex;align-items:center"><div class="lab on" style="flex:1;text-align:center;padding:0">Início</div><div class="lab" style="flex:1;text-align:center;padding:0">Explorar</div><div class="lab" style="flex:1;text-align:center;padding:0">Jornada</div><div class="lab" style="flex:1;text-align:center;padding:0">Buscar</div></div>
+                </div>
+                <div style="width:132px;display:flex;flex-direction:column;gap:8px">
+                  <div class="b" style="height:74px;display:flex;align-items:flex-end;padding:5px"><div class="b g" style="height:14px;width:100%"><div class="lab" style="padding:2px 5px">⏵ ━━━━━━</div></div></div>
+                  <div class="b" style="height:10px;width:76%;background:rgba(243,245,252,.14)"></div>
+                  <div class="row"><div class="b f1" style="height:16px;background:rgba(243,245,252,.1)"><div class="lab on" style="padding:3px 6px">Saber</div></div><div class="b f1" style="height:16px"><div class="lab">Fazer</div></div></div>
+                  <div class="b" style="height:52px"><div style="padding:8px;display:flex;flex-direction:column;gap:5px"><div class="b" style="height:5px"></div><div class="b" style="height:5px;width:88%"></div><div class="b" style="height:5px;width:64%"></div></div></div>
+                  <div style="flex:1"></div>
+                  <div class="b a" style="height:26px"><div class="lab acc" style="text-align:center;padding-top:7px">Marcar como aplicada</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p><strong>Mobile não é desktop encolhido.</strong> Para Saber e Para Fazer viram abas em vez de empilhar 1.200px de scroll; o CTA de aplicação fica ancorado no rodapé, dentro do alcance do polegar; o player entra em fullscreen nativo na rotação.</p>
+      </section>
+
+      <!-- 07 -->
+      <section id="dados">
+        <div class="head">
+          <div class="eyebrow">07 · Data model</div>
+          <h2>Schema do MVP, com espaço reservado para o futuro</h2>
+        </div>
+        <pre>
+<i>-- identidade ------------------------------------------------------</i>
+<b>profiles</b>          id ᐧ nome ᐧ avatar ᐧ role ᐧ onboarding ᐧ criado_em
+                  <i>role: 'admin' | 'editor' | 'student'  (espelhado no JWT)</i>
+<b>subscriptions</b>     user ᐧ status ᐧ plano ᐧ inicio ᐧ fim
+                  <i>sem cobrança no MVP; existe para o gate nascer certo</i>
+
+<i>-- catálogo -------------------------------------------------------</i>
+<b>themes</b>            id ᐧ slug ᐧ nome ᐧ descricao ᐧ cor ᐧ posicao ᐧ status
+<b>instructors</b>       id ᐧ nome ᐧ bio ᐧ foto ᐧ titulo
+<b>courses</b>           id ᐧ slug ᐧ titulo ᐧ resumo ᐧ descricao ᐧ capa
+                  ᐧ <u>format</u> ᐧ instructor ᐧ status ᐧ publicado_em ᐧ duracao_cache
+                  <i>format: 'course' | 'masterclass'</i>
+<b>course_themes</b>     course ᐧ theme ᐧ posicao            <i>N:N</i>
+<b>modules</b>           id ᐧ course ᐧ titulo ᐧ posicao ᐧ status
+<b>lessons</b>           id ᐧ module ᐧ slug ᐧ titulo ᐧ descricao ᐧ posicao ᐧ status
+                  ᐧ video_provider ᐧ video_asset_id ᐧ duracao_s
+                  ᐧ <u>para_saber</u> ᐧ <u>para_fazer</u>          <i>rich text</i>
+<b>materials</b>         id ᐧ lesson|course ᐧ tipo ᐧ titulo ᐧ url ᐧ posicao
+
+<i>-- jornada --------------------------------------------------------</i>
+<b>enrollments</b>       user ᐧ course ᐧ iniciado_em ᐧ <u>ultima_lesson</u>
+                  ᐧ <u>progresso_pct</u> ᐧ aulas_feitas ᐧ concluido_em
+                  <i>tabela derivada, mantida por trigger</i>
+<b>lesson_progress</b>   user ᐧ lesson ᐧ status ᐧ posicao_s ᐧ assistido_s ᐧ concluido_em
+<b>applications</b>      user ᐧ lesson ᐧ status ᐧ concluido_em ᐧ nota
+                  ᐧ <u>evidence jsonb</u> ᐧ evidence_type    <i>nulos no MVP</i>
+
+<i>-- skills: gravar agora, exibir depois -----------------------------</i>
+<b>skills</b>            id ᐧ slug ᐧ nome ᐧ descricao
+<b>lesson_skills</b>     lesson ᐧ skill ᐧ peso
+<b>skill_signals</b>     user ᐧ skill ᐧ tipo ᐧ valor ᐧ origem ᐧ criado_em
+                  <i>append-only. É o combustível do Skill Engine.</i>
+<b>skill_scores</b>      user ᐧ skill ᐧ score ᐧ confianca ᐧ atualizado_em
+                  <i>snapshot recalculável; nada de UI no MVP</i></pre>
+
+        <div class="cols-2">
+          <div class="card">
+            <h3><span class="pill next">decisão</span> <code>enrollments</code> derivada, não calculada</h3>
+            <p style="font-size:14.5px">"Continue de onde parou" é a primeira coisa que carrega em toda sessão. Agregar <code>lesson_progress</code> a cada abertura fica lento com o catálogo crescendo. Um trigger atualiza <code>enrollments</code> na conclusão de cada aula, e a Home faz <strong>uma query indexada</strong>.</p>
+          </div>
+          <div class="card">
+            <h3><span class="pill next">decisão</span> <code>format</code> em vez de <code>is_masterclass</code></h3>
+            <p style="font-size:14.5px">Um enum aceita o terceiro formato que vai aparecer (série, workshop, intensivo) sem virar uma família de booleanos mutuamente exclusivos. Atende exatamente o que o briefing pede, com uma porta a mais.</p>
+          </div>
+          <div class="card">
+            <h3><span class="pill next">decisão</span> <code>skill_signals</code> desde o dia um</h3>
+            <p style="font-size:14.5px">Uma tabela append-only, escrita por trigger, sem UI e sem custo perceptível. No dia em que o Skill Engine ligar, ele encontra meses de comportamento real em vez de uma base vazia. É o item de arquitetura mais barato e mais valioso deste documento.</p>
+          </div>
+          <div class="card">
+            <h3><span class="pill later">preparado</span> Evidências</h3>
+            <p style="font-size:14.5px"><code>applications.evidence</code> é <code>jsonb</code> anulável com <code>evidence_type</code>. Arquivo, link, texto ou checklist entram depois <strong>sem migração destrutiva</strong> — e sem nenhuma complexidade agora.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 08 -->
+      <section id="permissoes">
+        <div class="head">
+          <div class="eyebrow">08 · Permission model</div>
+          <h2>A permissão mora no banco</h2>
+        </div>
+        <p>O frontend esconde botões. O <strong>Postgres</strong> nega operações. Se a UI do Admin vazasse inteira para um aluno, ele não conseguiria ler nem escrever uma linha a mais.</p>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Capacidade</th><th>Admin</th><th>Conteudista</th><th>Aluno</th><th style="color:var(--ink-3)">Líder <i style="font-style:normal;font-weight:400">(futuro)</i></th></tr></thead>
+            <tbody>
+              <tr><td>Ler conteúdo publicado</td><td class="yes">sim</td><td class="yes">sim</td><td class="yes">sim</td><td class="yes">sim</td></tr>
+              <tr><td>Ler rascunhos</td><td class="yes">sim</td><td class="yes">sim</td><td class="no">não</td><td class="no">não</td></tr>
+              <tr><td>Criar e editar conteúdo</td><td class="yes">sim</td><td class="yes">sim</td><td class="no">não</td><td class="no">não</td></tr>
+              <tr><td>Publicar</td><td class="yes">sim</td><td class="part">conforme flag</td><td class="no">não</td><td class="no">não</td></tr>
+              <tr><td>Excluir curso com alunos</td><td class="yes">sim</td><td class="no">não</td><td class="no">não</td><td class="no">não</td></tr>
+              <tr><td>Gerir pessoas e papéis</td><td class="yes">sim</td><td class="no">não</td><td class="no">não</td><td class="part">só do time</td></tr>
+              <tr><td>Ver progresso de terceiros</td><td class="yes">sim</td><td class="no">não</td><td class="no">não</td><td class="part">só do time</td></tr>
+              <tr><td>Escrever o próprio progresso</td><td class="yes">sim</td><td class="yes">sim</td><td class="yes">sim</td><td class="yes">sim</td></tr>
+              <tr><td>Billing</td><td class="yes">sim</td><td class="no">não</td><td class="no">não</td><td class="no">não</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="cols-2">
+          <div class="card">
+            <h3>Papel no JWT, não em JOIN</h3>
+            <p style="font-size:14.5px">Se cada política RLS consultar <code>profiles</code>, é um JOIN por linha em toda leitura. O papel é espelhado no token via <em>custom access token hook</em>; a política lê <code>auth.jwt()</code> e custa O(1). Mudança de papel invalida a sessão.</p>
+          </div>
+          <div class="card">
+            <h3>Um único portão de acesso</h3>
+            <p style="font-size:14.5px">Uma função <code>tem_acesso(uid)</code> concentra a regra de "esse usuário pode consumir conteúdo". Hoje devolve verdadeiro para qualquer conta ativa; quando a cobrança existir, muda em <strong>um lugar</strong> — não em quarenta políticas.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 09 -->
+      <section id="design">
+        <div class="head">
+          <div class="eyebrow">09 · Design system</div>
+          <h2>Extensão da identidade Allen, não uma nova</h2>
+        </div>
+        <div class="sw">
+          <div><span style="background:#050714"></span><p><b>Navy Deep</b>#050714<br>fundo</p></div>
+          <div><span style="background:#0A0F2E"></span><p><b>Navy</b>#0A0F2E<br>superfície</p></div>
+          <div><span style="background:#12173D"></span><p><b>Navy Soft</b>#12173D<br>elevado</p></div>
+          <div><span style="background:#1201F5"></span><p><b>Blue</b>#1201F5<br>ação · glow</p></div>
+          <div><span style="background:#4C41FF"></span><p><b>Blue Light</b>#4C41FF<br>estado · foco</p></div>
+          <div><span style="background:#F3F5FC"></span><p><b>Off White</b>#F3F5FC<br>texto</p></div>
+        </div>
+        <p>Os neutros intermediários são derivados do Navy, não de cinza puro: <code>#B9C0DC</code> para texto secundário e <code>#7E87AB</code> para terciário. Cinza neutro sobre azul-marinho parece sujeira; cinza enviesado parece decisão.</p>
+
+        <div class="cols-2">
+          <div class="card">
+            <h3>Tipografia</h3>
+            <ul style="font-size:14.5px">
+              <li><strong>Inter Tight</strong> — títulos e números. Tracking negativo (−0.03em) nos tamanhos grandes.</li>
+              <li><strong>Inter</strong> — corpo, interface, dados. <code>tabular-nums</code> em tudo que é número.</li>
+              <li><strong>Fraunces Italic</strong> — no máximo <strong>um</strong> momento editorial por tela. Abertura de Masterclass, título de tema. Nunca em UI funcional.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Vidro, com regra escrita</h3>
+            <p style="font-size:14.5px">Glass só onde há <strong>algo por baixo que importa</strong>: controles do player, modais, menu de comando, barra mobile, overlay de busca. Card de curso não é vidro. Página não é vidro.</p>
+            <p style="font-size:14.5px">Receita única: blur 22px, saturação 140%, borda superior mais clara que as laterais, sombra longa e difusa.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Motion — quatro primitivas nomeadas</h3>
+          <div class="scroll" style="border:none;background:transparent">
+            <table style="min-width:520px">
+              <thead><tr><th>Nome</th><th>Onde</th><th>Duração</th><th>Curva</th></tr></thead>
+              <tbody>
+                <tr><td><b>rise</b></td><td>entrada de conteúdo · 8px + fade, escalonado 40ms</td><td class="n">240ms</td><td class="n">(.2,.8,.2,1)</td></tr>
+                <tr><td><b>sheen</b></td><td>loading · luz azul atravessando o skeleton</td><td class="n">1400ms loop</td><td class="n">linear</td></tr>
+                <tr><td><b>settle</b></td><td>progresso · barra alcança o valor sem elástico</td><td class="n">420ms</td><td class="n">(.32,.72,0,1)</td></tr>
+                <tr><td><b>bloom</b></td><td>aplicação concluída · glow único que expande e some</td><td class="n">560ms</td><td class="n">(.16,1,.3,1)</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="font-size:14.5px">Quatro primitivas, usadas em todo lugar. É isso que faz a plataforma parecer <strong>uma coisa só</strong> em vez de uma coleção de telas animadas. <code>prefers-reduced-motion</code> desliga deslocamento e loop, mantém opacidade.</p>
+        </div>
+
+        <div class="card">
+          <h3>Loading: nunca tela branca, nunca spinner</h3>
+          <p style="font-size:14.5px">Cada rota tem skeleton com a <strong>forma real</strong> do conteúdo que vem — o layout não pula quando os dados chegam. O <em>sheen</em> azul percorre os blocos. Navegações internas fazem prefetch no hover, então na prática a maior parte já chega pronta.</p>
+        </div>
+      </section>
+
+      <!-- 10 -->
+      <section id="componentes">
+        <div class="head">
+          <div class="eyebrow">10 · Component architecture</div>
+          <h2>Servidor por padrão, cliente por exceção</h2>
+        </div>
+        <pre>
+<b>primitivas</b>     Button · Field · Sheet · Dialog · Tabs · Toast · Skeleton
+               <i>sem conhecimento de domínio · sem biblioteca de UI pronta</i>
+
+<b>superfícies</b>    GlassPanel · Surface · SectionHeader · Rail · BottomBar
+               <i>onde o vidro e a profundidade vivem, e só aqui</i>
+
+<b>domínio</b>       CourseCard · LessonRow · ContinueCard · ThemeChip
+               ProgressMeter · ApplicationToggle · MasterclassHero
+               <i>falam a língua da Allen, não de "item" e "lista"</i>
+
+<b>ilhas cliente</b> <u>LessonPlayer</u>   heartbeat de posição, atalhos, fullscreen
+               <u>ApplicationToggle</u> optimistic update + bloom
+               <u>CommandSearch</u>   ⌘K, debounce, navegação por teclado
+               <u>StudioEditor</u>    autosave, drag & drop, upload
+               <i>tudo o mais é Server Component</i></pre>
+        <ul>
+          <li><strong>Sem biblioteca de componentes.</strong> shadcn/MUI/Chakra trazem uma identidade visual junto — e o pedido é o oposto disso. Primitivas próprias sobre Radix apenas onde acessibilidade é difícil (dialog, tabs, popover).</li>
+          <li><strong>O peso do cliente é orçado.</strong> A rota da aula é a mais pesada e não passa de ~90KB de JS. O Content Studio pode ser pesado — só a equipe entra lá.</li>
+          <li><code>framer-motion</code> só nas ilhas cliente. Entradas e hovers são CSS puro.</li>
+        </ul>
+      </section>
+
+      <!-- 11 -->
+      <section id="tecnica">
+        <div class="head">
+          <div class="eyebrow">11 · Technical architecture</div>
+          <h2>Stack e a decisão de vídeo</h2>
+        </div>
+        <div class="cols">
+          <div class="card"><h4>App</h4><p style="font-size:14px">Next.js (App Router, RSC) · TypeScript estrito · Tailwind com os tokens Allen · Vercel</p></div>
+          <div class="card"><h4>Dados</h4><p style="font-size:14px">Supabase Postgres · RLS · Auth · Storage para capas e materiais</p></div>
+          <div class="card"><h4>Busca</h4><p style="font-size:14px">Postgres full-text em português com <code>unaccent</code>, view materializada</p></div>
+          <div class="card"><h4>Vídeo</h4><p style="font-size:14px">HLS adaptativo com URL assinada de curta duração, atrás de uma interface própria</p></div>
+        </div>
+
+        <h3>Mux ou Bunny Stream</h3>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Critério</th><th>Mux</th><th>Bunny Stream</th></tr></thead>
+            <tbody>
+              <tr><td>Custo por hora entregue</td><td>Bem mais alto</td><td class="yes">Ordem de grandeza mais barato</td></tr>
+              <tr><td>Entrega no Brasil</td><td>Boa</td><td class="yes">CDN forte na América do Sul</td></tr>
+              <tr><td>Upload direto do navegador</td><td class="yes">Excelente</td><td>Bom, com mais trabalho</td></tr>
+              <tr><td>Proteção do link</td><td class="yes">Playback assinado + DRM</td><td>Token com expiração e trava de IP</td></tr>
+              <tr><td>Analytics de retenção</td><td class="yes">Nativo e detalhado</td><td>Básico</td></tr>
+              <tr><td>Risco de troca</td><td colspan="2">Nulo dos dois lados — a interface <code>VideoProvider</code> isola tudo. Trocar = uma implementação nova + reprocessar os vídeos.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="glass">
+          <h3>Recomendação: <strong>Bunny Stream</strong> para o lançamento</h3>
+          <p style="font-size:14.5px">Escola por assinatura com catálogo crescente é um negócio de <strong>custo marginal de entrega</strong>. A diferença de preço aparece exatamente quando a base cresce — o pior momento para descobrir. O analytics do Mux é ótimo, mas as métricas que decidem produto aqui são conclusão de aula e aplicação feita, e essas são nossas, não do player. <span class="pill warn">confirmar preço vigente antes de contratar</span></p>
+        </div>
+
+        <h3>Orçamento de performance</h3>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Métrica</th><th>Alvo</th><th>Como</th></tr></thead>
+            <tbody>
+              <tr><td>LCP da Home</td><td class="n">&lt; 1,4s</td><td>RSC + uma query indexada + capa priorizada</td></tr>
+              <tr><td>JS na rota da aula</td><td class="n">&lt; 90KB</td><td>Player é a única ilha pesada, carregada sob demanda</td></tr>
+              <tr><td>Busca (digitar → ver)</td><td class="n">&lt; 150ms</td><td>Índice materializado + debounce 120ms</td></tr>
+              <tr><td>Tela branca</td><td class="n">nunca</td><td>Skeleton por rota, com a forma do conteúdo</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 12 -->
+      <section id="escopo">
+        <div class="head">
+          <div class="eyebrow">12 · Scope</div>
+          <h2>O que entra, o que fica preparado, o que fica fora</h2>
+        </div>
+        <div class="cols-2">
+          <div class="card">
+            <h3><span class="pill mvp">MVP</span></h3>
+            <ul style="font-size:14.5px">
+              <li>Auth, papéis, primeiro acesso curto</li>
+              <li>Admin + Content Studio completo</li>
+              <li>Temas, cursos, módulos, aulas, instrutores, materiais</li>
+              <li>Upload de vídeo e publicação</li>
+              <li>Home da jornada, Explorar, Tema, Curso</li>
+              <li>Experiência da aula: player, Para Saber, Para Fazer</li>
+              <li>Marcar aplicação · progresso · retomada exata</li>
+              <li>Masterclass com apresentação própria</li>
+              <li>Busca</li>
+              <li>Responsivo real + PWA instalável</li>
+              <li>RLS auditada</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3><span class="pill next">preparado, sem UI</span></h3>
+            <ul style="font-size:14.5px">
+              <li><code>skill_signals</code> sendo gravado</li>
+              <li><code>applications.evidence</code> reservado</li>
+              <li><code>subscriptions</code> + portão de acesso único</li>
+              <li>Core sem React, pronto para Expo</li>
+              <li><code>VideoProvider</code> trocável</li>
+              <li><code>resolveHome()</code> — hoje regras fixas, amanhã recomendação</li>
+            </ul>
+            <h3 style="margin-top:8px"><span class="pill later">fora deste ciclo</span></h3>
+            <ul style="font-size:14.5px">
+              <li>Cobrança e Stripe · B2B multi-assento</li>
+              <li>Certificados · comunidade · ranking</li>
+              <li>Skill Score visível · agentes de IA</li>
+              <li>App nativo publicado</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 13 -->
+      <section id="plano">
+        <div class="head">
+          <div class="eyebrow">13 · Execução</div>
+          <h2>Treze fases, na ordem do briefing</h2>
+        </div>
+        <div class="scroll">
+          <table>
+            <thead><tr><th style="width:34px">#</th><th>Fase</th><th>Entrega concreta</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td class="n">01</td><td><b>Arquitetura de produto</b></td><td>Este documento</td><td><span class="pill mvp">pronta</span></td></tr>
+              <tr><td class="n">02</td><td><b>Design system</b></td><td>Tokens, tipografia, quatro primitivas de motion, componentes, página viva em <code>/design</code></td><td><span class="pill mvp">pronta</span></td></tr>
+              <tr><td class="n">03</td><td><b>Arquitetura técnica</b></td><td>Repositório, <code>src/core</code>, lint de fronteira, proxy de sessão, ponte de tokens</td><td><span class="pill mvp">pronta</span></td></tr>
+              <tr><td class="n">04</td><td><b>Banco de dados</b></td><td>6 migrations, triggers de progresso e de sinais, RLS, seed do catálogo</td><td><span class="pill mvp">pronta</span></td></tr>
+              <tr><td class="n">05</td><td>Autenticação e permissões</td><td>Login, papéis no JWT, RLS aplicada no projeto + testes de política</td><td><span class="pill next">a seguir</span></td></tr>
+              <tr><td class="n">06</td><td>Admin e Content Studio</td><td>A escola fica <b>construível</b> — é o marco que destrava tudo</td><td></td></tr>
+              <tr><td class="n">07</td><td>Área do aluno</td><td>Home, Explorar, Tema, Curso</td><td></td></tr>
+              <tr><td class="n">08</td><td>Player e experiência da aula</td><td>Vídeo, Para Saber, Para Fazer, materiais</td><td></td></tr>
+              <tr><td class="n">09</td><td>Progresso e aplicações</td><td>Retomada exata, marcação, Minha Jornada</td><td></td></tr>
+              <tr><td class="n">10</td><td>Masterclass</td><td>Vitrine e apresentação premium</td><td></td></tr>
+              <tr><td class="n">11</td><td>Busca</td><td>⌘K, índice em português, resultados por tipo</td><td></td></tr>
+              <tr><td class="n">12</td><td>PWA e mobile</td><td>Instalável, offline básico, gestos, revisão de toque</td><td></td></tr>
+              <tr><td class="n">13</td><td>Camada de Skills</td><td>Sinais gravando, mapeamento aula↔skill no Studio</td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>O Content Studio vem antes da área do aluno de propósito.</strong> No dia em que ele ficar pronto, você começa a produzir a escola — e a área do aluno nasce sobre conteúdo real em vez de <em>lorem ipsum</em>. Isso muda a qualidade de tudo que vem depois.</p>
+      </section>
+
+      <!-- 14 -->
+      <section id="divergencias">
+        <div class="head">
+          <div class="eyebrow">14 · Divergências</div>
+          <h2>Onde eu não segui o briefing ao pé da letra</h2>
+        </div>
+        <div class="card">
+          <div class="q"><b><code>format</code> no lugar de <code>is_masterclass</code></b><span>O briefing pede o booleano. Um enum entrega o mesmo comportamento e absorve o próximo formato sem refatorar catálogo, filtros e busca.</span></div>
+          <div class="q"><b>Masterclass não vira item de navegação</b><span>Ela ganha superfície própria e apresentação premium, como pedido — mas como conteúdo em destaque, não como quinta aba. O briefing pede julgamento de UX; esse é o julgamento.</span></div>
+          <div class="q"><b><code>enrollments</code> como tabela derivada</b><span>Uma tabela a mais que o briefing não lista. Justificativa: é o que segura a promessa de "continue de onde parou" instantâneo quando o catálogo crescer.</span></div>
+          <div class="q"><b><code>skill_signals</code> escrevendo no MVP</b><span>O briefing pede para não implementar a camada de IA agora — e não estou implementando. Estou apenas gravando o histórico que ela vai precisar ler, a custo praticamente zero e sem nenhuma interface.</span></div>
+          <div class="q"><b><code>subscriptions</code> sem cobrança</b><span>Billing fica fora. A tabela e o portão de acesso entram para que ligar a cobrança depois seja uma mudança em um ponto, e não uma auditoria de todas as políticas.</span></div>
+          <div class="q"><b>Registries de componentes entram — as convenções do shadcn, não o tema <span class="pill next">22 ago</span></b><span>A versão 0.1 deste documento vetava bibliotecas de componentes. O veto era largo demais: 21st.dev, Cult UI e Skiper UI publicam código de copiar-e-colar, que passa a ser nosso. Adotamos as convenções deles (<code>cn()</code>, cva, Radix, motion) e uma <strong>ponte de tokens</strong> que apelida <code>--background</code>, <code>--primary</code>, <code>--border</code> e companhia para os tokens Allen — um componente colado nasce navy e azul Allen sem editar cor. O que continua vetado é herdar identidade: nada entra com cor, raio, sombra, fonte ou timing próprios.</span></div>
+        </div>
+      </section>
+
+      <!-- 15 -->
+      <section id="decisoes">
+        <div class="head">
+          <div class="eyebrow">15 · Antes de eu escrever a Fase 2</div>
+          <h2>O que preciso de você</h2>
+        </div>
+        <div class="card">
+          <div class="q"><b>Vídeo: fecho com Bunny Stream?</b><span>É a decisão com maior efeito no custo recorrente. Se preferir Mux pelo analytics de retenção, também está resolvido — só preciso saber antes da Fase 3.</span></div>
+          <div class="q"><b>Existe base de alunos hoje?</b><span>Se houver gente em outra plataforma, importação e migração de progresso entram no escopo e mudam a Fase 5.</span></div>
+          <div class="q"><b>Acesso no lançamento: aberto a quem tem conta, ou por liberação manual?</b><span>Define o comportamento inicial do portão de acesso. Liberação manual é trivial agora; cobrança automática é outro ciclo.</span></div>
+          <div class="q"><b>Quem produz conteúdo além de você?</b><span>Se houver mais de um conteudista, o Content Studio precisa de estados de revisão. Se for só você, publicação direta é melhor — menos cerimônia.</span></div>
+          <div class="q"><b>Quantos cursos existirão no dia do lançamento?</b><span>Três cursos e trinta cursos pedem Home, Explorar e busca diferentes. Prefiro projetar para o número real do dia um, com folga para crescer.</span></div>
+          <div class="q"><b>Data de lançamento?</b><span>Não muda a arquitetura — muda o que eu corto primeiro se a Fase 8 apertar.</span></div>
+        </div>
+      </section>
+
+      <footer>
+        <p><strong style="color:var(--ink)">Próximo passo, se você validar:</strong> Fases 2, 3 e 4 juntas — design system em código, repositório com a fronteira de domínio configurada e as migrations do banco com seed. É o alicerce sobre o qual todo o resto para de ser opinião e vira produto.</p>
+        <p>Allen Escola · Blueprint v0.1 · nenhuma linha de código de produto escrita até aqui, por decisão.</p>
+      </footer>
+
+    </main>
+  </div>
+</div>
+
+<script>
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  var map = {};
+  links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(!e.isIntersecting) return;
+      links.forEach(function(l){ l.classList.remove('on'); });
+      var a = map[e.target.id];
+      if(a) a.classList.add('on');
+    });
+  }, { rootMargin: '-12% 0px -70% 0px', threshold: 0 });
+  document.querySelectorAll('main section').forEach(function(s){ obs.observe(s); });
+})();
+</script>

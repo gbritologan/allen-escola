@@ -1,0 +1,258 @@
+@import 'tailwindcss';
+@import '../design/motion.css';
+
+/* ===========================================================================
+   ALLEN ESCOLA — Design tokens
+
+   Tema único, escuro. Não é omissão: é o mundo visual da marca.
+   Toda cor é pintada explicitamente.
+   =========================================================================== */
+
+@theme {
+  /* --- Cores da marca ---------------------------------------------------- */
+  --color-navy-deep: #050714;
+  --color-navy: #0a0f2e;
+  --color-navy-soft: #12173d;
+  --color-blue: #1201f5;
+  --color-blue-light: #4c41ff;
+  --color-off-white: #f3f5fc;
+
+  /* --- Neutros derivados do navy, nunca cinza puro ------------------------ */
+  --color-ink: #f3f5fc;
+  --color-ink-2: #b9c0dc;
+  --color-ink-3: #7e87ab;
+  --color-ink-4: #5a6288;
+
+  --color-line: rgba(243, 245, 252, 0.09);
+  --color-line-strong: rgba(243, 245, 252, 0.18);
+
+  --color-positive: #48d6a8;
+  --color-caution: #e8b14c;
+  --color-critical: #ff6b6b;
+
+  /* =========================================================================
+     TIPOGRAFIA — Elvon Grotesk, e só ela.
+
+     O contraste da Allen não vem de misturar famílias. Vem da distância entre
+     o Thin (100) e o ExtraBold (800) dentro do mesmo desenho: um título em 100
+     ao lado de uma palavra em 800 diz mais do que qualquer combinação de duas
+     fontes — e não se parece com nada que venha pronto.
+     ========================================================================= */
+  --font-sans: var(--font-elvon), 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-display: var(--font-elvon), 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-body: var(--font-elvon), 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+  /* Pesos com nome semântico. Use o nome, nunca o número solto. */
+  --font-weight-hair: 100;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-strong: 600;
+  --font-weight-heavy: 800;
+
+  /* --- Escala tipográfica -------------------------------------------------
+     Seis degraus. Um sétimo quase sempre é problema de hierarquia, não de
+     tamanho. Tracking negativo cresce com o tamanho: grotesk grande fecha. */
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.45;
+  --text-caption--letter-spacing: 0.01em;
+  --text-label: 0.8125rem;
+  --text-label--line-height: 1.45;
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.62;
+  --text-lead: 1.125rem;
+  --text-lead--line-height: 1.55;
+  --text-lead--letter-spacing: -0.01em;
+  --text-title: 1.625rem;
+  --text-title--line-height: 1.12;
+  --text-title--letter-spacing: -0.025em;
+  --text-display: 3rem;
+  --text-display--line-height: 0.98;
+  --text-display--letter-spacing: -0.04em;
+  --text-hero: 4.5rem;
+  --text-hero--line-height: 0.92;
+  --text-hero--letter-spacing: -0.05em;
+
+  /* --- Raios -------------------------------------------------------------- */
+  --radius-control: 10px;
+  --radius-card: 16px;
+  --radius-panel: 28px;
+
+  /* --- Motion (D-16) ------------------------------------------------------ */
+  --ease-allen: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-settle: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-bloom: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-rise: rise 240ms var(--ease-allen) both;
+  --animate-sheen: sheen 1400ms linear infinite;
+  --animate-bloom: bloom 560ms var(--ease-bloom) both;
+
+  --shadow-panel: 0 24px 70px -24px rgba(0, 4, 30, 0.75);
+  --shadow-glow: 0 0 60px -26px rgba(76, 65, 255, 0.75);
+
+  /* =========================================================================
+     PONTE DE TOKENS shadcn/ui → Allen (D-13)
+     Componentes colados do 21st.dev / Cult UI / Skiper UI já nascem na
+     paleta Allen. Nada aqui recebe valor literal — tudo aponta para cima. */
+  --color-background: var(--color-navy-deep);
+  --color-foreground: var(--color-ink);
+  --color-card: var(--color-navy);
+  --color-card-foreground: var(--color-ink);
+  --color-popover: var(--color-navy-soft);
+  --color-popover-foreground: var(--color-ink);
+  --color-primary: var(--color-blue);
+  --color-primary-foreground: var(--color-off-white);
+  --color-secondary: var(--color-navy-soft);
+  --color-secondary-foreground: var(--color-ink);
+  --color-muted: var(--color-navy-soft);
+  --color-muted-foreground: var(--color-ink-3);
+  --color-accent: var(--color-blue-light);
+  --color-accent-foreground: var(--color-off-white);
+  --color-destructive: var(--color-critical);
+  --color-destructive-foreground: var(--color-off-white);
+  --color-border: var(--color-line);
+  --color-input: var(--color-line-strong);
+  --color-ring: var(--color-blue-light);
+}
+
+:root {
+  --background: var(--color-navy-deep);
+  --foreground: var(--color-ink);
+  --card: var(--color-navy);
+  --card-foreground: var(--color-ink);
+  --popover: var(--color-navy-soft);
+  --popover-foreground: var(--color-ink);
+  --primary: var(--color-blue);
+  --primary-foreground: var(--color-off-white);
+  --secondary: var(--color-navy-soft);
+  --secondary-foreground: var(--color-ink);
+  --muted: var(--color-navy-soft);
+  --muted-foreground: var(--color-ink-3);
+  --accent: var(--color-blue-light);
+  --accent-foreground: var(--color-off-white);
+  --destructive: var(--color-critical);
+  --border: var(--color-line);
+  --input: var(--color-line-strong);
+  --ring: var(--color-blue-light);
+  --radius: 1rem;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-navy-deep);
+    color: var(--color-ink-2);
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Títulos NÃO nascem em negrito. O peso é decisão de composição, não padrão —
+     e o padrão da Allen tende ao leve. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    color: var(--color-ink);
+    font-weight: var(--font-weight-light);
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  [data-numeric],
+  time,
+  th,
+  td {
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    background-color: rgba(76, 65, 255, 0.35);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-blue-light);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+}
+
+/* ===========================================================================
+   LIQUID GLASS — o material da Allen.
+
+   Herdado do Allen Hub e ajustado para a Escola. Não é "fundo translúcido":
+   é vidro com reflexo especular no topo, luz fina na aresta superior, inset
+   claro em cima e escuro embaixo. É a diferença entre parecer vidro e ser.
+
+   Só use onde há algo se movendo por trás (D-15).
+   =========================================================================== */
+@utility liquid-glass {
+  position: relative;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.07),
+      rgba(255, 255, 255, 0.015) 42%,
+      rgba(255, 255, 255, 0.03)
+    ),
+    rgba(12, 16, 40, 0.55);
+  backdrop-filter: blur(26px) saturate(165%);
+  -webkit-backdrop-filter: blur(26px) saturate(165%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.5),
+    0 24px 70px -24px rgba(0, 4, 30, 0.75),
+    0 0 60px -26px rgba(76, 65, 255, 0.55);
+}
+
+/* Reflexo especular do topo. `screen` é o que faz a luz somar em vez de cobrir. */
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 26%);
+  opacity: 0.55;
+  mix-blend-mode: screen;
+}
+
+/* Fio de luz na aresta de cima — o detalhe que mais vende o material. */
+.liquid-glass::after {
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 0;
+  height: 1px;
+  border-radius: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+}
+
+/* Quem pede menos transparência recebe uma superfície sólida, não um vidro sujo. */
+@media (prefers-reduced-transparency: reduce) {
+  .liquid-glass {
+    background: #0c1028;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .liquid-glass::before {
+    display: none;
+  }
+}

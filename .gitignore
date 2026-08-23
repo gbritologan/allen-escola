@@ -1,0 +1,29 @@
+node_modules/
+.next/
+out/
+build/
+.DS_Store
+*.pem
+
+.env
+.env.local
+.env*.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+next-env.d.ts
+*.tsbuildinfo
+
+.vercel
+.supabase/
+
+# Fonte de origem: o pacote comprado da Elvon Grotesk.
+# Só os .woff2 usados pela aplicação entram no repositório (src/design/fonts/).
+# O pacote completo (OTF/TTF/zip) é licença comercial e fica fora — se este
+# repositório um dia virar público, os arquivos versionados precisam ser
+# revistos com a licença na mão.
+/Elvon Grotesk/
+*.zip
