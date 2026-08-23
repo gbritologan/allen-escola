@@ -15,7 +15,7 @@ const PALETTE = [
   { name: 'Navy Deep', value: '#050714', use: 'fundo da plataforma' },
   { name: 'Navy', value: '#0A0F2E', use: 'superfícies' },
   { name: 'Navy Soft', value: '#12173D', use: 'superfície elevada' },
-  { name: 'Blue', value: '#1201F5', use: 'ação' },
+  { name: 'Blue', value: '#000DFF', use: 'ação' },
   { name: 'Blue Light', value: '#4C41FF', use: 'estado e foco' },
   { name: 'Off White', value: '#F3F5FC', use: 'texto principal' },
 ]
@@ -180,7 +180,7 @@ export default function DesignSystemPage() {
           {/* Vidro só faz sentido quando há algo por baixo que importa. */}
           <div
             aria-hidden
-            className="absolute inset-0 bg-[radial-gradient(420px_240px_at_20%_20%,rgba(18,1,245,0.55),transparent_70%),radial-gradient(380px_220px_at_80%_70%,rgba(76,65,255,0.35),transparent_70%)]"
+            className="absolute inset-0 bg-[radial-gradient(420px_240px_at_20%_20%,rgba(0,13,255,0.55),transparent_70%),radial-gradient(380px_220px_at_80%_70%,rgba(76,65,255,0.35),transparent_70%)]"
           />
           <GlassPanel className="relative flex flex-col gap-3 p-6">
             <span className="text-caption uppercase tracking-[0.16em] text-ink-3">

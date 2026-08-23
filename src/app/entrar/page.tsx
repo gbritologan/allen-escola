@@ -80,7 +80,7 @@ export default async function EntrarPage({
                 translúcida. Fica atrás, nunca é visto direto. */}
             <div
               aria-hidden
-              className="pointer-events-none absolute -top-16 -right-10 -z-10 size-72 rounded-full opacity-80 blur-[2px] [background:radial-gradient(circle_at_35%_30%,rgba(90,150,255,0.95),rgba(18,1,245,0.6)_42%,rgba(20,40,160,0.15)_70%,transparent_78%)]"
+              className="pointer-events-none absolute -top-16 -right-10 -z-10 size-72 rounded-full opacity-80 blur-[2px] [background:radial-gradient(circle_at_35%_30%,rgba(90,150,255,0.95),rgba(0,13,255,0.6)_42%,rgba(20,40,160,0.15)_70%,transparent_78%)]"
             />
             <div
               aria-hidden

@@ -100,7 +100,7 @@ void main() {
 `
 
 /** Azul Allen em três paradas: profundo → marca → claro. */
-const ALLEN_STOPS = ['#0A0F2E', '#1201F5', '#4C41FF'] as const
+const ALLEN_STOPS = ['#0A0F2E', '#000DFF', '#4C41FF'] as const
 
 export function Aurora({
   amplitude = 0.9,
