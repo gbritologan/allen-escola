@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import { Athena } from '@/components/backgrounds/athena'
 import { Aurora } from '@/components/backgrounds/aurora'
+import { Assinatura } from '@/components/brand/marca'
 import { GlassPanel } from '@/components/surfaces/glass-panel'
 import { getSession } from '@/lib/auth/session'
 import { LoginForm } from './login-form'
@@ -52,11 +54,16 @@ export default async function EntrarPage({
         className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(5,7,20,0.35)_0%,rgba(5,7,20,0.75)_45%,var(--color-navy-deep)_88%)]"
       />
 
+      {/* Athena vem DEPOIS da vinheta, de propósito. Antes dela, o degradê
+          escuro apagava a figura — e o pedido era sutil, não invisível.
+          Fica no terço direito, alta o bastante para o cartão de vidro pousar
+          sobre ela: é o que o vidro tem para difundir. */}
+      <Athena className="inset-y-0 right-[-10%] w-[86%] lg:right-[-3%] lg:w-[54%]" />
+
       {/* --- Conteúdo ------------------------------------------------------ */}
       <div className="relative mx-auto flex min-h-dvh w-full max-w-6xl flex-col justify-between gap-16 px-6 py-10 lg:py-16">
-        <header className="flex items-center gap-3">
-          <div className="size-6 rounded-lg bg-gradient-to-br from-blue-light to-blue shadow-glow" />
-          <span className="text-label font-heavy tracking-[0.22em] text-ink">ALLEN</span>
+        <header>
+          <Assinatura variant="azul" size={26} glow />
         </header>
 
         <div className="grid flex-1 items-center gap-14 lg:grid-cols-[1.15fr_minmax(0,380px)] lg:gap-20">

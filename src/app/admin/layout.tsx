@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { Assinatura } from '@/components/brand/marca'
 import { canOpenAdmin } from '@/core/identity/permissions'
 import { ROLE_LABEL } from '@/core/identity/roles'
 import { getSession } from '@/lib/auth/session'
@@ -34,10 +35,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="flex min-h-dvh bg-navy-deep">
       <aside className="sticky top-0 hidden h-dvh w-56 shrink-0 flex-col gap-6 border-r border-line px-4 py-6 md:flex">
-        <Link href="/admin" className="flex items-center gap-2.5 px-2">
-          <div className="size-5 rounded-md bg-gradient-to-br from-blue-light to-blue" />
-          <span className="text-caption font-heavy tracking-[0.2em] text-ink">ALLEN</span>
-          <span className="text-caption font-light tracking-[0.14em] text-ink-4">ADMIN</span>
+        <Link href="/admin" className="px-2">
+          {/* Rail é superfície chapada: aqui a marca vai na variante clara. */}
+          <Assinatura size={20} suffix="ADMIN" />
         </Link>
 
         <nav className="flex flex-1 flex-col gap-0.5">

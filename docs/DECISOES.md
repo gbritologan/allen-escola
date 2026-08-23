@@ -330,3 +330,48 @@ para superfície sólida.
 
 **Why:** é a diferença entre parecer vidro e ser vidro — e é material que a Allen
 já desenvolveu. Reaproveitar mantém as duas experiências parecendo da mesma casa.
+
+## D-28 · Athena no fundo da zona de entrada
+
+Do brandbook: Athena = sabedoria + estratégia + guerra — e a guerra que é
+preparação e execução, não força bruta. Arena mais estudo.
+
+Havia seis desenhos na pasta (três Agon, três Athena). Escolhi a **Athena de pé
+com lança, escudo e coruja**, não a sentada que serviu de referência:
+
+- composição vertical ocupa a altura da tela sem cruzar a headline;
+- frontal e simétrica, continua legível a 13% de opacidade — pose diagonal a
+  essa opacidade vira ruído;
+- carrega as três ideias do brandbook numa imagem só.
+
+**Como ela virou fundo, e não ilustração:**
+
+1. O original é traço escuro sobre papel branco. Convertido em traço claro com
+   transparência real (alpha derivado da luminância invertida) — em fundo
+   escuro, o papel viraria um bloco branco.
+2. **Sem `mix-blend-mode`.** A ideia era `screen`, para o traço somar luz à
+   aurora. Blend sobre canvas WebGL tira a composição da GPU e travou o
+   renderizador do navegador durante o desenvolvimento. Como o traço já é claro
+   e o fundo escuro, opacidade normal chega ao mesmo resultado sem custo.
+3. Máscara radial nas quatro bordas: ela emerge e se dissolve. Figura com
+   aresta dura vira adesivo.
+4. **Ordem de camada importa.** Ela vem depois da vinheta. Antes, o degradê
+   escuro a apagava — sutil não é invisível.
+5. Fica atrás do cartão de vidro de propósito: é o que o vidro difunde (D-15).
+
+**Motion `vigil`** — quinta primitiva, e de categoria diferente das quatro de
+interação: `rise`, `sheen`, `settle` e `bloom` respondem a algo que aconteceu;
+`vigil` não responde a nada, é a respiração do fundo. 24s por ciclo,
+deslocamento de 1,4%, seis pontos de opacidade. Se dá para ver a animação
+acontecendo, está forte demais.
+
+## D-29 · A marca tem duas variantes, e escolher errado some com ela
+
+O "a" alado, geradas do mesmo canal alpha:
+
+- **azul** (`#000DFF`) — só onde há luz por trás, como a aurora da entrada.
+  Sobre navy chapado, azul sobre azul-escuro não lê.
+- **clara** (off-white) — superfícies chapadas: rail do Admin, cabeçalhos.
+
+O arquivo antigo (`logo-allen.png`, marca branca sobre quadrado azul) foi
+removido: quadrado sólido não compõe com fundo nenhum.

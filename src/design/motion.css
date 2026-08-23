@@ -87,3 +87,33 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   MOTION AMBIENTE — categoria separada das quatro primitivas de interação.
+
+   `rise`, `sheen`, `settle` e `bloom` respondem a alguma coisa que aconteceu.
+   `vigil` não responde a nada: é a respiração do fundo. Vinte e quatro
+   segundos por ciclo, deslocamento de 1,4% e dois pontos de opacidade — no
+   limite do perceptível, que é exatamente onde um fundo deve ficar.
+
+   Se você consegue ver a animação acontecendo, ela está forte demais.
+   --------------------------------------------------------------------------- */
+@keyframes vigil {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: var(--vigil-min);
+  }
+  50% {
+    transform: translate3d(0, -1.4%, 0) scale(1.025);
+    opacity: var(--vigil-max);
+  }
+}
+
+@utility vigil-breathe {
+  --vigil-min: 0.13;
+  --vigil-max: 0.19;
+  opacity: var(--vigil-min);
+  animation: vigil 24s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  will-change: transform, opacity;
+}
