@@ -31,7 +31,16 @@ export async function requestCode(_prev: LoginState, formData: FormData): Promis
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      shouldCreateUser: true,
+      // ACESSO POR CONVITE.
+      //
+      // `true` aqui significa: qualquer pessoa que digitar um e-mail nesta tela
+      // ganha uma conta — e, como `handle_new_user` já cria uma assinatura
+      // ativa, ganha junto o catálogo inteiro. Com a tela pública, isso é uma
+      // porta aberta.
+      //
+      // Só entra quem já existe em `auth.users`. Cadastrar alunos é ato
+      // deliberado do Admin, não efeito colateral de alguém curioso.
+      shouldCreateUser: false,
       emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
     },
   })
@@ -44,7 +53,7 @@ export async function requestCode(_prev: LoginState, formData: FormData): Promis
       email,
       error: tooMany
         ? 'Muitas tentativas seguidas. Espere um minuto e peça de novo.'
-        : 'Não consegui enviar o código agora. Tente de novo em instantes.',
+        : 'Não encontrei uma conta com esse e-mail, ou não consegui enviar agora.',
     }
   }
 
