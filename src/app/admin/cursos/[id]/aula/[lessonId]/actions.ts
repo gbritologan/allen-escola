@@ -149,3 +149,63 @@ export async function removerMaterial(formData: FormData) {
 
   revalidatePath(`/admin/cursos/${courseId}/aula/${lessonId}`)
 }
+
+/* --- Habilidades ----------------------------------------------------------
+ *
+ * A única entrada humana da camada de skills (D-08).
+ *
+ * O banco grava sinal a cada aula concluída e a cada aplicação marcada desde
+ * a migration 0005 — mas o gatilho lê `lesson_skills`. Aula sem habilidade
+ * mapeada gera zero sinais: a camada roda, e grava nada. Este par de ações é
+ * o que faz o histórico existir de verdade.
+ */
+
+export async function alternarHabilidade(formData: FormData) {
+  const lessonId = String(formData.get('lesson_id') ?? '')
+  const courseId = String(formData.get('course_id') ?? '')
+  const skillId = String(formData.get('skill_id') ?? '')
+  const ligada = String(formData.get('ligada') ?? '') === 'true'
+  if (!lessonId || !skillId) return
+
+  const supabase = await createClient()
+
+  if (ligada) {
+    await supabase
+      .from('lesson_skills')
+      .delete()
+      .eq('lesson_id', lessonId)
+      .eq('skill_id', skillId)
+  } else {
+    await supabase
+      .from('lesson_skills')
+      .insert({ lesson_id: lessonId, skill_id: skillId, weight: 1 })
+  }
+
+  revalidatePath(`/admin/cursos/${courseId}/aula/${lessonId}`)
+}
+
+/**
+ * Peso: quanto ESTA aula desenvolve ESTA habilidade.
+ *
+ * O banco aceita de 0.01 a 10, mas a tela oferece três degraus. Um campo livre
+ * faria alguém escolher entre 2.4 e 2.6 numa medida que nunca teve essa
+ * precisão — e a diferença entre "toca no assunto" e "é o assunto" é toda a
+ * informação que existe aqui.
+ */
+export async function ajustarPesoHabilidade(formData: FormData) {
+  const lessonId = String(formData.get('lesson_id') ?? '')
+  const courseId = String(formData.get('course_id') ?? '')
+  const skillId = String(formData.get('skill_id') ?? '')
+  const peso = Number(formData.get('weight') ?? 1)
+  if (!lessonId || !skillId) return
+  if (!Number.isFinite(peso) || peso <= 0 || peso > 10) return
+
+  const supabase = await createClient()
+  await supabase
+    .from('lesson_skills')
+    .update({ weight: peso })
+    .eq('lesson_id', lessonId)
+    .eq('skill_id', skillId)
+
+  revalidatePath(`/admin/cursos/${courseId}/aula/${lessonId}`)
+}

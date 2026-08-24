@@ -14,6 +14,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noEmit": true,
+    // Só os testes do `core/` usam extensão explícita: o runner nativo do Node
+    // é ESM de verdade e não adivinha `./x` → `./x.ts`. O app segue sem extensão.
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",

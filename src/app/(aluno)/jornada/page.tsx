@@ -3,8 +3,10 @@ import Link from 'next/link'
 import { ButtonLink } from '@/components/primitives/button'
 import { ProgressMeter } from '@/components/primitives/progress-meter'
 import { Surface } from '@/components/surfaces/surface'
+import { resolverSkills, type SinalCru } from '@/core/skills/resolve-skills'
 import { createClient } from '@/lib/supabase/server'
 import { requireSession } from '@/lib/auth/session'
+import { Habilidades } from './habilidades'
 
 export const metadata: Metadata = { title: 'Minha jornada' }
 
@@ -46,6 +48,34 @@ export default async function JornadaPage() {
   const emAndamento = lista.filter((e) => !e.completed_at)
   const concluidos = lista.filter((e) => e.completed_at)
 
+  /**
+   * A camada de skills, lida pela primeira vez.
+   *
+   * Os sinais são append-only e crescem por aluno, não por catálogo — mesmo
+   * quem terminar tudo terá algumas centenas de linhas. Ler tudo e reduzir em
+   * memória é mais simples e mais rápido que agregar no banco, e mantém a
+   * regra num módulo puro, testado, fora do React.
+   */
+  const [{ data: skills }, { data: sinais }] = await Promise.all([
+    supabase.from('skills').select('id, slug, name, description'),
+    supabase
+      .from('skill_signals')
+      .select('skill_id, kind, value, source_id')
+      .eq('user_id', session.userId),
+  ])
+
+  const habilidades = resolverSkills(
+    skills ?? [],
+    (sinais ?? []).map(
+      (s): SinalCru => ({
+        skillId: s.skill_id,
+        kind: s.kind,
+        value: Number(s.value),
+        sourceId: s.source_id,
+      }),
+    ),
+  )
+
   return (
     <main className="mx-auto flex max-w-4xl flex-col gap-12 px-6 pt-10 sm:pt-14">
       <header className="flex flex-col gap-3">
@@ -57,6 +87,8 @@ export default async function JornadaPage() {
         <Numero valor={concluidos.length} rotulo="concluídos" />
         <Numero valor={aplicacoes ?? 0} rotulo="aplicações feitas" destaque />
       </section>
+
+      <Habilidades skills={habilidades} />
 
       {lista.length === 0 ? (
         <section className="flex flex-col items-start gap-4">

@@ -399,3 +399,49 @@ O "a" alado, geradas do mesmo canal alpha:
 
 O arquivo antigo (`logo-allen.png`, marca branca sobre quadrado azul) foi
 removido: quadrado sólido não compõe com fundo nenhum.
+
+## D-30 · Assistir conta pela metade, e sem aplicar o nível trava em 40
+
+A camada de skills gravava desde a migration 0005. `resolve-skills.ts` é a
+primeira leitura — e a leitura precisa dizer a mesma coisa que o produto diz.
+
+O banco já grava aplicação com peso dobrado (`emit_application_signals`). Só
+isso não bastava: com peso 1, **três aulas assistidas davam exatamente o mesmo
+número que uma aula aplicada**. Aritmeticamente coerente, e para o produto
+errado — o teste `aplicar vale mais que assistir` falhou e a regra foi
+corrigida, não o teste.
+
+Três decisões, todas num arquivo puro e testável:
+
+1. `PESO_ESTUDO = 0.5` — assistir conta metade. Com o dobro do banco, dá 4:1:
+   quatro aulas vistas para empatar com uma coisa feita.
+2. `TETO_SEM_PRATICA = 40` — sem nenhuma aplicação o nível não passa disso.
+   Não 0 (seria desonesto com quem estudou); não 70 (aí assistir bastaria).
+3. O **estágio** é contado em aplicações, nunca em nível. É o rótulo que a
+   pessoa lê primeiro, e ele responde "o que eu já fiz?", não "quanto o
+   sistema acha que eu sei?".
+
+A tela do aluno mostra o teto **e** o motivo. Esconder seria mentir por
+omissão; mostrar sem explicar seria punir sem dizer por quê.
+
+Nove testes rodam com `npm test` — runner nativo do Node, nenhuma dependência
+nova. É o primeiro retorno concreto do `core/` puro (D-01): a regra que define
+o produto se prova sem banco, sem React e sem mock.
+
+## D-31 · Toda tabela precisa de um escritor, ou a leitura mente
+
+Três telas liam de tabelas que nada preenchia:
+
+- o seletor de instrutor existia no editor de curso e nascia sempre vazio;
+- a aula do aluno renderizava materiais que não havia como criar;
+- `emit_lesson_signals` disparava a cada aula concluída e inseria **zero
+  linhas**, porque lê `lesson_skills` e nada mapeava aula a habilidade.
+
+O terceiro é o pior tipo de falha: nada quebra. A aula publica, o aluno
+assiste, o gatilho roda, e só meses depois alguém descobre que o histórico —
+a coisa que "passado não se cria retroativamente" (D-08) existia para
+proteger — está vazio.
+
+Por isso o aviso **sem habilidade** entrou ao lado de *sem vídeo* e *sem Para
+Fazer*, na mesma altura visual do editor de aula. O custo de esquecer só
+aparece tarde demais, então o lembrete tem que aparecer cedo.

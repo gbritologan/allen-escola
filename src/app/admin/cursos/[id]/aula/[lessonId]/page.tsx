@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/server'
 import { apagarAula, atualizarAula, publicarAula } from './actions'
 import { CampoLongo } from './campo-longo'
 import { EnviarVideo } from './enviar-video'
+import { Habilidades } from './habilidades'
 import { Materiais } from './materiais'
 import { videoConfigurado } from '@/lib/video'
 
@@ -47,18 +48,26 @@ export default async function EditorDeAulaPage({
 
   if (!lesson) notFound()
 
-  const [{ data: mod }, { data: materiais }] = await Promise.all([
-    supabase.from('modules').select('title').eq('id', lesson.module_id).maybeSingle(),
-    supabase
-      .from('materials')
-      .select('id, title, url, kind')
-      .eq('lesson_id', lessonId)
-      .order('position'),
-  ])
+  const [{ data: mod }, { data: materiais }, { data: skills }, { data: mapeamento }] =
+    await Promise.all([
+      supabase.from('modules').select('title').eq('id', lesson.module_id).maybeSingle(),
+      supabase
+        .from('materials')
+        .select('id, title, url, kind')
+        .eq('lesson_id', lessonId)
+        .order('position'),
+      supabase.from('skills').select('id, name, description').order('name'),
+      supabase.from('lesson_skills').select('skill_id, weight').eq('lesson_id', lessonId),
+    ])
+
+  const habilidadesMapeadas = new Map(
+    (mapeamento ?? []).map((m) => [m.skill_id, Number(m.weight)]),
+  )
 
   const published = lesson.status === 'published'
   const temVideo = Boolean(lesson.video_asset_id)
   const temParaFazer = Boolean(lesson.para_fazer?.trim())
+  const semHabilidade = habilidadesMapeadas.size === 0
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8 px-6 py-10 lg:px-10">
@@ -77,6 +86,7 @@ export default async function EditorDeAulaPage({
               </Chip>
               {!temVideo && <Chip tone="caution">sem vídeo</Chip>}
               {!temParaFazer && <Chip>sem Para Fazer</Chip>}
+              {semHabilidade && <Chip tone="caution">sem habilidade</Chip>}
             </div>
           </div>
 
@@ -183,6 +193,27 @@ export default async function EditorDeAulaPage({
           defaultValue={lesson.para_fazer ?? ''}
           accent
         />
+      </section>
+
+      {/* --- Habilidades ---------------------------------------------------
+          Mapear aqui é o que faz `skill_signals` gravar alguma coisa. Sem
+          isto, a aula conclui e o gatilho insere zero linhas. */}
+      <section className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-title font-light">Habilidades</h2>
+          <p className="text-caption text-ink-4">
+            O que esta aula desenvolve. É daqui que sai o histórico do aluno — aula sem habilidade
+            marcada não registra nada.
+          </p>
+        </div>
+        <Surface className="p-5">
+          <Habilidades
+            lessonId={lesson.id}
+            courseId={courseId}
+            skills={skills ?? []}
+            mapeadas={habilidadesMapeadas}
+          />
+        </Surface>
       </section>
 
       {/* --- Materiais ----------------------------------------------------- */}
