@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Button } from '@/components/primitives/button'
 import { Chip } from '@/components/primitives/chip'
+import { IconeApagar, IconeMover } from '@/components/icons'
 import { Field, Input, Textarea } from '@/components/primitives/field'
 import { Surface } from '@/components/surfaces/surface'
 import { formatDuration, formatPosition } from '@/core/shared/format'
@@ -247,7 +248,12 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
                   <form action={apagarModulo}>
                     <input type="hidden" name="id" value={mod.id} />
                     <input type="hidden" name="course_id" value={course.id} />
-                    <button type="submit" className="text-caption text-ink-4 hover:text-critical">
+                    <button
+                      type="submit"
+                      aria-label={`Apagar módulo ${mod.title}`}
+                      className="flex items-center gap-1.5 text-caption text-ink-4 transition-colors hover:text-critical"
+                    >
+                      <IconeApagar className="size-3.5" />
                       Apagar
                     </button>
                   </form>
@@ -270,7 +276,10 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
                             disabled={dir === 'up' ? index === 0 : index === mod.lessons.length - 1}
                             aria-label={`Mover ${lesson.title} para ${dir === 'up' ? 'cima' : 'baixo'}`}
                           >
-                            {dir === 'up' ? '↑' : '↓'}
+                            <IconeMover
+                              direcao={dir === 'up' ? 'cima' : 'baixo'}
+                              className="size-3"
+                            />
                           </button>
                         </form>
                       ))}

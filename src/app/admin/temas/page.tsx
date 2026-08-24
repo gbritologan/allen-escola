@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Chip } from '@/components/primitives/chip'
+import { IconeMover } from '@/components/icons'
 import { Surface } from '@/components/surfaces/surface'
 import { CONTENT_STATUS_LABEL, type ContentStatus } from '@/core/shared/types'
 import { createClient } from '@/lib/supabase/server'
@@ -60,7 +61,7 @@ export default async function TemasPage() {
                       disabled={index === 0}
                       aria-label={`Mover ${theme.name} para cima`}
                     >
-                      ↑
+                      <IconeMover direcao="cima" className="size-3.5" />
                     </button>
                   </form>
                   <form action={moverTema}>
@@ -72,7 +73,7 @@ export default async function TemasPage() {
                       disabled={index === list.length - 1}
                       aria-label={`Mover ${theme.name} para baixo`}
                     >
-                      ↓
+                      <IconeMover direcao="baixo" className="size-3.5" />
                     </button>
                   </form>
                 </div>

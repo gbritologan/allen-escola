@@ -2,6 +2,10 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Button, ButtonLink } from '@/components/primitives/button'
 import { Chip, ThemeChip } from '@/components/primitives/chip'
+import {
+  IconeAdicionar, IconeApagar, IconeCopiar, IconeEditar, IconeExpandir,
+  IconeFiltro, IconeMover, IconeOrdenar, IconePerfil,
+} from '@/components/icons'
 import { ProgressMeter } from '@/components/primitives/progress-meter'
 import { Skeleton, SkeletonText } from '@/components/primitives/skeleton'
 import { GlassPanel } from '@/components/surfaces/glass-panel'
@@ -116,6 +120,43 @@ export default function DesignSystemPage() {
           misturar tipos: vem da distância entre 100 e 800 dentro do mesmo desenho — mais difícil
           de acertar, e muito mais difícil de imitar. Thin só acima de 44px; abaixo disso a haste
           desaparece na tela.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-6">
+        <SectionHeader eyebrow="Iconografia" title="Canto chanfrado, faceta interna" />
+        <Surface className="grid grid-cols-3 gap-px overflow-hidden bg-[var(--color-line)] sm:grid-cols-5">
+          {[
+            ['adicionar', <IconeAdicionar key="a" className="size-6" />],
+            ['editar', <IconeEditar key="b" className="size-6" />],
+            ['apagar', <IconeApagar key="c" className="size-6" />],
+            ['filtro', <IconeFiltro key="d" className="size-6" />],
+            ['ordenar', <IconeOrdenar key="e" className="size-6" />],
+            ['copiar', <IconeCopiar key="f" className="size-6" />],
+            ['expandir', <IconeExpandir key="g" className="size-6" />],
+            ['perfil', <IconePerfil key="h" className="size-6" />],
+            ['mover ↑', <IconeMover key="i" direcao="cima" className="size-6" />],
+            ['mover ↓', <IconeMover key="j" direcao="baixo" className="size-6" />],
+          ].map(([nome, icone]) => (
+            <div
+              key={String(nome)}
+              className="flex flex-col items-center gap-2.5 bg-navy px-3 py-5 text-blue-light"
+            >
+              {icone as React.ReactNode}
+              <span className="text-caption text-ink-4">{String(nome)}</span>
+            </div>
+          ))}
+        </Surface>
+        <p className="max-w-[66ch] text-label text-ink-3">
+          Desenhados à mão a partir do conjunto de referência da marca, não vetorizados dele — os
+          originais são JPEG com espessuras diferentes entre si. O que veio da referência é a
+          linguagem: <strong className="text-ink-2">canto superior direito cortado em 45°</strong>{' '}
+          em todo retângulo, e faceta interna nas formas maiores. Traço 1.75, `currentColor`,
+          nenhum preenchimento.
+        </p>
+        <p className="max-w-[66ch] text-label text-ink-4">
+          Usados no Admin, que é ferramenta densa. Na área do aluno os destinos continuam em
+          texto — ícone ali seria forçar a barra.
         </p>
       </section>
 

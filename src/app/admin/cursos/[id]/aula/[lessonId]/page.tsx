@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Button } from '@/components/primitives/button'
 import { Chip } from '@/components/primitives/chip'
+import { IconeApagar } from '@/components/icons'
 import { Field, Input } from '@/components/primitives/field'
 import { Surface } from '@/components/surfaces/surface'
 import { createClient } from '@/lib/supabase/server'
@@ -172,7 +173,11 @@ export default async function EditorDeAulaPage({
       <form action={apagarAula} className="border-t border-line pt-6">
         <input type="hidden" name="id" value={lesson.id} />
         <input type="hidden" name="course_id" value={courseId} />
-        <button type="submit" className="text-caption text-ink-4 transition-colors hover:text-critical">
+        <button
+          type="submit"
+          className="flex items-center gap-2 text-caption text-ink-4 transition-colors hover:text-critical"
+        >
+          <IconeApagar className="size-4" />
           Apagar esta aula
         </button>
       </form>
