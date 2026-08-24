@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/server'
 import { apagarAula, atualizarAula, publicarAula } from './actions'
 import { CampoLongo } from './campo-longo'
 import { EnviarVideo } from './enviar-video'
+import { Materiais } from './materiais'
 import { videoConfigurado } from '@/lib/video'
 
 export async function generateMetadata({
@@ -46,11 +47,14 @@ export default async function EditorDeAulaPage({
 
   if (!lesson) notFound()
 
-  const { data: mod } = await supabase
-    .from('modules')
-    .select('title')
-    .eq('id', lesson.module_id)
-    .maybeSingle()
+  const [{ data: mod }, { data: materiais }] = await Promise.all([
+    supabase.from('modules').select('title').eq('id', lesson.module_id).maybeSingle(),
+    supabase
+      .from('materials')
+      .select('id, title, url, kind')
+      .eq('lesson_id', lessonId)
+      .order('position'),
+  ])
 
   const published = lesson.status === 'published'
   const temVideo = Boolean(lesson.video_asset_id)
@@ -179,6 +183,19 @@ export default async function EditorDeAulaPage({
           defaultValue={lesson.para_fazer ?? ''}
           accent
         />
+      </section>
+
+      {/* --- Materiais ----------------------------------------------------- */}
+      <section className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-title font-light">Materiais</h2>
+          <p className="text-caption text-ink-4">
+            O que o aluno leva da aula. Aparece embaixo do Para Fazer.
+          </p>
+        </div>
+        <Surface className="p-5">
+          <Materiais lessonId={lesson.id} courseId={courseId} materiais={materiais ?? []} />
+        </Surface>
       </section>
 
       <form action={apagarAula} className="border-t border-line pt-6">

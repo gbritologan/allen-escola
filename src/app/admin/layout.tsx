@@ -20,11 +20,12 @@ export const metadata: Metadata = {
  * A guarda abaixo é conveniência. Quem nega de verdade é a RLS.
  */
 // Só entra aqui o que existe. Link de menu que leva a 404 é pior que menu curto.
-// Instrutores, Mídia e Pessoas entram conforme forem construídos.
+// Pessoas entra quando a gestão de alunos for construída.
 const NAV = [
   { href: '/admin', label: 'Painel' },
   { href: '/admin/temas', label: 'Temas' },
   { href: '/admin/cursos', label: 'Cursos' },
+  { href: '/admin/instrutores', label: 'Instrutores' },
 ]
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

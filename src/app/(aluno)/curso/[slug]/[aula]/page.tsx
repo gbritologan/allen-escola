@@ -128,6 +128,18 @@ export default async function AulaPage({
     }
   }
 
+  /**
+   * Modelo antes de arquivo, arquivo antes de link.
+   *
+   * Não é estética: o modelo é o que a pessoa abre para EXECUTAR o Para Fazer.
+   * Ele ficar em terceiro lugar porque foi cadastrado depois seria a ordem do
+   * cadastro vencendo a ordem do uso.
+   */
+  const PESO: Record<string, number> = { template: 0, file: 1, link: 2 }
+  const materiaisOrdenados = [...(materiais ?? [])].sort(
+    (a, b) => (PESO[a.kind] ?? 9) - (PESO[b.kind] ?? 9),
+  )
+
   const temParaFazer = Boolean(lesson.para_fazer?.trim())
   const aplicada = Boolean(aplicacao)
   const concluida = progresso?.state === 'completed'
@@ -211,21 +223,32 @@ export default async function AulaPage({
           </form>
         )}
 
-        {(materiais ?? []).length > 0 && (
+        {materiaisOrdenados.length > 0 && (
           <section className="flex flex-col gap-3">
             <h2 className="text-caption font-medium uppercase tracking-[0.16em] text-ink-3">
               Materiais
             </h2>
             <Surface className="flex flex-col divide-y divide-[var(--color-line)]">
-              {(materiais ?? []).map((m) => (
+              {materiaisOrdenados.map((m) => (
                 <a
                   key={m.id}
                   href={m.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-5 py-3.5 text-body text-ink-2 transition-colors hover:bg-[rgba(243,245,252,0.03)] hover:text-ink"
+                  className="group flex items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-[rgba(243,245,252,0.03)]"
                 >
-                  {m.title}
+                  <span className="min-w-0 truncate text-body text-ink-2 group-hover:text-ink">
+                    {m.title}
+                  </span>
+                  {/* O modelo é a ferramenta do Para Fazer, não um anexo
+                      qualquer — e é o único que ganha destaque. */}
+                  {m.kind === 'template' ? (
+                    <Chip tone="accent">modelo</Chip>
+                  ) : (
+                    <span className="shrink-0 text-caption text-ink-4">
+                      {m.kind === 'link' ? 'link' : 'arquivo'}
+                    </span>
+                  )}
                 </a>
               ))}
             </Surface>
