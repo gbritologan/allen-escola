@@ -24,9 +24,9 @@ export async function generateMetadata({
  * responder "vale meu tempo?" em uma olhada: quantas aulas, quanto tempo, quem
  * ensina, sobre o quê.
  *
- * As aulas ainda não são clicáveis. Não é esquecimento: a experiência da aula
- * é a Fase 8 e depende do player. Link que leva a lugar nenhum é pior que link
- * que não existe — então elas aparecem listadas, com duração, e sem link.
+ * Daqui a pessoa entra na aula. O player ainda não existe (depende do Bunny),
+ * mas a aula já funciona sem ele: o Para Saber e o Para Fazer estão no ar, e
+ * é isso que faz a Allen ser uma escola de aplicação em vez de uma videoteca.
  */
 export default async function CursoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -58,7 +58,7 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
         .order('position'),
       supabase
         .from('lessons')
-        .select('id, title, position, duration_seconds, module_id, para_fazer')
+        .select('id, slug, title, position, duration_seconds, module_id, para_fazer')
         .eq('course_id', course.id)
         .order('position'),
       supabase.from('course_themes').select('theme_id').eq('course_id', course.id),
@@ -132,15 +132,20 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
 
                 <ol className="flex flex-col divide-y divide-[var(--color-line)]">
                   {aulas.map((aula) => (
-                    <li key={aula.id} className="flex items-center gap-3 px-5 py-3">
-                      <span data-numeric className="w-6 text-caption text-ink-4">
-                        {formatPosition(aula.position)}
-                      </span>
-                      <span className="flex-1 text-body text-ink-2">{aula.title}</span>
-                      {aula.para_fazer?.trim() && <Chip tone="accent">Para fazer</Chip>}
-                      <span data-numeric className="text-caption text-ink-4">
-                        {formatDuration(aula.duration_seconds)}
-                      </span>
+                    <li key={aula.id}>
+                      <Link
+                        href={`/curso/${course.slug}/${aula.slug}`}
+                        className="flex items-center gap-3 px-5 py-3 transition-colors duration-150 hover:bg-[rgba(243,245,252,0.03)]"
+                      >
+                        <span data-numeric className="w-6 text-caption text-ink-4">
+                          {formatPosition(aula.position)}
+                        </span>
+                        <span className="flex-1 text-body text-ink-2">{aula.title}</span>
+                        {aula.para_fazer?.trim() && <Chip tone="accent">Para fazer</Chip>}
+                        <span data-numeric className="text-caption text-ink-4">
+                          {formatDuration(aula.duration_seconds)}
+                        </span>
+                      </Link>
                     </li>
                   ))}
                   {aulas.length === 0 && (
@@ -153,7 +158,7 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
         </div>
 
         <p className="text-caption text-ink-4">
-          A experiência da aula — player, Para Saber e Para Fazer — entra na próxima fase.
+          O player entra na próxima fase. O Para Saber e o Para Fazer de cada aula já estão no ar.
         </p>
       </section>
 
