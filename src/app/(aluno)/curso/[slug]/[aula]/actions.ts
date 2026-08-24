@@ -114,3 +114,54 @@ export async function registrarAbertura(lessonId: string) {
     .from('lesson_progress')
     .insert({ user_id: user.id, lesson_id: lessonId, state: 'in_progress' })
 }
+
+/**
+ * Guarda o segundo exato onde o aluno está.
+ *
+ * Chamada a cada 15s e ao sair da página. É o que separa "continue de onde
+ * parou" de "recomece do início" — e é a única razão de `position_seconds`
+ * existir na tabela.
+ *
+ * Não conclui a aula sozinha: passar de 92% do vídeo marca como assistida,
+ * mas concluir de verdade, na Allen, é ter feito o Para Fazer.
+ */
+export async function salvarPosicao(lessonId: string, segundos: number, duracao: number) {
+  if (!lessonId || segundos < 0) return
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return
+
+  const { data: atual } = await supabase
+    .from('lesson_progress')
+    .select('state, watched_seconds')
+    .eq('user_id', user.id)
+    .eq('lesson_id', lessonId)
+    .maybeSingle()
+
+  // Reassistir uma aula concluída não a devolve para "em andamento".
+  const state = atual?.state === 'completed' ? 'completed' : 'in_progress'
+
+  await supabase.from('lesson_progress').upsert(
+    {
+      user_id: user.id,
+      lesson_id: lessonId,
+      state,
+      position_seconds: segundos,
+      watched_seconds: Math.max(atual?.watched_seconds ?? 0, segundos),
+    },
+    { onConflict: 'user_id,lesson_id' },
+  )
+
+  // 92% e não 100%: créditos finais, um respiro no fim, quem pula os últimos
+  // segundos. Exigir o vídeo inteiro transforma progresso em burocracia.
+  if (duracao > 0 && segundos / duracao >= 0.92 && state !== 'completed') {
+    await supabase
+      .from('lesson_progress')
+      .update({ state: 'completed' })
+      .eq('user_id', user.id)
+      .eq('lesson_id', lessonId)
+  }
+}

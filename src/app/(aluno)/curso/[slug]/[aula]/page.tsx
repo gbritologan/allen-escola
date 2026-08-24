@@ -8,6 +8,8 @@ import { requireSession } from '@/lib/auth/session'
 import { createClient } from '@/lib/supabase/server'
 import { concluirAula, registrarAbertura } from './actions'
 import { Aplicacao } from './aplicacao'
+import { Player } from './player'
+import { getVideoProvider, videoConfigurado } from '@/lib/video'
 
 export async function generateMetadata({
   params,
@@ -40,9 +42,12 @@ export async function generateMetadata({
  * que ela precisa FAZER — e o Para Fazer não é um apêndice no rodapé, é um
  * bloco com peso visual próprio, borda azul e o único botão primário da tela.
  *
- * O player entra na Fase 8, quando o Bunny estiver contratado. A aula já
- * funciona sem ele: o conhecimento e a aplicação estão aqui. É deliberado que
- * a página faça sentido nessa ordem — vídeo é veículo, não é o produto.
+ * O player tem controles próprios, não o embed do provedor: um player com a
+ * marca de outra empresa no canto derruba a tese de produto proprietário na
+ * tela mais importante que existe.
+ *
+ * E a aula continua funcionando sem vídeo — o conhecimento e a aplicação são
+ * o produto; vídeo é veículo.
  */
 export default async function AulaPage({
   params,
@@ -83,7 +88,7 @@ export default async function AulaPage({
         .order('position'),
       supabase
         .from('lesson_progress')
-        .select('state')
+        .select('state, position_seconds')
         .eq('user_id', session.userId)
         .eq('lesson_id', lesson.id)
         .maybeSingle(),
@@ -104,6 +109,24 @@ export default async function AulaPage({
   const todas = irmas ?? []
   const indice = todas.findIndex((l) => l.id === lesson.id)
   const proxima = todas[indice + 1]
+
+  /**
+   * O ticket de reprodução é criado a cada visita e expira em 90 minutos.
+   * Link copiado do inspetor para de funcionar sozinho — e o RLS acima já
+   * garantiu que só quem pode ver a aula chegou até esta linha.
+   */
+  let video: { url: string; poster: string | null } | null = null
+  if (lesson.video_asset_id && videoConfigurado()) {
+    try {
+      const ticket = await getVideoProvider().createPlaybackTicket({
+        assetId: lesson.video_asset_id,
+        viewerId: session.userId,
+      })
+      video = { url: ticket.url, poster: ticket.posterUrl }
+    } catch {
+      video = null
+    }
+  }
 
   const temParaFazer = Boolean(lesson.para_fazer?.trim())
   const aplicada = Boolean(aplicacao)
@@ -130,16 +153,20 @@ export default async function AulaPage({
         </header>
 
         {/* --- Vídeo ------------------------------------------------------- */}
-        <div className="flex aspect-video items-center justify-center rounded-[var(--radius-card)] border border-dashed border-line bg-[linear-gradient(140deg,rgba(18,23,61,0.8),rgba(5,7,20,1))]">
-          <div className="flex flex-col items-center gap-1.5 px-6 text-center">
-            <span className="text-label text-ink-3">
-              {lesson.video_asset_id ? 'Vídeo pronto para reprodução' : 'Vídeo ainda não enviado'}
-            </span>
-            <span className="text-caption text-ink-4">
-              O player entra na próxima fase, com o Bunny Stream.
+        {video ? (
+          <Player
+            src={video.url}
+            poster={video.poster}
+            lessonId={lesson.id}
+            posicaoInicial={progresso?.position_seconds ?? 0}
+          />
+        ) : (
+          <div className="flex aspect-video items-center justify-center rounded-[var(--radius-card)] border border-dashed border-line bg-[linear-gradient(140deg,rgba(18,23,61,0.8),rgba(5,7,20,1))]">
+            <span className="px-6 text-center text-label text-ink-4">
+              Esta aula ainda não tem vídeo. O que está escrito abaixo já vale.
             </span>
           </div>
-        </div>
+        )}
 
         {/* --- Para saber -------------------------------------------------- */}
         {lesson.para_saber?.trim() && (

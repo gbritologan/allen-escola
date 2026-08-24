@@ -9,6 +9,8 @@ import { Surface } from '@/components/surfaces/surface'
 import { createClient } from '@/lib/supabase/server'
 import { apagarAula, atualizarAula, publicarAula } from './actions'
 import { CampoLongo } from './campo-longo'
+import { EnviarVideo } from './enviar-video'
+import { videoConfigurado } from '@/lib/video'
 
 export async function generateMetadata({
   params,
@@ -105,7 +107,7 @@ export default async function EditorDeAulaPage({
           <Field
             label="Duração"
             htmlFor="duration_minutes"
-            hint="Em minutos. Vira automático quando o provedor de vídeo responder."
+            hint="Preenchida sozinha quando o vídeo termina de processar. Edite só se precisar corrigir."
           >
             <Input
               id="duration_minutes"
@@ -124,14 +126,23 @@ export default async function EditorDeAulaPage({
         </form>
       </Surface>
 
-      {/* --- Vídeo (Fase 8) ----------------------------------------------- */}
-      <Surface className="flex flex-col gap-2 border-dashed p-5">
+      {/* --- Vídeo --------------------------------------------------------- */}
+      <Surface className="flex flex-col gap-4 p-5">
         <span className="text-label font-medium text-ink-2">Vídeo</span>
-        <p className="text-caption text-ink-4">
-          O envio direto para o Bunny Stream entra na Fase 8. Até lá o campo
-          <code className="mx-1 text-ink-3">video_asset_id</code>
-          existe no banco e é o que libera a publicação.
-        </p>
+        {videoConfigurado() ? (
+          <EnviarVideo
+            lessonId={lesson.id}
+            courseId={courseId}
+            tituloAula={lesson.title}
+            assetIdAtual={lesson.video_asset_id}
+            duracaoAtual={lesson.duration_seconds}
+          />
+        ) : (
+          <p className="text-caption text-caution">
+            O provedor de vídeo não está configurado neste ambiente. Faltam as variáveis
+            BUNNY_STREAM_* — em produção elas precisam ser adicionadas na Vercel.
+          </p>
+        )}
       </Surface>
 
       {/* --- O par que define a Allen -------------------------------------- */}
