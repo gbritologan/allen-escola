@@ -1,4 +1,4 @@
-import type { Course, Theme } from '../catalog/types'
+import type { CourseSummary, Theme } from '../catalog/types'
 import type { ContinueTarget } from '../progress/types'
 
 /**
@@ -19,16 +19,16 @@ import type { ContinueTarget } from '../progress/types'
 
 export type HomeBlock =
   | { kind: 'continue'; target: ContinueTarget }
-  | { kind: 'start'; courses: Course[] }
-  | { kind: 'masterclass'; courses: Course[] }
-  | { kind: 'recommended'; title: string; reason: string | null; courses: Course[] }
+  | { kind: 'start'; courses: CourseSummary[] }
+  | { kind: 'masterclass'; courses: CourseSummary[] }
+  | { kind: 'recommended'; title: string; reason: string | null; courses: CourseSummary[] }
   | { kind: 'themes'; themes: Theme[] }
   | { kind: 'journey'; inProgress: number; completed: number; applications: number }
 
 export interface HomeInput {
   continueTarget: ContinueTarget | null
-  masterclasses: Course[]
-  recommended: Course[]
+  masterclasses: CourseSummary[]
+  recommended: CourseSummary[]
   themes: Theme[]
   journey: { inProgress: number; completed: number; applications: number }
 }

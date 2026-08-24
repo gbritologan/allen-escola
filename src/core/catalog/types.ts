@@ -102,6 +102,26 @@ export interface Material {
   position: number
 }
 
+/**
+ * O que um card de curso precisa saber — e nada além disso.
+ *
+ * A Home mostra dezenas de cards. Carregar o `Course` inteiro (descrição longa,
+ * instrutor completo, temas com descrição) para renderizar um título e uma
+ * duração é desperdício que aparece no tempo de carregamento.
+ */
+export interface CourseSummary {
+  id: UUID
+  slug: string
+  title: string
+  summary: string | null
+  coverUrl: string | null
+  format: CourseFormat
+  durationSeconds: number
+  lessonCount: number
+  instructorName: string | null
+  themeNames: string[]
+}
+
 /** Curso com currículo carregado — o formato que a página do curso consome. */
 export interface CourseOutline extends Course {
   modules: Array<Module & { lessons: Lesson[] }>
