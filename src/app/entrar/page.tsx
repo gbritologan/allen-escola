@@ -54,16 +54,6 @@ export default async function EntrarPage({
         className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(5,7,20,0.35)_0%,rgba(5,7,20,0.75)_45%,var(--color-navy-deep)_88%)]"
       />
 
-      {/* Athena vem DEPOIS da vinheta, de propósito: antes dela, o degradê
-          escuro apagava a figura — e o pedido era sutil, não invisível.
-          Grande e ancorada embaixo à direita, ela preenche a metade inferior
-          que antes era só escuro, e o cartão de vidro pousa sobre o peitoral
-          dela — é o que o vidro tem para difundir. */}
-      <Athena
-        opacity={0.26}
-        className="top-[2vh] right-[-14%] h-[112vh] w-[104%] sm:right-[-8%] sm:w-[88%] lg:top-[-4vh] lg:right-[-2%] lg:h-[122vh] lg:w-[62%]"
-      />
-
       {/* --- Conteúdo ------------------------------------------------------ */}
       <div className="relative mx-auto flex min-h-dvh w-full max-w-6xl flex-col justify-between gap-16 px-6 py-10 lg:py-16">
         <header>
@@ -73,16 +63,42 @@ export default async function EntrarPage({
         <div className="grid flex-1 items-center gap-14 lg:grid-cols-[1.15fr_minmax(0,380px)] lg:gap-20">
           {/* A tipografia é o argumento: Thin gigante, uma palavra em ExtraBold.
               Uma família só. O contraste vem do peso. */}
-          <div className="flex flex-col gap-7 animate-[var(--animate-rise)]">
-            {/* Thin (100) só ganha corpo acima de ~44px. No celular o mesmo
-                texto vai em Light (300), senão a haste some na tela. */}
-            <h1 className="max-w-[13ch] text-[clamp(2.75rem,7.5vw,5.25rem)] font-light leading-[0.94] tracking-[-0.045em] text-ink sm:font-hair">
-              Escola de <span className="font-heavy tracking-[-0.055em]">habilidades</span>{' '}
-              corporativas
-            </h1>
-            <p className="max-w-[42ch] text-lead font-light text-ink-2">
-              A arena, não a arquibancada.
-            </p>
+          {/* O invólucro é `relative` no celular e `static` daí para cima —
+              e isso é o que reposiciona a Athena sem duplicar o canvas.
+              Elemento absoluto se ancora no ancestral posicionado mais
+              próximo: no celular, este bloco; no desktop, o <main>.
+              Sem transform aqui: elemento transformado também vira âncora, e
+              a animação do título arrastaria a figura junto. */}
+          <div className="relative sm:static">
+            {/* ATHENA.
+                No desktop ela é fundo: grande, difusa, e o cartão de vidro
+                pousa sobre o peitoral dela.
+
+                No celular isso não funcionava. A tela é estreita, o cartão
+                ocupa a metade de baixo inteira, e ela ficava atrás dele — do
+                busto para baixo, invisível. Aqui ela sai do fundo e vem para o
+                lado do título, no espaço vazio à direita de "Escola de" e
+                "corporativas", que era o único lugar da tela sem nada.
+
+                A opacidade é a do celular (0.42); no desktop o CSS a reduz
+                para os mesmos 0.26 de antes. Uma instância só, um contexto
+                WebGL só. */}
+            <Athena
+              opacity={0.42}
+              className="-top-[26%] -right-[22%] h-[164%] w-[82%] opacity-100 sm:top-[2vh] sm:right-[-8%] sm:h-[112vh] sm:w-[88%] sm:opacity-[0.62] lg:top-[-4vh] lg:right-[-2%] lg:h-[122vh] lg:w-[62%]"
+            />
+
+            <div className="relative flex flex-col gap-7 animate-[var(--animate-rise)]">
+              {/* Thin (100) só ganha corpo acima de ~44px. No celular o mesmo
+                  texto vai em Light (300), senão a haste some na tela. */}
+              <h1 className="max-w-[13ch] text-[clamp(2.75rem,7.5vw,5.25rem)] font-light leading-[0.94] tracking-[-0.045em] text-ink sm:font-hair">
+                Escola de <span className="font-heavy tracking-[-0.055em]">habilidades</span>{' '}
+                corporativas
+              </h1>
+              <p className="max-w-[42ch] text-lead font-light text-ink-2">
+                A arena, não a arquibancada.
+              </p>
+            </div>
           </div>
 
           <div className="relative">
