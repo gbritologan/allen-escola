@@ -53,13 +53,13 @@ export function LoginForm({ destination }: { destination: string }) {
               name="code"
               inputMode="numeric"
               autoComplete="one-time-code"
-              maxLength={6}
-              placeholder="000000"
+              maxLength={10}
+              placeholder="Código do e-mail"
               autoFocus
               required
               aria-describedby={state.error ? 'login-erro' : undefined}
               data-numeric
-              className={`${inputClass} text-center text-lead font-light tracking-[0.6em] indent-[0.6em]`}
+              className={`${inputClass} text-center text-lead font-light tracking-[0.4em] indent-[0.4em] placeholder:tracking-normal placeholder:indent-0`}
             />
           </div>
           <Submit>Entrar</Submit>

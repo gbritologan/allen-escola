@@ -21,7 +21,7 @@ function Submit() {
  * O convite pede duas coisas e manda um e-mail. Só isso.
  *
  * Sem senha para inventar, sem link de "complete seu cadastro", sem tela
- * intermediária: a pessoa recebe o mesmo código de 6 dígitos que vai usar
+ * intermediária: a pessoa recebe o mesmo código numérico que vai usar
  * todas as outras vezes. O primeiro acesso é igual ao centésimo, e não há um
  * fluxo de entrada separado para dar manutenção.
  */
@@ -57,7 +57,7 @@ export function Convidar() {
       <div className="flex flex-wrap items-center gap-3">
         <Submit />
         <span className="text-caption text-ink-4">
-          Recebe um código de 6 dígitos e entra em <strong className="text-ink-3">/entrar</strong>.
+          Recebe um código por e-mail e entra em <strong className="text-ink-3">/entrar</strong>.
           Já nasce com acesso ao catálogo.
         </span>
       </div>

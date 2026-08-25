@@ -15,8 +15,8 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
  * Passo 1 — pedir o código.
  *
  * Sem senha, por decisão: nada para esquecer, nada para vazar, e no celular a
- * pessoa não precisa sair do app para colar um link. O e-mail traz o código de
- * 6 dígitos e também um link, para quem preferir clicar.
+ * pessoa não precisa sair do app para colar um link. O e-mail traz um código
+ * numérico e também um link, para quem preferir clicar.
  */
 export async function requestCode(_prev: LoginState, formData: FormData): Promise<LoginState> {
   const email = String(formData.get('email') ?? '')
@@ -66,8 +66,25 @@ export async function verifyCode(prev: LoginState, formData: FormData): Promise<
   const email = String(formData.get('email') ?? prev.email)
   const destination = String(formData.get('destino') ?? '/')
 
-  if (token.length !== 6) {
-    return { step: 'code', email, error: 'O código tem 6 dígitos.' }
+  /**
+   * O TAMANHO DO CÓDIGO NÃO É DECISÃO DESTE ARQUIVO.
+   *
+   * Quem gera o código é o Supabase, e o tamanho dele é configuração de lá.
+   * Aqui eu tinha escrito `!== 6` — e o dia em que a configuração estava em 8,
+   * o campo truncava o que a pessoa digitava e a validação recusava o resto.
+   * Ninguém conseguia entrar, e o erro na tela ainda dizia com convicção que o
+   * código tinha 6 dígitos.
+   *
+   * A faixa abaixo cobre qualquer configuração razoável. Se o código estiver
+   * errado de verdade, quem diz isso é o `verifyOtp` logo abaixo — que é o
+   * único lugar que realmente sabe.
+   */
+  if (token.length < 6 || token.length > 10) {
+    return {
+      step: 'code',
+      email,
+      error: 'Digite o código do e-mail, só os números.',
+    }
   }
 
   const supabase = await createClient()
