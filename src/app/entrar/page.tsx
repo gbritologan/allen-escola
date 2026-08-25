@@ -85,7 +85,7 @@ export default async function EntrarPage({
                 WebGL só. */}
             <Athena
               opacity={0.42}
-              className="-top-[26%] -right-[22%] h-[164%] w-[82%] opacity-100 sm:top-[2vh] sm:right-[-8%] sm:h-[112vh] sm:w-[88%] sm:opacity-[0.62] lg:top-[-4vh] lg:right-[-2%] lg:h-[122vh] lg:w-[62%]"
+              className="-top-[26%] -right-[22%] h-[164%] w-[82%] opacity-100 sm:top-[2vh] sm:right-[-8%] sm:h-[112vh] sm:w-[88%] sm:opacity-[0.62] lg:top-[-18vh] lg:right-[-4%] lg:h-[150vh] lg:w-[80%]"
             />
 
             <div className="relative flex flex-col gap-7 animate-[var(--animate-rise)]">

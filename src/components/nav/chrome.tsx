@@ -24,9 +24,9 @@ import { cn } from '@/lib/utils'
 
 const DESTINOS = [
   { href: '/', label: 'Início' },
+  { href: '/mapa', label: 'Mapa' },
   { href: '/explorar', label: 'Explorar' },
   { href: '/jornada', label: 'Jornada' },
-  { href: '/buscar', label: 'Buscar' },
 ] as const
 
 /**
@@ -41,6 +41,9 @@ const DESTINOS = [
  * ajuda de fácil acesso.
  */
 const AJUDA = { href: '/ajuda', label: 'Ajuda' } as const
+
+/** Buscar sai da lista principal: o Mapa passou a ser o jeito de se encontrar. */
+const BUSCAR = { href: '/buscar', label: 'Buscar' } as const
 
 function estaAtivo(pathname: string, href: string) {
   return href === '/' ? pathname === '/' : pathname.startsWith(href)
@@ -100,6 +103,19 @@ export function StudentChrome({ nome }: { nome: string }) {
             </div>
 
             <div className="flex flex-1 items-center justify-end gap-4">
+              <Link
+                href={BUSCAR.href}
+                aria-current={estaAtivo(pathname, BUSCAR.href) ? 'page' : undefined}
+                className={cn(
+                  'rounded-[var(--radius-control)] px-3 py-1.5 text-label transition-colors duration-150',
+                  estaAtivo(pathname, BUSCAR.href)
+                    ? 'text-ink'
+                    : 'text-ink-3 hover:bg-[rgba(243,245,252,0.05)] hover:text-ink-2',
+                )}
+              >
+                {BUSCAR.label}
+              </Link>
+
               <Link
                 href={AJUDA.href}
                 aria-current={estaAtivo(pathname, AJUDA.href) ? 'page' : undefined}

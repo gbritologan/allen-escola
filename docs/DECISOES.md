@@ -518,3 +518,44 @@ Quatro decisões dentro:
 linha, um aluno insere no próprio chamado uma mensagem que aparece como
 resposta oficial da Allen. E é congelado na gravação: se um aluno virar
 conteudista amanhã, as mensagens antigas dele não podem mudar de lado.
+
+## D-35 · O Mapa: um céu que se acende aplicando
+
+A referência que o Gabriel trouxe (Arkom) mapeia capacidades de IA por área de
+negócio, com um mapa estelar navegável. A estrutura é ótima; copiá-la seria
+errado, porque ela responde a uma pergunta que não é a da Allen.
+
+O que o mapa da Allen responde é **"onde eu estou"** — a pergunta que uma lista
+de catálogo nunca responde, e a que faz aluno de assinatura abrir a plataforma,
+não saber por onde continuar, e fechar.
+
+Cada tema é uma constelação, cada curso uma estrela, cada aula um ponto em
+volta dela. E a regra que faz este mapa ser da Allen e de mais ninguém:
+
+> **A estrela acende com APLICAÇÃO, não com visualização.**
+
+Assistir deixa cinza. Aplicar acende, com halo. O céu inteiro é o retrato do
+que a pessoa FEZ — e é impossível simular progresso deixando vídeo rodando,
+que é exatamente o que um mapa de "% assistido" premiaria. O progresso usa a
+mesma conta de D-30: assistir vale um quarto.
+
+A identidade grega não é fantasia colada por cima: foram os gregos que
+nomearam as constelações, e a Athena já é a figura da marca.
+
+Decisões técnicas:
+
+- **Canvas, não DOM.** São centenas de pontos movendo juntos a cada quadro de
+  pan e zoom. Em divs isso é layout recalculado; em canvas é um laço.
+- **Posição determinística, nunca `Math.random()`.** Quem aprendeu onde fica
+  Negociação precisa achar Negociação amanhã. O deslocamento orgânico vem de
+  um hash do id — testado.
+- **Toda a geometria em `core/mapa/layout.ts`**, pura e com dez testes. Quem
+  desenha não decide nada.
+- **Alvo mínimo de 14px** no acerto do clique: ponto de 3px é impossível de
+  tocar com o dedo.
+- **O estado é dito em palavras** no painel, não só em cor.
+
+`/design/mapa` monta o mesmo componente com um catálogo fictício de seis temas
+e dezoito cursos. A Allen tem dois cursos hoje, e um céu de duas estrelas não
+deixa ninguém julgar a ideia — a decisão de design precisa ser tomada sobre o
+produto cheio.
