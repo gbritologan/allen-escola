@@ -26,13 +26,24 @@ function Submit({ children }: { children: string }) {
   )
 }
 
-const INITIAL: LoginState = { step: 'email', email: '', error: null }
-
-export function LoginForm({ destination }: { destination: string }) {
+/**
+ * `emailPendente` vem da URL (`/entrar?codigo=...`), posto lá pelo servidor
+ * depois que o código foi enviado. É o que faz o campo do código sobreviver a
+ * sair da aba para ler o e-mail e voltar.
+ */
+export function LoginForm({
+  destination,
+  emailPendente,
+}: {
+  destination: string
+  emailPendente: string | null
+}) {
   const [state, action] = useActionState(
     async (prev: LoginState, formData: FormData) =>
       prev.step === 'email' ? requestCode(prev, formData) : verifyCode(prev, formData),
-    INITIAL,
+    emailPendente
+      ? ({ step: 'code', email: emailPendente, error: null } as LoginState)
+      : ({ step: 'email', email: '', error: null } as LoginState),
   )
 
   const onCodeStep = state.step === 'code'
@@ -95,9 +106,20 @@ export function LoginForm({ destination }: { destination: string }) {
       )}
 
       {onCodeStep && (
-        <p className="text-caption text-ink-3">
-          O código vale por uma hora. Se não chegar, confira o spam.
-        </p>
+        <div className="flex flex-col gap-2">
+          <p className="text-caption text-ink-3">
+            O código vale por uma hora. Se não chegar, confira o spam.
+          </p>
+          {/* Saída explícita. Sem ela, quem digitou o e-mail errado só sai
+              recarregando a página — que era exatamente o gesto que fazia a
+              pessoa perder o passo. */}
+          <a
+            href="/entrar"
+            className="self-start text-caption text-ink-4 underline-offset-4 transition-colors hover:text-ink-2 hover:underline"
+          >
+            Usar outro e-mail
+          </a>
+        </div>
       )}
     </form>
   )

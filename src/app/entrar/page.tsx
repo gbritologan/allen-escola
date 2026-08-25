@@ -12,12 +12,12 @@ export const metadata: Metadata = { title: 'Entrar' }
 export default async function EntrarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ destino?: string }>
+  searchParams: Promise<{ destino?: string; codigo?: string }>
 }) {
   const session = await getSession()
   if (session) redirect('/')
 
-  const { destino } = await searchParams
+  const { destino, codigo } = await searchParams
   const destination = destino?.startsWith('/') && !destino.startsWith('//') ? destino : '/'
 
   return (
@@ -124,7 +124,7 @@ export default async function EntrarPage({
                     Sem senha. Enviamos um código para o seu e-mail.
                   </p>
                 </div>
-                <LoginForm destination={destination} />
+                <LoginForm destination={destination} emailPendente={codigo ?? null} />
               </div>
             </GlassPanel>
           </div>

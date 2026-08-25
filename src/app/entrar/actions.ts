@@ -57,7 +57,22 @@ export async function requestCode(_prev: LoginState, formData: FormData): Promis
     }
   }
 
-  return { step: 'code', email, error: null }
+  /**
+   * O PASSO DO CÓDIGO VAI PARA A URL, NÃO PARA A MEMÓRIA.
+   *
+   * Antes eu devolvia `{ step: 'code' }` e pronto — e esse estado morria em
+   * qualquer recarregamento. O caminho real de qualquer pessoa é: pedir o
+   * código, SAIR DA ABA para ver o e-mail, e voltar. Se a aba recarregou nesse
+   * meio, o formulário voltava a pedir o e-mail, a pessoa pedia outro código,
+   * e depois de algumas voltas o Supabase bloqueava por excesso de tentativas.
+   *
+   * Com o e-mail na URL, voltar para a aba mostra o campo do código — e o
+   * código que já chegou continua valendo.
+   */
+  const destino = String(formData.get('destino') ?? '/')
+  const query = new URLSearchParams({ codigo: email })
+  if (destino !== '/') query.set('destino', destino)
+  redirect(`/entrar?${query.toString()}`)
 }
 
 /** Passo 2 — conferir o código. */
