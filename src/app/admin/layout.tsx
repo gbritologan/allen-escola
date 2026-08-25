@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Assinatura } from '@/components/brand/marca'
-import { canOpenAdmin } from '@/core/identity/permissions'
+import { can, canOpenAdmin } from '@/core/identity/permissions'
 import { ROLE_LABEL } from '@/core/identity/roles'
 import { getSession } from '@/lib/auth/session'
 
@@ -20,13 +20,17 @@ export const metadata: Metadata = {
  * A guarda abaixo é conveniência. Quem nega de verdade é a RLS.
  */
 // Só entra aqui o que existe. Link de menu que leva a 404 é pior que menu curto.
-// Pessoas entra quando a gestão de alunos for construída.
+//
+// `Pessoas` é o único item com dono: conteudista administra conteúdo, não quem
+// entra na escola. Esconder aqui é conveniência — quem barra de verdade é o
+// redirect dentro da página, e a RLS embaixo dele.
 const NAV = [
   { href: '/admin', label: 'Painel' },
   { href: '/admin/temas', label: 'Temas' },
   { href: '/admin/cursos', label: 'Cursos' },
   { href: '/admin/instrutores', label: 'Instrutores' },
   { href: '/admin/habilidades', label: 'Habilidades' },
+  { href: '/admin/pessoas', label: 'Pessoas', requer: 'people.manage' as const },
 ]
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -43,7 +47,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </Link>
 
         <nav className="flex flex-1 flex-col gap-0.5">
-          {NAV.map((item) => (
+          {NAV.filter((item) => !item.requer || can(session.role, item.requer)).map((item) => (
             <Link
               key={item.href}
               href={item.href}

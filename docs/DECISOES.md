@@ -445,3 +445,45 @@ proteger — está vazio.
 Por isso o aviso **sem habilidade** entrou ao lado de *sem vídeo* e *sem Para
 Fazer*, na mesma altura visual do editor de aula. O custo de esquecer só
 aparece tarde demais, então o lembrete tem que aparecer cedo.
+
+## D-32 · O convite é a porta, e é a única exceção à regra da casa
+
+Fechar o cadastro aberto tirou a porta e não colocou outra: só entrava quem já
+existisse em `auth.users`, e ninguém tinha como passar a existir. A escola
+ficou sem alunos possíveis.
+
+O convite resolve — e obriga a quebrar D-11 num ponto só.
+
+Em todo o resto do produto quem nega é o Postgres, e o código não repete a
+checagem. Mas `signInWithOtp({ shouldCreateUser: true })` fala com o GoTrue,
+não com o Postgres: nenhuma tabela é lida, então **nenhuma política de RLS é
+consultada**. Sem uma verificação em código, `convidarPessoa` seria o mesmo
+buraco que 854d193 fechou, escondido dentro do Admin.
+
+Por isso a verificação é a primeira linha da ação, e é `people.manage` (só
+admin) — não `canOpenAdmin`, que inclui conteudista. Quem edita conteúdo não
+decide quem entra na escola.
+
+Outras três decisões:
+
+- **Não existe apagar pessoa.** Apagar destrói progresso, aplicações e sinais
+  de habilidade em cascata, e sinal apagado não volta. Desligar o acesso
+  resolve o caso real e preserva o histórico de quem um dia voltar.
+- **Ninguém rebaixa a si mesmo.** Um admin sozinho que virasse aluno trancaria
+  a escola por fora, com o SQL como única saída.
+- **O primeiro acesso é igual ao centésimo.** O convite manda o mesmo código de
+  6 dígitos de sempre. Sem senha para inventar, sem "complete seu cadastro" —
+  e sem um segundo fluxo de entrada para dar manutenção.
+
+## D-33 · A interface precisa cair para `profiles` como a RLS já caía
+
+`getSession()` lia o papel só da claim do JWT. O banco não: desde 0008,
+`auth_role()` cai para `profiles` quando a claim não existe.
+
+A diferença ficava invisível até o pior momento. Com o Custom Access Token
+hook desligado no painel, o admin entra, a RLS o reconhece, o Postgres libera
+tudo — e a interface o manda para a área do aluno, porque a claim não estava
+lá. Painel vazio, nenhum erro, nenhuma pista.
+
+Agora o app cai para a mesma fonte que a RLS consulta. Não afrouxa nada: é o
+mesmo dado, e continua fechando em `student` se as duas faltarem.

@@ -43,3 +43,31 @@ export function percentOf(done: number, total: number): number {
 export function formatPosition(position: number): string {
   return String(position).padStart(2, '0')
 }
+
+/**
+ * "há 3 dias" — quando foi, não que dia foi.
+ *
+ * Numa lista de pessoas, "24/08/2026" obriga quem lê a fazer a conta de
+ * cabeça. A pergunta real é "essa pessoa sumiu?", e a resposta é a distância,
+ * não a data. Acima de um ano a distância perde a graça e a data volta.
+ *
+ * `agora` é parâmetro e não `Date.now()` de propósito: assim a função é pura
+ * e testável, e o servidor decide qual relógio vale.
+ */
+export function formatSince(iso: string | null | undefined, agora: Date): string {
+  if (!iso) return 'nunca'
+
+  const quando = new Date(iso)
+  if (Number.isNaN(quando.getTime())) return '—'
+
+  const dias = Math.floor((agora.getTime() - quando.getTime()) / 86_400_000)
+
+  if (dias < 0) return 'agora'
+  if (dias === 0) return 'hoje'
+  if (dias === 1) return 'ontem'
+  if (dias < 30) return `há ${dias} dias`
+  if (dias < 60) return 'há 1 mês'
+  if (dias < 365) return `há ${Math.floor(dias / 30)} meses`
+
+  return quando.toLocaleDateString('pt-BR')
+}

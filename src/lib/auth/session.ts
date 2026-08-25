@@ -37,10 +37,26 @@ export const getSession = cache(async (): Promise<Session | null> => {
     .eq('id', user.id)
     .maybeSingle()
 
+  /**
+   * O papel vem do JWT quando o hook está ligado; de `profiles` quando não.
+   *
+   * O banco já resolvia isso desde 0008 — `auth_role()` cai para `profiles`
+   * se a claim não existir. O app não caía, e a diferença era invisível até o
+   * pior momento possível: o admin entra, a RLS o reconhece, o Postgres
+   * libera tudo, e a interface o manda para a área do aluno porque a claim
+   * não estava lá. Painel vazio, sem erro, sem pista.
+   *
+   * Ler `profiles` aqui não afrouxa nada: é exatamente a mesma fonte que a
+   * RLS consulta no fallback. A interface passa a dizer a mesma coisa que o
+   * banco — e continua fechando em 'student' se as duas faltarem.
+   */
+  const claim = user.app_metadata?.['allen_role']
+  const role = claim ? roleFromClaim(claim) : roleFromClaim(data?.role)
+
   return {
     userId: user.id,
     email: user.email ?? null,
-    role: roleFromClaim(user.app_metadata?.['allen_role']),
+    role,
     profile: data
       ? {
           id: data.id,
