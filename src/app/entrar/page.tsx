@@ -119,7 +119,25 @@ export default async function EntrarPage({
             <GlassPanel className="p-7 animate-[var(--animate-rise)] [animation-delay:120ms]">
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col gap-1.5">
-                  <h2 className="text-title font-strong text-ink">Entrar</h2>
+                  {/* A ARENA AO LADO DE "ENTRAR".
+                      O coliseu da iconografia da Allen, não um redesenho meu.
+                      O original é JPEG de 916 KB, azul sobre papel branco —
+                      colado aqui seria um retângulo branco no vidro. Virou
+                      WebP de 30 KB onde a tinta do desenho é o próprio canal
+                      alpha, e a arte é branca. O antialiasing do traço veio
+                      junto, que é o que segura a forma em tamanho pequeno. */}
+                  <h2 className="flex items-center gap-3 text-title font-strong text-ink">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/brand/arena.webp"
+                      alt=""
+                      aria-hidden
+                      width={320}
+                      height={175}
+                      className="h-auto w-8 shrink-0 opacity-90"
+                    />
+                    Entrar
+                  </h2>
                   <p className="text-label text-ink-3">
                     Sem senha. Enviamos um código para o seu e-mail.
                   </p>
