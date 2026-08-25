@@ -85,6 +85,18 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
     ajustar()
   }, [ajustar])
 
+  // Esc fecha o painel e devolve a visão do céu inteiro. Sem isto, quem
+  // aproximou demais só volta arrastando às cegas.
+  useEffect(() => {
+    const aoTeclar = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      setSelecionado(null)
+      ajustar()
+    }
+    window.addEventListener('keydown', aoTeclar)
+    return () => window.removeEventListener('keydown', aoTeclar)
+  }, [ajustar])
+
   // --- Desenho ------------------------------------------------------------
   useEffect(() => {
     const canvas = canvasRef.current
@@ -120,13 +132,24 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
       const A = el.clientHeight
       const t = ms * 0.001
 
-      // A câmera persegue o alvo. Sem isso, centralizar uma constelação
-      // teleporta e a pessoa perde a noção de onde estava.
+      /**
+       * A CÂMERA VIAJA, NÃO TELEPORTA.
+       *
+       * Sem a viagem, clicar numa constelação recorta a tela e a pessoa perde
+       * a noção de onde estava — o mapa deixa de ser um lugar. Com ela, o
+       * olho acompanha o percurso e aprende a geografia.
+       *
+       * O zoom interpola em ESCALA LOGARÍTMICA. Interpolar o número direto faz
+       * a aproximação começar violenta e terminar arrastada, porque ir de 0,4
+       * para 0,8 é o mesmo salto perceptivo que de 0,8 para 1,6 — e em linear
+       * o segundo trecho leva o dobro do tempo.
+       */
       const c = cam.current
       const al = alvo.current
-      c.x += (al.x - c.x) * 0.12
-      c.y += (al.y - c.y) * 0.12
-      c.z += (al.z - c.z) * 0.12
+      const passo = 0.085
+      c.x += (al.x - c.x) * passo
+      c.y += (al.y - c.y) * passo
+      c.z = Math.exp(Math.log(c.z) + (Math.log(al.z) - Math.log(c.z)) * passo)
 
       const paraTela = (x: number, y: number): [number, number] => [
         (x - c.x) * c.z + L / 2,
@@ -294,12 +317,22 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
 
     const r = e.currentTarget.getBoundingClientRect()
     const achado = acharSob(e.clientX - r.left, e.clientY - r.top)
-    if (!achado || achado.tipo === 'aula') {
-      setSelecionado(achado?.tipo === 'aula' ? achado : null)
+    if (!achado) {
+      setSelecionado(null)
       return
     }
+    if (achado.tipo === 'centro') {
+      setSelecionado(null)
+      ajustar()
+      return
+    }
+
     setSelecionado(achado)
-    irPara(achado.x, achado.y, Math.max(cam.current.z, achado.tipo === 'tema' ? 0.7 : 1.1))
+    // Nível fixo por tipo, e não `max` com o zoom atual: com `max`, quem já
+    // estava aproximado clicava e nada acontecia — o gesto morria sem resposta.
+    // Cada tipo tem a distância em que ele se lê melhor.
+    const perto = achado.tipo === 'tema' ? 0.9 : 1.9
+    irPara(achado.x, achado.y, perto)
   }
 
   function aoRolar(e: React.WheelEvent) {
