@@ -29,6 +29,19 @@ const DESTINOS = [
   { href: '/buscar', label: 'Buscar' },
 ] as const
 
+/**
+ * Ajuda fica fora de DESTINOS de propósito.
+ *
+ * No desktop ela vai à direita, junto da conta: é serviço, não destino de
+ * navegação, e misturá-la com Explorar e Jornada dilui as quatro coisas que a
+ * pessoa realmente vem fazer.
+ *
+ * No dock do celular ela entra como quinto item mesmo assim — no telefone não
+ * existe "canto direito da barra", e ajuda que só aparece em outra tela não é
+ * ajuda de fácil acesso.
+ */
+const AJUDA = { href: '/ajuda', label: 'Ajuda' } as const
+
 function estaAtivo(pathname: string, href: string) {
   return href === '/' ? pathname === '/' : pathname.startsWith(href)
 }
@@ -88,6 +101,19 @@ export function StudentChrome({ nome }: { nome: string }) {
 
             <div className="flex flex-1 items-center justify-end gap-4">
               <Link
+                href={AJUDA.href}
+                aria-current={estaAtivo(pathname, AJUDA.href) ? 'page' : undefined}
+                className={cn(
+                  'rounded-[var(--radius-control)] px-3 py-1.5 text-label transition-colors duration-150',
+                  estaAtivo(pathname, AJUDA.href)
+                    ? 'text-ink'
+                    : 'text-ink-3 hover:bg-[rgba(243,245,252,0.05)] hover:text-ink-2',
+                )}
+              >
+                {AJUDA.label}
+              </Link>
+
+              <Link
                 href="/conta"
                 className="flex size-8 items-center justify-center rounded-full border border-line text-caption font-medium text-ink-2 transition-colors hover:border-line-strong hover:text-ink"
                 aria-label="Sua conta"
@@ -104,7 +130,7 @@ export function StudentChrome({ nome }: { nome: string }) {
           Aqui o vidro é vidro de verdade: o conteúdo passa por baixo dele. */}
       <nav className="fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:hidden">
         <div className="liquid-glass mx-auto flex max-w-md items-stretch rounded-[var(--radius-panel)] p-1">
-          {DESTINOS.map((d) => {
+          {[...DESTINOS, AJUDA].map((d) => {
             const ativo = estaAtivo(pathname, d.href)
             return (
               <Link
@@ -112,7 +138,7 @@ export function StudentChrome({ nome }: { nome: string }) {
                 href={d.href}
                 aria-current={ativo ? 'page' : undefined}
                 className={cn(
-                  'flex-1 rounded-[calc(var(--radius-panel)-4px)] py-2.5 text-center text-caption transition-colors duration-150',
+                  'flex-1 rounded-[calc(var(--radius-panel)-4px)] px-1 py-2.5 text-center text-caption transition-colors duration-150',
                   ativo ? 'bg-[rgba(76,65,255,0.16)] text-ink' : 'text-ink-3',
                 )}
               >

@@ -255,6 +255,17 @@ export default async function AulaPage({
           </section>
         )}
 
+        {/* AJUDA COM CONTEXTO.
+            Discreto, no fim, e carregando de onde a pessoa veio: aula, curso e
+            caminho. Quem clica aqui não precisa explicar onde estava — e do
+            outro lado ninguém precisa perguntar. */}
+        <Link
+          href={`/ajuda?de=${encodeURIComponent(caminho)}&aula=${lesson.id}&curso=${course.id}`}
+          className="self-start text-caption text-ink-4 transition-colors hover:text-ink-2"
+        >
+          Algum problema nesta aula?
+        </Link>
+
         {proxima && (
           <Link
             href={`/curso/${course.slug}/${proxima.slug}`}

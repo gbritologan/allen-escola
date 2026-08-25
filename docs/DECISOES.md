@@ -487,3 +487,34 @@ lá. Painel vazio, nenhum erro, nenhuma pista.
 
 Agora o app cai para a mesma fonte que a RLS consulta. Não afrouxa nada: é o
 mesmo dado, e continua fechando em `student` se as duas faltarem.
+
+## D-34 · Suporte é produto, não widget alugado
+
+O briefing pede um produto que só poderia ser da Allen. Um balãozinho da
+Intercom no canto derruba isso — e cobra por assento, para sempre.
+
+Mas o motivo de construir não é marca. É que **chamado preso a uma aula vira
+diagnóstico de conteúdo**. Três pessoas perguntando a mesma coisa na mesma
+aula não é volume de suporte: é um Para Saber que não explica, ou um Para
+Fazer ambíguo. Nenhum widget alugado sabe o que é uma aula da Allen, e por
+isso nenhum conseguiria mostrar isso. O Admin mostra, numa seção própria.
+
+Quatro decisões dentro:
+
+- **Resposta pronta antes de humano.** Não porque gente seja cara, mas porque
+  esperar é ruim: quem trava às onze da noite quer a resposta às onze da
+  noite. `help_articles` usa o mesmo índice em português do catálogo, e o
+  título é a PERGUNTA como a pessoa faria — ninguém busca por substantivo.
+- **O contexto viaja sozinho.** Abrir chamado dentro de uma aula anexa a aula.
+  Elimina as três mensagens de ida e volta que existem só para descobrir onde
+  a pessoa estava.
+- **A fila ordena por quem espera há mais tempo**, nunca pelo mais recente.
+  Mais-novo-no-topo faz o chamado difícil afundar até virar cliente perdido.
+- **Chamado resolvido aceita resposta e reabre sozinho**, por trigger. Fechar
+  a porta para quem voltou dizendo "não funcionou" é o defeito mais comum
+  desse tipo de sistema.
+
+`from_staff` é conferido pela RLS contra o papel de quem escreve — sem essa
+linha, um aluno insere no próprio chamado uma mensagem que aparece como
+resposta oficial da Allen. E é congelado na gravação: se um aluno virar
+conteudista amanhã, as mensagens antigas dele não podem mudar de lado.
