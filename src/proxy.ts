@@ -21,9 +21,8 @@ const PUBLIC_PREFIXES = [
   '/_next',
   '/favicon',
   '/brand',
-  // Referência do design system: ferramenta de equipe, só existe em dev
-  // (a própria página responde 404 em produção).
-  ...(process.env.NODE_ENV === 'production' ? [] : ['/design']),
+  // `/design` NÃO entra aqui: quem não estiver logado vai para /entrar como
+  // em qualquer outra tela, e a própria página confere se é da equipe.
 ]
 
 export async function proxy(request: NextRequest) {

@@ -1,5 +1,8 @@
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 import { montarMapa, type AulaEntrada, type CursoEntrada } from '@/core/mapa/layout'
+import { canOpenAdmin } from '@/core/identity/permissions'
+import { getSession } from '@/lib/auth/session'
 import { Ceu } from '@/app/(aluno)/mapa/ceu'
 
 export const metadata: Metadata = { title: 'O Mapa · exemplo' }
@@ -64,7 +67,11 @@ const AULAS: AulaEntrada[] = CURSOS.flatMap((c, ci) =>
   }),
 )
 
-export default function MapaExemploPage() {
+export default async function MapaExemploPage() {
+  // Mesma guarda de /design: é referência de equipe, não conteúdo de aluno.
+  const session = await getSession()
+  if (!session || !canOpenAdmin(session.role)) redirect('/')
+
   const mapa = montarMapa(TEMAS, CURSOS, AULAS, 'Gabriel')
   const constelacoes = mapa.astros.filter((a) => a.tipo === 'tema')
 

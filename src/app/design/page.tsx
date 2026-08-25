@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { redirect } from 'next/navigation'
+import { canOpenAdmin } from '@/core/identity/permissions'
+import { getSession } from '@/lib/auth/session'
 import { Button, ButtonLink } from '@/components/primitives/button'
 import { Chip, ThemeChip } from '@/components/primitives/chip'
 import {
@@ -49,8 +51,13 @@ const WEIGHTS = [
  *
  * Fora do ar em produção: é ferramenta de equipe, não página do produto.
  */
-export default function DesignSystemPage() {
-  if (process.env.NODE_ENV === 'production') notFound()
+export default async function DesignSystemPage() {
+  // Referência do sistema de design: ferramenta de equipe, não segredo.
+  // Antes isto era `notFound()` em produção — o que também escondia a página
+  // de quem a construiu. Bloquear por PAPEL diz a coisa certa e continua
+  // fechado para aluno.
+  const session = await getSession()
+  if (!session || !canOpenAdmin(session.role)) redirect('/')
 
   return (
     <main className="mx-auto flex max-w-4xl flex-col gap-20 px-6 py-20">
