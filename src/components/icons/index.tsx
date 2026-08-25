@@ -138,3 +138,88 @@ export function IconePerfil(props: Props) {
     </Base>
   )
 }
+
+/* --- Navegação --------------------------------------------------------------
+ *
+ * REVISÃO DE D-21. A regra dizia: destino do aluno em TEXTO, nunca só ícone —
+ * porque ícone sozinho é adivinhação. Ela continua valendo, e por isso estes
+ * ícones NUNCA aparecem sozinhos: sempre ao lado do rótulo, na sidebar.
+ *
+ * O que eles fazem é dar âncora visual a uma lista vertical. Numa barra
+ * horizontal de quatro itens o olho acha pelo texto; numa coluna de seis, o
+ * ícone é o que permite achar sem ler.
+ */
+
+/** Início — casa com o canto chanfrado da marca. */
+export function IconeInicio(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M4 10.5 12 4l8 6.5" />
+      <path d="M6 10v9.5h12V10" />
+      <path d="M10 19.5v-5h4v5" />
+    </Base>
+  )
+}
+
+/** Mapa — três estrelas e as linhas que as ligam. É a própria constelação. */
+export function IconeMapa(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M6.5 7.5 12 12l5.5-2.5M12 12l-1.5 6.5" />
+      <circle cx="6.5" cy="7.5" r="1.6" />
+      <circle cx="17.5" cy="9" r="1.6" />
+      <circle cx="12" cy="12" r="1.6" />
+      <circle cx="10.5" cy="18.5" r="1.6" />
+    </Base>
+  )
+}
+
+/** Explorar — a bússola, com a agulha apontando fora do eixo. */
+export function IconeExplorar(props: Props) {
+  return (
+    <Base {...props}>
+      <circle cx="12" cy="12" r="8.25" />
+      <path d="m15 9-2 5-4 1 2-5z" />
+    </Base>
+  )
+}
+
+/** Jornada — degraus subindo. Progresso é escada, não barra. */
+export function IconeJornada(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M4 19h4v-4H4zM10 19h4v-8h-4zM16 19h4V7h-4z" />
+    </Base>
+  )
+}
+
+/** Buscar — lupa. */
+export function IconeBuscar(props: Props) {
+  return (
+    <Base {...props}>
+      <circle cx="11" cy="11" r="6.25" />
+      <path d="m15.5 15.5 4 4" />
+    </Base>
+  )
+}
+
+/** Ajuda — a pergunta dentro do círculo. */
+export function IconeAjuda(props: Props) {
+  return (
+    <Base {...props}>
+      <circle cx="12" cy="12" r="8.25" />
+      <path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.4" />
+      <path d="M12 17.2v.01" strokeLinecap="round" />
+    </Base>
+  )
+}
+
+/** Admin — o painel, com o canto chanfrado da marca. */
+export function IconePainel(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M4.5 4.5h11l4 4v11h-15z" />
+      <path d="M4.5 10.5h15M10.5 10.5v9" />
+    </Base>
+  )
+}

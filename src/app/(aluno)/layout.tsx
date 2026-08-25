@@ -1,22 +1,26 @@
 import { StudentChrome } from '@/components/nav/chrome'
+import { canOpenAdmin } from '@/core/identity/permissions'
 import { requireSession } from '@/lib/auth/session'
 
 /**
  * A casca da área do aluno.
  *
- * Conteúdo full-bleed: nenhuma largura é reservada para chrome. A barra
- * superior flutua sobre a página e o dock mobile também — é isso que permite
- * a uma tela de curso ocupar a tela inteira quando ela precisar (D-21).
+ * No desktop, a sidebar ocupa 240px fixos à esquerda e o conteúdo mora ao lado
+ * dela. No celular não existe sidebar: barra em cima, dock embaixo, e o
+ * conteúdo respira entre os dois.
  */
 export default async function AlunoLayout({ children }: { children: React.ReactNode }) {
   const session = await requireSession()
 
   return (
     <>
-      <StudentChrome nome={session.profile?.fullName ?? session.email ?? 'Aluno'} />
-      {/* Espaço para a barra (56px) e para o dock, que no mobile flutua sobre
-          o rodapé da página. */}
-      <div className="pb-28 md:pt-14 md:pb-16">{children}</div>
+      <StudentChrome
+        nome={session.profile?.fullName ?? session.email ?? 'Aluno'}
+        email={session.email}
+        ehEquipe={canOpenAdmin(session.role)}
+      />
+      {/* pb-28 no celular reserva o dock; md:pl-60 reserva a sidebar. */}
+      <div className="pb-28 md:pb-10 md:pl-60">{children}</div>
     </>
   )
 }

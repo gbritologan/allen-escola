@@ -559,3 +559,55 @@ Decisões técnicas:
 e dezoito cursos. A Allen tem dois cursos hoje, e um céu de duas estrelas não
 deixa ninguém julgar a ideia — a decisão de design precisa ser tomada sobre o
 produto cheio.
+
+## D-36 · D-21 revisto: a sidebar entra
+
+A decisão original era não ter sidebar. O argumento era bom: um rail reserva
+240px permanentes, espreme o conteúdo, e é o gesto que faz um produto parecer
+painel de controle. A Allen é editorial.
+
+O Gabriel pediu a sidebar duas vezes, a segunda depois de usar o produto. É
+decisão dele, e ele está certo — por duas razões que só apareceram com o
+produto na mão:
+
+1. Os destinos passaram de quatro para seis. Barra horizontal com seis itens
+   vira sopa.
+2. O Mapa ocupa a tela inteira e é navegação constante. Com barra superior que
+   some ao rolar, sair do Mapa exigia rolar para cima antes. Sidebar fixa não
+   tem esse problema.
+
+**O que sobrevive de D-21:** rótulo em TEXTO, sempre. Os ícones novos são
+âncora visual numa lista vertical — numa coluna de seis itens o ícone é o que
+deixa achar sem ler — e nunca aparecem sozinhos. E no celular continua o dock:
+sidebar em 375px é o gesto errado.
+
+Efeito colateral bem-vindo: com 240px de casca, o conteúdo `mx-auto` deixa de
+boiar num vazio largo em telas grandes.
+
+## D-37 · A cor identifica o setor; o brilho identifica o estado
+
+O Gabriel pediu cor por setor, "sem ficar apapagaiado". As duas coisas juntas
+exigem que cor carregue duas informações sem virar duas escalas concorrentes.
+
+**O matiz diz de que constelação a estrela é. A saturação e o brilho dizem em
+que estado ela está.** A faixa vai de 196° a 292° — ciano a violeta, com o azul
+da marca (244°) no meio. Estreita de propósito: seis matizes espalhados pelo
+círculo cromático dariam um mapa de papagaio.
+
+O efeito colateral é o melhor da ideia, e reforça a tese em vez de disputar com
+ela: apagado fica quase neutro, aceso fica no tom cheio. **A constelação ganha
+cor ao ser feita.**
+
+## D-38 · O núcleo é o catálogo, não o placar
+
+Primeira versão: o enxame central crescia com o número de aplicações. Ficava
+quase vazio para quem estava chegando — e o centro é a primeira coisa que a
+pessoa vê. Um produto que se apresenta vazio no primeiro dia perde no primeiro
+dia.
+
+Agora o núcleo é **uma aula, um ponto**: o conhecimento inteiro da Allen,
+sempre completo. As aulas que você aplicou acendem dentro dele.
+
+Isso é melhor por três razões. É honesto — o centro mostra o que existe, não o
+que você fez. É estável — não encolhe quando alguém entra. E continua pessoal,
+porque a sua parte acesa está lá dentro, contra o total.

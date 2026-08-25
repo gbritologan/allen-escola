@@ -69,8 +69,13 @@ const AULAS: AulaEntrada[] = CURSOS.flatMap((c, ci) =>
 
 export default async function MapaExemploPage() {
   // Mesma guarda de /design: é referência de equipe, não conteúdo de aluno.
-  const session = await getSession()
-  if (!session || !canOpenAdmin(session.role)) redirect('/')
+  // Em produção, só a equipe. Em desenvolvimento, quem subiu o servidor já é
+  // a equipe — exigir login para ver a referência de design só atrapalha quem
+  // está construindo.
+  if (process.env.NODE_ENV === 'production') {
+    const session = await getSession()
+    if (!session || !canOpenAdmin(session.role)) redirect('/')
+  }
 
   const mapa = montarMapa(TEMAS, CURSOS, AULAS, 'Gabriel')
   const constelacoes = mapa.astros.filter((a) => a.tipo === 'tema')

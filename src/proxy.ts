@@ -21,8 +21,10 @@ const PUBLIC_PREFIXES = [
   '/_next',
   '/favicon',
   '/brand',
-  // `/design` NÃO entra aqui: quem não estiver logado vai para /entrar como
-  // em qualquer outra tela, e a própria página confere se é da equipe.
+  // Em produção `/design` NÃO é público: a própria página confere se quem
+  // abriu é da equipe. Em desenvolvimento ele passa direto, porque quem subiu
+  // o servidor já é a equipe.
+  ...(process.env.NODE_ENV === 'production' ? [] : ['/design']),
 ]
 
 export async function proxy(request: NextRequest) {

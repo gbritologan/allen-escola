@@ -37,6 +37,38 @@ export interface Astro {
   progresso: number
   /** Texto de apoio no painel — "3 aulas · 42min". */
   detalhe: string | null
+  /**
+   * Matiz da constelação, em graus.
+   *
+   * A cor identifica o SETOR; o estado (apagado/visto/aceso) controla o
+   * brilho e a saturação. Assim a constelação ganha cor ao ser acesa — o que
+   * reforça a tese em vez de disputar com ela.
+   */
+  hue: number
+}
+
+/**
+ * Um ponto do núcleo — UMA AULA DO CATÁLOGO.
+ *
+ * Não é clicável: é textura, não destino. Mas não é decoração, e essa é a
+ * diferença que importa: cada ponto é uma aula que a Allen ensina, e ele
+ * ACENDE se você aplicou aquela aula.
+ *
+ * Foi uma correção de rota. A primeira versão fazia o enxame crescer com o
+ * número de aplicações, o que deixava o centro quase vazio para quem estava
+ * chegando — e o centro é a primeira coisa que a pessoa vê. Assim o núcleo é
+ * o conhecimento da escola, sempre inteiro, com a sua parte acesa dentro dele.
+ */
+export interface PontoNucleo {
+  x: number
+  y: number
+  r: number
+  /** Fase da cintilação, para os pontos não pulsarem em coro. */
+  fase: number
+  /** Distância do centro: pontos de fora giram mais devagar. */
+  orbita: number
+  /** Você aplicou esta aula. */
+  aceso: boolean
 }
 
 export interface Linha {
@@ -49,6 +81,14 @@ export interface Linha {
 export interface Mapa {
   astros: Astro[]
   linhas: Linha[]
+  /**
+   * O NÚCLEO.
+   *
+   * Um ponto só no centro não é base de conhecimento — é um pixel. Aqui é um
+   * enxame com UMA AULA POR PONTO: o conhecimento inteiro da Allen, sempre
+   * completo, com as aulas que você aplicou acesas dentro dele.
+   */
+  nucleo: PontoNucleo[]
   /** Caixa que contém tudo, para a tela saber o zoom inicial. */
   limites: { minX: number; minY: number; maxX: number; maxY: number }
 }
@@ -76,6 +116,25 @@ export interface AulaEntrada {
   vista: boolean
   /** Para Fazer marcado como aplicado. */
   aplicada: boolean
+}
+
+/**
+ * A FAIXA DE COR DOS SETORES.
+ *
+ * De 196° (ciano) a 292° (violeta), passando pelo azul da marca (~244°). É uma
+ * faixa estreita de propósito: seis matizes espalhados pelo círculo cromático
+ * dariam um mapa de papagaio, e a Allen é azul. Aqui cada constelação tem tom
+ * próprio e todas continuam da mesma família.
+ *
+ * E a cor só se revela ao acender: apagado é quase neutro, aceso é o tom
+ * cheio. A constelação ganha identidade sendo feita.
+ */
+const HUE_INICIO = 196
+const HUE_FIM = 292
+
+export function hueDoTema(indice: number, total: number): number {
+  if (total <= 1) return 244
+  return HUE_INICIO + (indice / (total - 1)) * (HUE_FIM - HUE_INICIO)
 }
 
 /**
@@ -168,10 +227,29 @@ export function montarMapa(
     estado: aplicadasTotal > 0 ? 'aceso' : 'visto',
     temaId: null,
     progresso: 0,
+    hue: 244,
     detalhe:
       aplicadasTotal === 0
         ? 'Nenhuma aplicação ainda'
         : `${aplicadasTotal} ${aplicadasTotal === 1 ? 'aplicação feita' : 'aplicações feitas'}`,
+  })
+
+  // Uma aula, um ponto. Acima de 240 vira mancha e deixa de comunicar — e um
+  // catálogo desse tamanho já provou o ponto.
+  const nucleo: PontoNucleo[] = aulas.slice(0, 240).map((aula) => {
+    // Raiz quadrada distribui por ÁREA. Sem ela os pontos amontoam no meio e
+    // o enxame vira um borrão com franja.
+    const orbita = Math.sqrt(Math.abs(ruido(aula.id + 'd', 1))) * 118 + 10
+    const ang = ruido(aula.id + 'a', Math.PI)
+    return {
+      x: Math.cos(ang) * orbita,
+      // Achatado: o núcleo é um disco visto de viés, não uma bola.
+      y: Math.sin(ang) * orbita * 0.78,
+      r: 0.9 + Math.abs(ruido(aula.id + 'r', 1.4)),
+      fase: ruido(aula.id + 'f', Math.PI),
+      orbita,
+      aceso: aula.aplicada,
+    }
   })
 
   // Temas em volta do centro. O -90° põe o primeiro no topo, que é onde o olho
@@ -179,6 +257,7 @@ export function montarMapa(
   const passo = temas.length > 0 ? (Math.PI * 2) / temas.length : 0
 
   temas.forEach((tema, i) => {
+    const hue = hueDoTema(i, temas.length)
     const ang = i * passo - Math.PI / 2
     const raio = RAIO_TEMA + ruido(tema.id, 70)
     const tx = Math.cos(ang) * raio
@@ -198,6 +277,7 @@ export function montarMapa(
       estado: estadoDoCurso(aulasDoTema),
       temaId: tema.id,
       progresso: progressoDoCurso(aulasDoTema),
+      hue,
       detalhe: `${doTema.length} ${doTema.length === 1 ? 'curso' : 'cursos'}`,
     })
 
@@ -231,6 +311,7 @@ export function montarMapa(
         estado,
         temaId: tema.id,
         progresso: progressoDoCurso(suasAulas),
+        hue,
         detalhe: `${curso.lessonCount} ${curso.lessonCount === 1 ? 'aula' : 'aulas'}`,
       })
 
@@ -257,6 +338,7 @@ export function montarMapa(
           estado: aula.aplicada ? 'aceso' : aula.vista ? 'visto' : 'apagado',
           temaId: tema.id,
           progresso: 0,
+          hue,
           detalhe: null,
         })
         linhas.push({
@@ -274,6 +356,7 @@ export function montarMapa(
   return {
     astros,
     linhas,
+    nucleo,
     limites: {
       minX: Math.min(...xs, -100),
       minY: Math.min(...ys, -100),

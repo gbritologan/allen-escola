@@ -23,12 +23,24 @@ import { ruido } from '@/core/mapa/layout'
  */
 
 const COR = {
-  aceso: '#4c41ff',
-  acesoBrilho: '#8b84ff',
-  visto: '#7e87ab',
-  apagado: '#3a4066',
   rotulo: '#b9c0dc',
   rotuloForte: '#f3f5fc',
+}
+
+/**
+ * A COR CARREGA DUAS INFORMAÇÕES AO MESMO TEMPO.
+ *
+ * O MATIZ diz de que constelação a estrela é. A SATURAÇÃO e o BRILHO dizem em
+ * que estado ela está. Um só canal não daria conta das duas, e usar duas
+ * escalas de cor independentes viraria papagaio.
+ *
+ * O efeito colateral é o melhor da ideia: apagado fica quase neutro e aceso
+ * fica no tom cheio. A constelação GANHA cor ao ser feita.
+ */
+function corDoAstro(hue: number, estado: string, realce = false): string {
+  if (estado === 'aceso') return `hsl(${hue} 82% ${realce ? 74 : 64}%)`
+  if (estado === 'visto') return `hsl(${hue} 22% ${realce ? 72 : 60}%)`
+  return `hsl(${hue} 14% ${realce ? 48 : 34}%)`
 }
 
 const ZOOM_MIN = 0.18
@@ -121,9 +133,7 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
     const ro = new ResizeObserver(medir)
     ro.observe(el)
 
-    function corDe(a: Astro) {
-      return a.estado === 'aceso' ? COR.aceso : a.estado === 'visto' ? COR.visto : COR.apagado
-    }
+
 
     function desenhar(ms: number) {
       frame = requestAnimationFrame(desenhar)
@@ -171,6 +181,48 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
       }
       ctx!.globalAlpha = 1
 
+      // --- núcleo ---------------------------------------------------------
+      // O enxame gira devagar, e os pontos de fora giram MAIS devagar — como
+      // um sistema de verdade. Girar tudo junto pareceria um disco rígido.
+      {
+        const [nx, ny] = paraTela(0, 0)
+        const raioNucleo = 160 * c.z
+        const brilho = ctx!.createRadialGradient(nx, ny, 0, nx, ny, raioNucleo)
+        brilho.addColorStop(0, 'rgba(76,65,255,0.22)')
+        brilho.addColorStop(0.55, 'rgba(76,65,255,0.07)')
+        brilho.addColorStop(1, 'rgba(0,0,0,0)')
+        ctx!.fillStyle = brilho
+        ctx!.beginPath()
+        ctx!.arc(nx, ny, raioNucleo, 0, Math.PI * 2)
+        ctx!.fill()
+
+        for (const p of mapa.nucleo) {
+          const giro = semMovimento ? 0 : (t * 0.06) / (0.4 + p.orbita / 60)
+          const cos = Math.cos(giro)
+          const sen = Math.sin(giro)
+          const gx = p.x * cos - p.y * sen
+          const gy = p.x * sen + p.y * cos
+          const [px, py] = paraTela(gx, gy)
+          // Aplicada brilha e tem halo; o resto é a poeira do que existe e
+          // ainda não foi feito.
+          const cintila = semMovimento ? 1 : 0.72 + 0.28 * Math.sin(t * 0.9 + p.fase)
+          if (p.aceso) {
+            ctx!.globalAlpha = cintila
+            ctx!.fillStyle = '#a9a2ff'
+            ctx!.beginPath()
+            ctx!.arc(px, py, Math.max(0.9, p.r * 1.5 * c.z), 0, Math.PI * 2)
+            ctx!.fill()
+          } else {
+            ctx!.globalAlpha = 0.3 * cintila
+            ctx!.fillStyle = '#8b93bd'
+            ctx!.beginPath()
+            ctx!.arc(px, py, Math.max(0.6, p.r * c.z), 0, Math.PI * 2)
+            ctx!.fill()
+          }
+        }
+        ctx!.globalAlpha = 1
+      }
+
       // --- linhas ---------------------------------------------------------
       for (const l of mapa.linhas) {
         const a = porId.get(l.de)
@@ -183,7 +235,7 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
           hoverId.current === b.id ||
           selecionado?.id === a.id ||
           selecionado?.id === b.id
-        ctx!.strokeStyle = b.estado === 'aceso' ? COR.aceso : COR.rotulo
+        ctx!.strokeStyle = corDoAstro(b.hue, b.estado)
         ctx!.globalAlpha = destacada ? Math.min(1, l.forca + 0.35) : l.forca
         ctx!.lineWidth = destacada ? 1.1 : 0.7
         ctx!.beginPath()
@@ -195,6 +247,9 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
 
       // --- astros ---------------------------------------------------------
       for (const a of mapa.astros) {
+        // O centro já foi desenhado como enxame. Um círculo por cima
+        // taparia o enxame inteiro.
+        if (a.tipo === 'centro') continue
         const [sx, sy] = paraTela(a.x, a.y)
         const raio = Math.max(1.2, a.r * c.z)
         if (sx < -60 || sx > L + 60 || sy < -60 || sy > A + 60) continue
@@ -205,7 +260,10 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
         // Halo só em quem foi aplicado. É o prêmio visual da tese.
         if (a.estado === 'aceso' || ativo) {
           const g = ctx!.createRadialGradient(sx, sy, 0, sx, sy, raio * (ativo ? 6 : 4.2))
-          g.addColorStop(0, a.estado === 'aceso' ? 'rgba(76,65,255,0.55)' : 'rgba(185,192,220,0.3)')
+          g.addColorStop(
+            0,
+            a.estado === 'aceso' ? `hsl(${a.hue} 82% 62% / 0.5)` : 'rgba(185,192,220,0.28)',
+          )
           g.addColorStop(1, 'rgba(0,0,0,0)')
           ctx!.fillStyle = g
           ctx!.beginPath()
@@ -213,14 +271,14 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
           ctx!.fill()
         }
 
-        ctx!.fillStyle = ativo ? COR.acesoBrilho : corDe(a)
+        ctx!.fillStyle = corDoAstro(a.hue, a.estado, ativo)
         ctx!.beginPath()
         ctx!.arc(sx, sy, raio * (1 + pulso), 0, Math.PI * 2)
         ctx!.fill()
 
         // Anel de progresso, só no curso e só quando há o que mostrar.
         if (a.tipo === 'curso' && a.progresso > 0 && c.z > 0.3) {
-          ctx!.strokeStyle = COR.aceso
+          ctx!.strokeStyle = corDoAstro(a.hue, 'aceso')
           ctx!.lineWidth = 1.6
           ctx!.beginPath()
           ctx!.arc(sx, sy, raio + 5, -Math.PI / 2, -Math.PI / 2 + (a.progresso / 100) * Math.PI * 2)
@@ -368,7 +426,7 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
   }
 
   return (
-    <div className="relative h-[calc(100dvh-3.5rem)] w-full overflow-hidden bg-navy-deep">
+    <div className="relative h-[calc(100dvh-3.5rem)] w-full overflow-hidden bg-navy-deep md:h-dvh">
       <div
         ref={wrap}
         // `active:` em vez de ler o ref no render: o CSS já sabe quando o

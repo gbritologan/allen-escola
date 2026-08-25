@@ -56,8 +56,13 @@ export default async function DesignSystemPage() {
   // Antes isto era `notFound()` em produção — o que também escondia a página
   // de quem a construiu. Bloquear por PAPEL diz a coisa certa e continua
   // fechado para aluno.
-  const session = await getSession()
-  if (!session || !canOpenAdmin(session.role)) redirect('/')
+  // Em produção, só a equipe. Em desenvolvimento, quem subiu o servidor já é
+  // a equipe — exigir login para ver a referência de design só atrapalha quem
+  // está construindo.
+  if (process.env.NODE_ENV === 'production') {
+    const session = await getSession()
+    if (!session || !canOpenAdmin(session.role)) redirect('/')
+  }
 
   return (
     <main className="mx-auto flex max-w-4xl flex-col gap-20 px-6 py-20">

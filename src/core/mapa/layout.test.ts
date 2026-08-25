@@ -114,3 +114,42 @@ test('céu vazio ainda tem limites usáveis', () => {
   assert.ok(m.limites.maxX > m.limites.minX)
   assert.ok(m.limites.maxY > m.limites.minY)
 })
+
+test('cada constelação tem um tom, e todos ficam na família do azul', () => {
+  const m = montarMapa(TEMAS, CURSOS, [], 'G')
+  const hues = m.astros.filter((a) => a.tipo === 'tema').map((a) => a.hue)
+
+  assert.equal(new Set(hues).size, hues.length, 'dois temas não podem ter o mesmo tom')
+  for (const h of hues) {
+    assert.ok(h >= 196 && h <= 292, `tom ${h} saiu da faixa — mapa de papagaio`)
+  }
+})
+
+test('tema único fica no azul da marca, não numa ponta da faixa', () => {
+  const m = montarMapa([TEMAS[0]!], [], [], 'G')
+  assert.equal(m.astros.find((a) => a.tipo === 'tema')?.hue, 244)
+})
+
+test('o núcleo é o catálogo: uma aula, um ponto', () => {
+  const aulas = [aula('a1', 'c1'), aula('a2', 'c1', true), aula('a3', 'c2', true, true)]
+  const m = montarMapa(TEMAS, CURSOS, aulas, 'G')
+  assert.equal(m.nucleo.length, 3)
+})
+
+test('dentro do núcleo, só acende o que foi aplicado', () => {
+  const aulas = [aula('a1', 'c1'), aula('a2', 'c1', true), aula('a3', 'c2', true, true)]
+  const m = montarMapa(TEMAS, CURSOS, aulas, 'G')
+  assert.equal(m.nucleo.filter((p) => p.aceso).length, 1, 'assistir não acende o núcleo')
+})
+
+test('o núcleo para de crescer antes de virar mancha', () => {
+  const muitas = Array.from({ length: 400 }, (_, i) => aula(`x${i}`, 'c1', true, true))
+  const m = montarMapa(TEMAS, CURSOS, muitas, 'G')
+  assert.equal(m.nucleo.length, 240)
+})
+
+test('o núcleo também não se reorganiza entre visitas', () => {
+  const a = montarMapa(TEMAS, CURSOS, [aula('a1', 'c1', true, true)], 'G')
+  const b = montarMapa(TEMAS, CURSOS, [aula('a1', 'c1', true, true)], 'G')
+  assert.deepEqual(a.nucleo, b.nucleo)
+})
