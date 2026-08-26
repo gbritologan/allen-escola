@@ -49,6 +49,12 @@ export default async function CursosPage() {
         <Surface className="flex flex-col divide-y divide-[var(--color-line)]">
           {list.map((course) => {
             const courseThemes = (themesByCourse.get(course.id) ?? []).join(' · ')
+            // Curso publicado sem tema não tem onde ser pendurado no Mapa: ele
+            // simplesmente não aparece, sem erro e sem aviso. Antes isso era um
+            // "· sem tema" cinza no fim de uma linha de metadados — informação
+            // verdadeira que ninguém lê, sobre uma consequência que ninguém
+            // adivinha.
+            const foraDoMapa = course.status === 'published' && !themesByCourse.has(course.id)
 
             return (
               <Link
@@ -63,6 +69,7 @@ export default async function CursosPage() {
                     <Chip tone={course.status === 'published' ? 'positive' : 'neutral'}>
                       {CONTENT_STATUS_LABEL[course.status as ContentStatus]}
                     </Chip>
+                    {foraDoMapa && <Chip tone="caution">fora do Mapa — sem tema</Chip>}
                   </div>
                   <span data-numeric className="truncate text-caption text-ink-4">
                     {course.lesson_count} {course.lesson_count === 1 ? 'aula' : 'aulas'} ·{' '}

@@ -634,3 +634,30 @@ Regra: destino que é vista não vale a volta. Hoje a lista tem só `/mapa`.
 voltava ao lugar certo; quem clicava no link do e-mail caía sempre na home.
 Dois caminhos de entrada, dois comportamentos. Agora os dois passam pela mesma
 função.
+
+## D-40 · O Mapa é automático, e o Studio avisa quando não vai ser
+
+O Mapa lê `themes`, `courses` e `lessons` do banco a cada visita — não há lista
+fixa, não há cache, não há passo de publicação separado. Criar um tema já abre
+lugar no céu, mesmo antes de ele ter curso.
+
+Duas condições, e a segunda era uma armadilha silenciosa:
+
+1. **`status = 'published'`** no tema, no curso e na aula. Rascunho não aparece
+   — que é o certo.
+2. **O curso precisa estar ligado a um tema.** Sem isso não existe constelação
+   onde pendurá-lo, e o curso simplesmente não aparece. Sem erro. Sem aviso.
+
+A ligação com tema é opcional no Studio, e continua sendo — um curso pode
+legitimamente ficar sem tema enquanto está em rascunho. O que mudou é que a
+consequência agora está escrita: curso **publicado** sem tema ganha o selo
+"fora do Mapa — sem tema" na lista, e o editor diz a mesma coisa na seção de
+Temas.
+
+Antes essa informação existia como um "· sem tema" cinza no fim de uma linha de
+metadados. Verdadeira, ilegível, e sobre uma consequência que ninguém adivinha.
+
+**Correção pendurada:** a legenda do Mapa mostrava uma bolinha azul ao lado de
+"aplicada". Desde que o matiz passou a identificar a constelação (D-37), azul
+virou informação errada — o que separa os três estados é o brilho. A legenda
+agora mostra os três brilhos num tom neutro.

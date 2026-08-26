@@ -89,13 +89,17 @@ export default async function MapaPage() {
     <>
       <Ceu mapa={mapa} temas={constelacoes} />
 
-      {/* A legenda existe porque cor sozinha não comunica — e porque a regra
-          do produto precisa estar escrita em algum lugar da tela onde ela é
-          aplicada, não só na Ajuda. */}
+      {/* A legenda existe porque a regra do produto precisa estar escrita na
+          tela onde ela é aplicada, não só na Ajuda.
+
+          Ela usa CINZA de propósito. Desde que o matiz passou a identificar a
+          constelação, uma bolinha azul ao lado de "aplicada" passaria a
+          informação errada — o que separa os três estados é o BRILHO, e é o
+          brilho que a legenda mostra. */}
       <div className="pointer-events-none absolute bottom-24 left-4 flex flex-col gap-1.5 md:bottom-8">
-        <Legenda cor="bg-blue-light" texto="aplicada" />
-        <Legenda cor="bg-[#7e87ab]" texto="assistida" />
-        <Legenda cor="bg-[#3a4066]" texto="não começou" />
+        <Legenda cor="bg-[hsl(244_82%_64%)]" texto="aplicada" />
+        <Legenda cor="bg-[hsl(244_22%_60%)]" texto="assistida" />
+        <Legenda cor="bg-[hsl(244_14%_34%)]" texto="não começou" />
       </div>
     </>
   )

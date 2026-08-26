@@ -153,3 +153,31 @@ test('o núcleo também não se reorganiza entre visitas', () => {
   const b = montarMapa(TEMAS, CURSOS, [aula('a1', 'c1', true, true)], 'G')
   assert.deepEqual(a.nucleo, b.nucleo)
 })
+
+test('tema novo vira constelação mesmo antes de ter curso', () => {
+  const novo: TemaEntrada = { id: 't9', slug: 'financas', name: 'Finanças' }
+  const m = montarMapa([...TEMAS, novo], CURSOS, [], 'G')
+  const constelacao = m.astros.find((a) => a.id === 't9')
+
+  assert.ok(constelacao, 'criar o tema já tem que abrir lugar no céu')
+  assert.equal(constelacao.detalhe, '0 cursos')
+})
+
+test('curso novo entra na constelação do tema dele sem mais nada', () => {
+  const novoCurso: CursoEntrada = {
+    id: 'c9', slug: 'fechar', title: 'Fechar', temaId: 't1', lessonCount: 3, durationSeconds: 900,
+  }
+  const m = montarMapa(TEMAS, [...CURSOS, novoCurso], [], 'G')
+
+  assert.ok(m.astros.find((a) => a.id === 'c9'), 'a estrela aparece')
+  assert.ok(m.linhas.find((l) => l.de === 't1' && l.para === 'c9'), 'e já ligada ao tema')
+})
+
+test('aula nova aparece como ponto em volta da estrela do curso', () => {
+  const m = montarMapa(TEMAS, CURSOS, [aula('nova', 'c1')], 'G')
+  const ponto = m.astros.find((a) => a.id === 'nova')
+
+  assert.ok(ponto)
+  assert.equal(ponto.tipo, 'aula')
+  assert.ok(m.linhas.find((l) => l.de === 'c1' && l.para === 'nova'))
+})

@@ -203,6 +203,11 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
           <p className="text-caption text-ink-4">
             Um curso pode estar em vários. É por aqui que o aluno chega nele.
           </p>
+          {linkedThemes.size === 0 && (
+            <p className="text-caption text-[var(--color-caution)]">
+              Sem tema, este curso não aparece no Mapa — não há constelação onde pendurá-lo.
+            </p>
+          )}
         </div>
         <div className="flex flex-wrap gap-2">
           {(themes ?? []).map((theme) => {
