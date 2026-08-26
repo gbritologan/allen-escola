@@ -661,3 +661,24 @@ metadados. Verdadeira, ilegível, e sobre uma consequência que ninguém adivinh
 "aplicada". Desde que o matiz passou a identificar a constelação (D-37), azul
 virou informação errada — o que separa os três estados é o brilho. A legenda
 agora mostra os três brilhos num tom neutro.
+
+## D-41 · A função roda onde o banco está
+
+O Gabriel disse que navegar entre itens da sidebar estava lento e "duro". A
+causa principal não estava no front-end.
+
+`x-vercel-id: gru1::iad1` — o pedido chegava em São Paulo e era **executado em
+Washington**. O banco está em `sa-east-1`, São Paulo. Cada consulta ao Supabase
+atravessava o continente e voltava: ~120ms por ida e volta.
+
+Uma navegação faz várias dessas em série: `getUser()` no proxy, `getUser()` +
+`profiles` na página, e só então as consultas de dados. Quatro travessias antes
+de qualquer pixel.
+
+`vercel.json` com `regions: ["gru1"]` põe a função ao lado do banco. A ida e
+volta cai de ~120ms para ~5ms.
+
+**Isso é infraestrutura, não código.** Fica registrado aqui porque é invisível
+no repositório e seria facilmente perdido: se o banco um dia mudar de região,
+esta linha precisa mudar junto, ou a lentidão volta sem ninguém entender por
+quê.

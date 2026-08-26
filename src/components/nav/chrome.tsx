@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link, { useLinkStatus } from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Assinatura, Marca } from '@/components/brand/marca'
 import {
@@ -51,6 +51,60 @@ function estaAtivo(pathname: string, href: string) {
   return href === '/' ? pathname === '/' : pathname.startsWith(href)
 }
 
+/**
+ * A RESPOSTA IMEDIATA AO CLIQUE.
+ *
+ * `usePathname` só muda quando a navegação COMPLETA. Entre o clique e a
+ * resposta do servidor, a sidebar continuava mostrando o item antigo como
+ * ativo — o clique parecia não ter pego. Era essa a sensação de "duro": não
+ * falta de animação, falta de resposta.
+ *
+ * `useLinkStatus` sabe que o clique está em voo. O item acende na hora, e a
+ * barrinha à esquerda cresce enquanto se espera. Se a resposta for rápida,
+ * ninguém chega a ver — que é o comportamento certo para um indicador de
+ * espera.
+ */
+function MarcaDeEspera() {
+  const { pending } = useLinkStatus()
+  if (!pending) return null
+  return (
+    <span
+      aria-hidden
+      className="absolute inset-y-1 left-0 w-[2px] origin-top rounded-full bg-blue-light [animation:esperar_600ms_var(--ease-allen)_infinite]"
+    />
+  )
+}
+
+/** O item da sidebar já se comporta como ativo enquanto o clique está em voo. */
+function ItemDaSidebar({
+  href,
+  label,
+  Icone,
+  ativo,
+}: {
+  href: string
+  label: string
+  Icone: (props: { className?: string }) => React.ReactElement
+  ativo: boolean
+}) {
+  return (
+    <Link
+      href={href}
+      aria-current={ativo ? 'page' : undefined}
+      className={cn(
+        'relative flex items-center gap-3 rounded-[var(--radius-control)] px-3 py-2 text-label transition-colors duration-150',
+        ativo
+          ? 'bg-[rgba(76,65,255,0.14)] text-ink'
+          : 'text-ink-3 hover:bg-[rgba(243,245,252,0.05)] hover:text-ink-2 active:bg-[rgba(76,65,255,0.10)] active:text-ink',
+      )}
+    >
+      <MarcaDeEspera />
+      <Icone className={cn('size-[18px] shrink-0', ativo && 'text-blue-light')} />
+      {label}
+    </Link>
+  )
+}
+
 export function StudentChrome({
   nome,
   email,
@@ -75,25 +129,15 @@ export function StudentChrome({
         </span>
 
         <nav className="flex flex-1 flex-col gap-0.5">
-          {DESTINOS.map(({ href, label, Icone }) => {
-            const ativo = estaAtivo(pathname, href)
-            return (
-              <Link
-                key={href}
-                href={href}
-                aria-current={ativo ? 'page' : undefined}
-                className={cn(
-                  'flex items-center gap-3 rounded-[var(--radius-control)] px-3 py-2 text-label transition-colors duration-150',
-                  ativo
-                    ? 'bg-[rgba(76,65,255,0.14)] text-ink'
-                    : 'text-ink-3 hover:bg-[rgba(243,245,252,0.05)] hover:text-ink-2',
-                )}
-              >
-                <Icone className={cn('size-[18px] shrink-0', ativo && 'text-blue-light')} />
-                {label}
-              </Link>
-            )
-          })}
+          {DESTINOS.map(({ href, label, Icone }) => (
+            <ItemDaSidebar
+              key={href}
+              href={href}
+              label={label}
+              Icone={Icone}
+              ativo={estaAtivo(pathname, href)}
+            />
+          ))}
 
           {ehEquipe && (
             <Link
