@@ -25,7 +25,11 @@ export default async function MapaPage() {
   const supabase = await createClient()
 
   const [{ data: temas }, { data: cursos }, { data: vinculos }] = await Promise.all([
-    supabase.from('themes').select('id, slug, name').eq('status', 'published').order('position'),
+    supabase
+      .from('themes')
+      .select('id, slug, name, description, icon')
+      .eq('status', 'published')
+      .order('position'),
     supabase
       .from('courses')
       .select('id, slug, title, lesson_count, duration_seconds')

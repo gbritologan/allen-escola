@@ -20,12 +20,12 @@ export const metadata: Metadata = { title: 'O Mapa · exemplo' }
  */
 
 const TEMAS = [
-  { id: 't1', slug: 'negociacao', name: 'Negociação' },
-  { id: 't2', slug: 'vendas', name: 'Vendas' },
-  { id: 't3', slug: 'ia', name: 'Inteligência Artificial' },
-  { id: 't4', slug: 'comunicacao', name: 'Comunicação' },
-  { id: 't5', slug: 'lideranca', name: 'Liderança' },
-  { id: 't6', slug: 'dados', name: 'Dados' },
+  { id: 't1', slug: 'negociacao', name: 'Negociação', icon: 'balanca', description: 'Acordo, troca, o sim' },
+  { id: 't2', slug: 'vendas', name: 'Vendas', icon: 'estandarte', description: 'Prospecção, pipeline, fechamento' },
+  { id: 't3', slug: 'ia', name: 'Inteligência Artificial', icon: 'olho', description: 'IA aplicada ao que você já faz' },
+  { id: 't4', slug: 'comunicacao', name: 'Comunicação', icon: 'agora', description: 'Falar, escrever, convencer' },
+  { id: 't5', slug: 'lideranca', name: 'Liderança', icon: 'mestre', description: 'Time, decisão, delegação' },
+  { id: 't6', slug: 'dados', name: 'Dados', icon: 'podio', description: 'Medir para decidir' },
 ]
 
 const CURSOS_POR_TEMA: Record<string, string[]> = {

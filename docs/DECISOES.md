@@ -731,3 +731,69 @@ cursos, que funciona. Por ora o Studio aceita o ID do vídeo no Bunny.
 Ajuda") deixaria cinco no dock. Os quatro agora são escolhidos a dedo — Início,
 Mapa, Apps, Jornada — porque cinco itens numa barra é exatamente a sopa que
 tirou a barra horizontal do produto.
+
+## D-43 · O Mapa ganha hierarquia, símbolo e segunda linha
+
+Três apontamentos do Gabriel, com uma referência de constelações na mão.
+
+**A âncora era do tamanho de uma estrela.** Raio 15 contra 10 do curso: 50% de
+diferença que o olho lê como ruído, não como hierarquia. Agora é 34 — três
+vezes a área — e virou ANEL em vez de disco. Disco cheio desse tamanho seria
+uma bola engolindo o céu; o anel ocupa o mesmo espaço e deixa o miolo livre
+para o símbolo.
+
+**Faltava a segunda linha.** A referência tem título grande e uma linha de
+apoio embaixo. Ela vem de `themes.description`, que já existia e já aparecia na
+Home. Some abaixo de 42% de zoom: a essa distância o nome é o que orienta, e a
+descrição vira sujeira sob ele.
+
+**Faltavam os símbolos** — e aqui eu errei primeiro. Escrevi dezesseis ícones
+de negócio genéricos: megafone, engrenagem, gráfico de barras. O Gabriel mandou
+olhar `ICONOGRAFIA ALLEN` antes de inventar, e a pasta é GREGA: coluna,
+pergaminho, tocha, louros, pódio, olho, o filósofo de toga. Tem `athena.webp` e
+`arena.webp` na marca. O vocabulário já estava lá e eu não tinha olhado.
+
+Refeitos no repertório clássico, com duas diferenças deliberadas em relação aos
+ícones de interface:
+
+1. **Silhueta cheia, não traço.** Os originais da pasta são chapados, e no Mapa
+   o ícone aparece a ~22px sobre fundo escuro: traço de 1.75 vira borrão nesse
+   tamanho.
+2. **Sem o canto chanfrado.** O chanfro é assinatura dos ícones de INTERFACE.
+   Coluna dórica com capitel cortado em 45° não é estilo, é erro.
+
+**Catorze, não dezesseis.** Louros e elmo falharam duas vezes: a 22px o louros
+vira escudo e o elmo vira cadeado — a silhueta perde exatamente o detalhe que
+identifica. Catorze que funcionam valem mais que dezesseis com dois que mentem.
+
+**Furos:** `<path>` separado SOMA, não recorta. Olho de máscara e fenda de elmo
+precisam estar no mesmo `d`, desenhados com `evenodd`. Foi o que transformou os
+dois em manchas na primeira tentativa.
+
+**Uma fonte, dois destinos:** os ícones são STRINGS DE CAMINHO, não JSX. O Mapa
+é `<canvas>` e componente React não se desenha nele; string vira `new Path2D(d)`
+e acompanha zoom e arrasto de graça. O Studio renderiza as mesmas strings num
+`<svg>`.
+
+**Tema é dado (D-04)**, então qual símbolo cada um usa mora em `themes.icon`
+(migration 0016), escolhido num seletor visual no Studio — um `<select>` com
+nomes seria adivinhação, ninguém escolhe desenho lendo "Ânfora".
+
+## D-44 · Favicon: o quadrado navy, não a marca solta
+
+Não existia favicon nenhum — nem `icon`, nem `apple-icon`. Agora existe, gerado
+do símbolo da marca sobre um quadrado navy de cantos arredondados.
+
+Fundo sólido de propósito: a marca é #000DFF sobre transparente, e numa aba
+escura ela quase desaparece. O quadrado navy dá o mesmo contraste nos dois
+temas de sistema — e é o fundo do próprio produto, então o ícone parece a
+plataforma.
+
+## D-45 · "Sair" requintado não é "Sair" invisível
+
+Era `text-ink-4` solto sob o e-mail: mesmo tom do texto secundário, sem borda,
+sem alvo de clique próprio. Três cinzas empilhados, e o único que era BOTÃO não
+parecia um.
+
+Agora tem contorno, ícone e alvo próprios. Ele se distingue pelo espaço e pela
+forma, não pela falta de contraste — que é a diferença entre sutil e escondido.

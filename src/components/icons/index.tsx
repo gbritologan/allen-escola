@@ -245,3 +245,14 @@ export function IconeMasterclass(props: Props) {
     </Base>
   )
 }
+
+/** Sair — a porta com a seta saindo. */
+export function IconeSair(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M14 4.5H5.5v15H14" />
+      <path d="M11 12h9.5" />
+      <path d="m17.5 8.5 3.5 3.5-3.5 3.5" />
+    </Base>
+  )
+}

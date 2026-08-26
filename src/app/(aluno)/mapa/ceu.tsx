@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { ICONES_TEMA } from '@/components/icons/temas'
 import type { Astro, Mapa } from '@/core/mapa/layout'
 import { ruido } from '@/core/mapa/layout'
 
@@ -37,6 +38,62 @@ const COR = {
  * O efeito colateral é o melhor da ideia: apagado fica quase neutro e aceso
  * fica no tom cheio. A constelação GANHA cor ao ser feita.
  */
+/**
+ * Um Path2D por chave de ícone, criado uma vez.
+ *
+ * `new Path2D(d)` a cada quadro, para cada tema, a 60fps, seria trabalho
+ * jogado fora: os caminhos nunca mudam.
+ */
+const CAMINHOS = new Map<string, Path2D[]>()
+
+function caminhosDoIcone(chave: string): Path2D[] | null {
+  const cache = CAMINHOS.get(chave)
+  if (cache) return cache
+  const icone = ICONES_TEMA[chave]
+  if (!icone) return null
+  const feito = icone.d.map((d) => new Path2D(d))
+  CAMINHOS.set(chave, feito)
+  return feito
+}
+
+/**
+ * Desenha o símbolo do tema dentro do anel.
+ *
+ * Os caminhos vêm no viewBox 24×24, então a transformação leva o centro do
+ * ícone (12,12) para o centro do astro e escala pelo lado desejado. `evenodd`
+ * é o que faz os subcaminhos internos virarem furo — sem ele a máscara do
+ * teatro vira uma mancha.
+ */
+function desenharIcone(
+  ctx: CanvasRenderingContext2D,
+  chave: string | null | undefined,
+  cx: number,
+  cy: number,
+  lado: number,
+  cor: string,
+) {
+  if (!chave || lado < 9) return
+  const caminhos = caminhosDoIcone(chave)
+  if (!caminhos) return
+
+  const escala = lado / 24
+  ctx.save()
+  ctx.translate(cx - lado / 2, cy - lado / 2)
+  ctx.scale(escala, escala)
+  ctx.fillStyle = cor
+  ctx.globalAlpha = 0.92
+  for (const caminho of caminhos) ctx.fill(caminho, 'evenodd')
+  ctx.restore()
+}
+
+/** Corta sem cortar palavra no meio. */
+function cortar(texto: string, max: number) {
+  if (texto.length <= max) return texto
+  const corte = texto.slice(0, max)
+  const espaco = corte.lastIndexOf(' ')
+  return (espaco > max * 0.6 ? corte.slice(0, espaco) : corte).trimEnd() + '…'
+}
+
 function corDoAstro(hue: number, estado: string, realce = false): string {
   if (estado === 'aceso') return `hsl(${hue} 82% ${realce ? 74 : 64}%)`
   if (estado === 'visto') return `hsl(${hue} 22% ${realce ? 72 : 60}%)`
@@ -271,10 +328,33 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
           ctx!.fill()
         }
 
-        ctx!.fillStyle = corDoAstro(a.hue, a.estado, ativo)
-        ctx!.beginPath()
-        ctx!.arc(sx, sy, raio * (1 + pulso), 0, Math.PI * 2)
-        ctx!.fill()
+        if (a.tipo === 'tema') {
+          /*
+           * A ÂNCORA DA CONSTELAÇÃO É ANEL, NÃO DISCO.
+           *
+           * Disco cheio de 34 unidades seria uma bola que engole o céu ao
+           * redor. O anel ocupa o mesmo espaço — a hierarquia que o Gabriel
+           * pediu — e deixa o miolo livre para o símbolo, como na referência.
+           */
+          const rr = raio * (1 + pulso)
+          ctx!.fillStyle = `hsl(${a.hue} 60% 12% / ${a.estado === 'apagado' ? 0.5 : 0.72})`
+          ctx!.beginPath()
+          ctx!.arc(sx, sy, rr, 0, Math.PI * 2)
+          ctx!.fill()
+
+          ctx!.strokeStyle = corDoAstro(a.hue, a.estado, ativo)
+          ctx!.lineWidth = Math.max(1, 2.2 * c.z)
+          ctx!.beginPath()
+          ctx!.arc(sx, sy, rr, 0, Math.PI * 2)
+          ctx!.stroke()
+
+          desenharIcone(ctx!, a.icone, sx, sy, rr * 1.05, corDoAstro(a.hue, a.estado, ativo))
+        } else {
+          ctx!.fillStyle = corDoAstro(a.hue, a.estado, ativo)
+          ctx!.beginPath()
+          ctx!.arc(sx, sy, raio * (1 + pulso), 0, Math.PI * 2)
+          ctx!.fill()
+        }
 
         // Anel de progresso, só no curso e só quando há o que mostrar.
         if (a.tipo === 'curso' && a.progresso > 0 && c.z > 0.3) {
@@ -294,8 +374,17 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
           ctx!.textAlign = 'center'
           ctx!.letterSpacing = '0.22em'
           ctx!.globalAlpha = 0.92
-          ctx!.fillText(a.rotulo.toUpperCase(), sx, sy - raio - 26)
+          ctx!.fillText(a.rotulo.toUpperCase(), sx, sy - raio - 30)
           ctx!.letterSpacing = '0px'
+
+          // A segunda linha. Some no zoom baixo: a esta distância o nome é o
+          // que orienta, e a descrição vira sujeira sob ele.
+          if (a.subtitulo && c.z > 0.42) {
+            ctx!.font = `400 ${Math.max(9, 10.5 * Math.min(1.3, c.z + 0.4))}px var(--font-elvon), Archivo, sans-serif`
+            ctx!.fillStyle = COR.rotulo
+            ctx!.globalAlpha = 0.6
+            ctx!.fillText(cortar(a.subtitulo, 42), sx, sy - raio - 15)
+          }
           ctx!.globalAlpha = 1
         } else if (a.tipo === 'curso' && (c.z > 0.55 || ativo)) {
           ctx!.font = '400 12px var(--font-elvon), Archivo, sans-serif'

@@ -6,6 +6,7 @@ import { CONTENT_STATUS_LABEL, type ContentStatus } from '@/core/shared/types'
 import { createClient } from '@/lib/supabase/server'
 import { alternarPublicacao, moverTema } from './actions'
 import { NovoTema } from './novo-tema'
+import { SeletorDeIcone } from './seletor-de-icone'
 
 export const metadata: Metadata = { title: 'Temas' }
 
@@ -21,7 +22,7 @@ export default async function TemasPage() {
   // salto no escuro. `count` no embed evita uma segunda ida ao banco.
   const { data: themes } = await supabase
     .from('themes')
-    .select('id, name, slug, description, position, status, course_themes(count)')
+    .select('id, name, slug, description, icon, position, status, course_themes(count)')
     .order('position')
 
   const list = themes ?? []
@@ -93,6 +94,8 @@ export default async function TemasPage() {
                     </span>
                   </p>
                 </div>
+
+                <SeletorDeIcone id={theme.id} atual={theme.icon ?? ''} />
 
                 <form action={alternarPublicacao}>
                   <input type="hidden" name="id" value={theme.id} />

@@ -38,6 +38,19 @@ export interface Astro {
   /** Texto de apoio no painel — "3 aulas · 42min". */
   detalhe: string | null
   /**
+   * Chave do ícone, só em astro de tema. O desenho mora em
+   * `components/icons/temas.ts`; aqui viaja só a chave.
+   */
+  icone?: string | null
+  /**
+   * Segunda linha sob o rótulo da constelação — a descrição do tema.
+   *
+   * A referência tem título grande E uma linha de apoio embaixo ("PRODUTO /
+   * Genesis, ideia → solução"). Sem ela o rótulo é só etiqueta; com ela a
+   * constelação se apresenta.
+   */
+  subtitulo?: string | null
+  /**
    * Matiz da constelação, em graus.
    *
    * A cor identifica o SETOR; o estado (apagado/visto/aceso) controla o
@@ -97,6 +110,8 @@ export interface TemaEntrada {
   id: string
   slug: string
   name: string
+  description?: string | null
+  icon?: string | null
 }
 
 export interface CursoEntrada {
@@ -273,11 +288,23 @@ export function montarMapa(
       href: `/tema/${tema.slug}`,
       x: tx,
       y: ty,
-      r: 15,
+      /*
+       * A ÂNCORA DA CONSTELAÇÃO É GRANDE.
+       *
+       * Era 15 contra 10 do curso: uma diferença de 50% que o olho não lê
+       * como hierarquia, ela lê como ruído. O Gabriel apontou isso olhando a
+       * referência, onde o nó do setor é claramente outro nível de coisa.
+       *
+       * 34 contra 10 é mais de três vezes a área, e abre espaço para o ícone
+       * caber dentro do anel em vez de flutuar ao lado.
+       */
+      r: 34,
       estado: estadoDoCurso(aulasDoTema),
       temaId: tema.id,
       progresso: progressoDoCurso(aulasDoTema),
       hue,
+      icone: tema.icon ?? null,
+      subtitulo: tema.description ?? null,
       detalhe: `${doTema.length} ${doTema.length === 1 ? 'curso' : 'cursos'}`,
     })
 

@@ -122,3 +122,27 @@ export async function moverTema(formData: FormData) {
 
   revalidatePath('/admin/temas')
 }
+
+/**
+ * Escolhe o símbolo da constelação no Mapa.
+ *
+ * Guarda a CHAVE, não o desenho. Chave vazia limpa: constelação sem símbolo é
+ * um estado legítimo, e é o padrão de todo tema novo.
+ *
+ * Não valida contra a lista de chaves de propósito — um ícone renomeado no
+ * código degrada para "sem símbolo" em vez de derrubar a tela do aluno.
+ */
+export async function definirIcone(formData: FormData) {
+  const id = String(formData.get('id') ?? '')
+  const icon = String(formData.get('icon') ?? '').trim()
+  if (!id) return
+
+  const supabase = await createClient()
+  await supabase
+    .from('themes')
+    .update({ icon: icon || null })
+    .eq('id', id)
+
+  revalidatePath('/admin/temas')
+  revalidatePath('/mapa')
+}

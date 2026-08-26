@@ -12,6 +12,7 @@ import {
   IconeMapa,
   IconeMasterclass,
   IconePainel,
+  IconeSair,
 } from '@/components/icons'
 import { cn } from '@/lib/utils'
 
@@ -181,10 +182,24 @@ export function StudentChrome({
           )}
         </nav>
 
-        {/* Quem está logado, e a saída. Sempre visível, como no rodapé de
-            qualquer ferramenta que se usa horas seguidas. */}
-        <div className="flex flex-col gap-2 border-t border-line px-3 pt-4">
-          <Link href="/conta" className="flex items-center gap-2.5">
+        {/*
+         * QUEM ESTÁ LOGADO, E A SAÍDA.
+         *
+         * O "Sair" era `text-ink-4` solto embaixo do e-mail: mesmo tom do
+         * texto secundário, sem borda, sem área de clique própria. O Gabriel
+         * disse que estava invisível e estava mesmo — três cinzas empilhados,
+         * e o único deles que é um BOTÃO não parecia um.
+         *
+         * Requintado não é apagado. Agora ele tem contorno e alvo de clique
+         * próprios, e some do plano de fundo pelo espaço, não pela falta de
+         * contraste. O nome e o e-mail é que recuam, porque são etiqueta; o
+         * botão é ação e ação se vê.
+         */}
+        <div className="flex flex-col gap-3 border-t border-line px-2 pt-4">
+          <Link
+            href="/conta"
+            className="flex items-center gap-2.5 rounded-[var(--radius-control)] px-1 py-1 transition-colors duration-150 hover:bg-[rgba(243,245,252,0.05)]"
+          >
             <span
               aria-hidden
               className="flex size-8 shrink-0 items-center justify-center rounded-full border border-line text-caption font-medium text-ink-2"
@@ -196,11 +211,13 @@ export function StudentChrome({
               {email && <span className="truncate text-caption text-ink-4">{email}</span>}
             </span>
           </Link>
+
           <form action="/sair" method="post">
             <button
               type="submit"
-              className="px-0.5 text-caption text-ink-4 transition-colors hover:text-ink"
+              className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-control)] border border-line px-3 py-2 text-caption text-ink-2 transition-colors duration-150 hover:border-line-strong hover:bg-[rgba(243,245,252,0.05)] hover:text-ink"
             >
+              <IconeSair className="size-4 shrink-0" />
               Sair
             </button>
           </form>
