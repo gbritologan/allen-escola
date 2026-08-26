@@ -682,3 +682,52 @@ volta cai de ~120ms para ~5ms.
 no repositório e seria facilmente perdido: se o banco um dia mudar de região,
 esta linha precisa mudar junto, ou a lentidão volta sem ninguém entender por
 quê.
+
+## D-42 · A sidebar depois do uso: Suporte, Apps, Masterclass
+
+Três mudanças pedidas pelo Gabriel, com a sidebar do Arkom como referência.
+
+**"Ajuda" virou "Suporte".** Não é maquiagem: a página tem artigo pronto E
+abertura de chamado com histórico e resposta da equipe. "Ajuda" prometia menos
+do que ela entrega. A rota mudou junto (`/ajuda` → `/suporte`), com redirect
+permanente — o e-mail de notificação de chamado já saiu com links `/ajuda/<id>`
+na caixa de entrada de alguém, e renomear rota sem redirecionar é quebrar o que
+já foi enviado.
+
+**"Explorar" saiu da sidebar — e a página continua.** Era o catálogo genérico,
+e três coisas já fazem esse trabalho melhor: o Mapa mostra onde você está, a
+Busca acha pelo nome, a Home recomenda. Mas seis lugares do produto linkam para
+`/explorar` ("Ver tudo", "Explorar cursos", o vazio da Busca), e o vazio da
+Masterclass agora também. O que saiu foi a cadeira permanente, não a rota.
+
+**"Masterclass" ganhou cadeira.** O formato já existia (`courses.format`), mas
+só aparecia como faixa dentro de Explorar e seção da Home: o formato mais caro
+de produzir era o mais difícil de achar. D-12 dizia que Masterclass é "formato
+editorial, não destino de navegação" — valia com quatro destinos e um produto
+pequeno.
+
+**"Apps" entrou como tipo de conteúdo novo** (migration 0015). Não é curso
+disfarçado, e a diferença decide o modelo: curso tem aula, módulo, progresso e
+aplicação; um app tem uma demonstração e um "como usar". Enfiá-lo em `courses`
+traria seis colunas nulas e uma regra de progresso sem sentido — quando você
+"conclui" um app?
+
+Reaproveita de propósito o par provider/asset_id do vídeo (D-17), o
+`content_status` e o `search_doc`, para os apps entrarem na Busca junto com o
+resto.
+
+A ordem da página de um app é a tese: **demonstração, depois como usar, depois
+acesso.** Quem chega ainda não sabe se a ferramenta serve; pedir para ler um
+passo a passo antes de ver a coisa funcionando é a ordem invertida. O link de
+acesso é opcional — um app pode ser anunciado antes de estar liberado, e aí a
+página não promete uma porta que não abre.
+
+**Dívida assumida:** o envio de vídeo pela própria tela de Apps não está
+ligado. O upload existente está amarrado a `lessons` em seis pontos, e
+generalizá-lo sem poder testar um upload real arriscaria o caminho de vídeo dos
+cursos, que funciona. Por ora o Studio aceita o ID do vídeo no Bunny.
+
+**Dock do celular:** com sete destinos, a regra antiga ("todos menos Buscar e
+Ajuda") deixaria cinco no dock. Os quatro agora são escolhidos a dedo — Início,
+Mapa, Apps, Jornada — porque cinco itens numa barra é exatamente a sopa que
+tirou a barra horizontal do produto.

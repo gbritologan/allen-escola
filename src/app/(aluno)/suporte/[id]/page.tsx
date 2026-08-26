@@ -59,8 +59,8 @@ export default async function ConversaPage({ params }: { params: Promise<{ id: s
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-8 px-6 pt-10 sm:pt-14">
       <header className="flex flex-col gap-3">
-        <Link href="/ajuda" className="text-caption text-ink-3 transition-colors hover:text-ink">
-          ← Ajuda
+        <Link href="/suporte" className="text-caption text-ink-3 transition-colors hover:text-ink">
+          ← Suporte
         </Link>
         <h1 className="text-title font-light">{thread.subject}</h1>
         <div className="flex flex-wrap items-center gap-2">

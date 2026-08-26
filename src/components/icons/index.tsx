@@ -223,3 +223,25 @@ export function IconePainel(props: Props) {
     </Base>
   )
 }
+
+/** Apps — a grade de soluções, com um quadrante no canto chanfrado da marca. */
+export function IconeApps(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M4.5 4.5h5.5v5.5H4.5z" />
+      <path d="M14 4.5h5.5v5.5H14z" />
+      <path d="M4.5 14h5.5v5.5H4.5z" />
+      <path d="M14 14h3.5l2 2v3.5H14z" />
+    </Base>
+  )
+}
+
+/** Masterclass — a sessão: o play dentro da moldura chanfrada. */
+export function IconeMasterclass(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M3.5 5.5h13l4 4v9h-17z" />
+      <path d="m10 10.5 4.5 2.75L10 16z" />
+    </Base>
+  )
+}

@@ -5,11 +5,12 @@ import { usePathname } from 'next/navigation'
 import { Assinatura, Marca } from '@/components/brand/marca'
 import {
   IconeAjuda,
+  IconeApps,
   IconeBuscar,
-  IconeExplorar,
   IconeInicio,
   IconeJornada,
   IconeMapa,
+  IconeMasterclass,
   IconePainel,
 } from '@/components/icons'
 import { cn } from '@/lib/utils'
@@ -35,17 +36,47 @@ import { cn } from '@/lib/utils'
  * continua o dock — sidebar em tela de 375px é o gesto errado.
  */
 
+/**
+ * OS DESTINOS.
+ *
+ * Três mudanças pedidas depois de usar o produto:
+ *
+ * "Ajuda" virou "Suporte". Não é maquiagem: a página tem artigos E abertura de
+ * chamado com histórico. "Ajuda" prometia menos do que ela entrega.
+ *
+ * "Explorar" saiu. Era o catálogo genérico, e três coisas já fazem esse
+ * trabalho melhor — o Mapa mostra onde você está, a Busca acha pelo nome, e a
+ * Home recomenda. A PÁGINA CONTINUA: seis lugares do produto linkam para ela
+ * ("Ver tudo", "Explorar cursos", vazio da Busca). O que saiu foi a cadeira
+ * permanente na sidebar, não a rota.
+ *
+ * "Masterclass" entrou. Já existia como formato de curso, escondido atrás de
+ * uma seção da Home — o formato mais caro de produzir era o mais difícil de
+ * achar.
+ */
 const DESTINOS = [
   { href: '/', label: 'Início', Icone: IconeInicio },
   { href: '/mapa', label: 'Mapa', Icone: IconeMapa },
-  { href: '/explorar', label: 'Explorar', Icone: IconeExplorar },
+  { href: '/masterclass', label: 'Masterclass', Icone: IconeMasterclass },
+  { href: '/apps', label: 'Apps', Icone: IconeApps },
   { href: '/jornada', label: 'Jornada', Icone: IconeJornada },
   { href: '/buscar', label: 'Buscar', Icone: IconeBuscar },
-  { href: '/ajuda', label: 'Ajuda', Icone: IconeAjuda },
+  { href: '/suporte', label: 'Suporte', Icone: IconeAjuda },
 ] as const
 
-/** No celular só cabem quatro. Buscar e Ajuda vivem dentro das telas. */
-const DOCK = DESTINOS.filter((d) => d.href !== '/buscar' && d.href !== '/ajuda')
+/**
+ * No celular cabem quatro, e a lista agora tem sete.
+ *
+ * Escolhidos a dedo em vez de filtrados por exclusão: com sete destinos, uma
+ * regra do tipo "todos menos dois" deixaria cinco no dock e viraria sopa —
+ * exatamente o problema que tirou a barra horizontal do produto.
+ */
+const DOCK = [
+  DESTINOS[0], // Início
+  DESTINOS[1], // Mapa
+  DESTINOS[3], // Apps
+  DESTINOS[4], // Jornada
+] as const
 
 function estaAtivo(pathname: string, href: string) {
   return href === '/' ? pathname === '/' : pathname.startsWith(href)
@@ -208,8 +239,8 @@ export function StudentChrome({
           <Link href="/buscar" className="text-caption text-ink-3">
             Buscar
           </Link>
-          <Link href="/ajuda" className="text-caption text-ink-3">
-            Ajuda
+          <Link href="/suporte" className="text-caption text-ink-3">
+            Suporte
           </Link>
           <Link
             href="/conta"

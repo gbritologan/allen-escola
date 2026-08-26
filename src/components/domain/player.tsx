@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { GlassPanel } from '@/components/surfaces/glass-panel'
 import { formatDuration } from '@/core/shared/format'
-import { salvarPosicao } from './actions'
+import { salvarPosicao } from '@/app/(aluno)/curso/[slug]/[aula]/actions'
 import { cn } from '@/lib/utils'
 
 /**
@@ -31,7 +31,13 @@ export function Player({
 }: {
   src: string
   poster: string | null
-  lessonId: string
+  /**
+   * Nulo quando o vídeo NÃO é uma aula — a demonstração de um app, por
+   * exemplo. Sem aula não há posição a guardar: "de onde você parou" é uma
+   * pergunta sobre um curso, não sobre um vídeo de dois minutos que mostra
+   * uma ferramenta.
+   */
+  lessonId: string | null
   posicaoInicial: number
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -87,6 +93,7 @@ export function Player({
 
   // Salva a cada 15s e ao sair da página. Sem isso, a Home aponta para o começo.
   useEffect(() => {
+    if (!lessonId) return
     const gravar = () => {
       const video = videoRef.current
       if (!video || !video.currentTime) return

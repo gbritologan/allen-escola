@@ -7,7 +7,7 @@ import { requireSession } from '@/lib/auth/session'
 import { createClient } from '@/lib/supabase/server'
 import { NovoChamado } from './novo-chamado'
 
-export const metadata: Metadata = { title: 'Ajuda' }
+export const metadata: Metadata = { title: 'Suporte' }
 
 const ROTULO_STATUS: Record<string, string> = {
   open: 'aguardando a Allen',
@@ -16,7 +16,11 @@ const ROTULO_STATUS: Record<string, string> = {
 }
 
 /**
- * AJUDA.
+ * SUPORTE.
+ *
+ * Chamava-se "Ajuda", e o nome prometia menos do que a página entrega: aqui
+ * tem artigo pronto E chamado com histórico e resposta da equipe. Suporte é o
+ * que isso é.
  *
  * A ordem da página é a tese do suporte: primeiro a resposta pronta, depois o
  * humano. Não porque falar com gente seja caro, mas porque esperar é ruim —
@@ -29,7 +33,7 @@ const ROTULO_STATUS: Record<string, string> = {
  * O formulário fica no fim, sempre visível, sem exigir clique para aparecer.
  * "Fale conosco" atrás de um botão é o padrão de quem não quer ser procurado.
  */
-export default async function AjudaPage({
+export default async function SuportePage({
   searchParams,
 }: {
   searchParams: Promise<{ q?: string; de?: string; aula?: string; curso?: string }>
@@ -80,13 +84,13 @@ export default async function AjudaPage({
     <main className="mx-auto flex max-w-3xl flex-col gap-10 px-6 pt-10 sm:pt-14">
       <header className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
-          <h1 className="text-display font-light">Ajuda</h1>
+          <h1 className="text-display font-light">Suporte</h1>
           <p className="max-w-[56ch] text-lead font-light text-ink-2">
             Procure sua dúvida abaixo. Se não estiver aqui, fale com a gente no fim da página.
           </p>
         </div>
 
-        <form action="/ajuda" method="get" className="flex gap-2">
+        <form action="/suporte" method="get" className="flex gap-2">
           {de && <input type="hidden" name="de" value={de} />}
           {aula && <input type="hidden" name="aula" value={aula} />}
           {curso && <input type="hidden" name="curso" value={curso} />}
@@ -116,7 +120,7 @@ export default async function AjudaPage({
             {(chamados ?? []).map((c) => (
               <Link
                 key={c.id}
-                href={`/ajuda/${c.id}`}
+                href={`/suporte/${c.id}`}
                 className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 transition-colors hover:bg-[rgba(243,245,252,0.03)]"
               >
                 <span className="min-w-0 flex-1 truncate text-body text-ink-2">{c.subject}</span>

@@ -65,7 +65,7 @@ export async function responderChamado(formData: FormData) {
           '',
           '—',
           'Responda por aqui ou continue a conversa em',
-          `${process.env.NEXT_PUBLIC_SITE_URL}/ajuda/${threadId}`,
+          `${process.env.NEXT_PUBLIC_SITE_URL}/suporte/${threadId}`,
         ].join('\n'),
       })
     }

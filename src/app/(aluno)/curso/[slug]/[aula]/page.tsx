@@ -8,7 +8,7 @@ import { requireSession } from '@/lib/auth/session'
 import { createClient } from '@/lib/supabase/server'
 import { concluirAula, registrarAbertura } from './actions'
 import { Aplicacao } from './aplicacao'
-import { Player } from './player'
+import { Player } from '@/components/domain/player'
 import { getVideoProvider, videoConfigurado } from '@/lib/video'
 
 export async function generateMetadata({
@@ -260,7 +260,7 @@ export default async function AulaPage({
             caminho. Quem clica aqui não precisa explicar onde estava — e do
             outro lado ninguém precisa perguntar. */}
         <Link
-          href={`/ajuda?de=${encodeURIComponent(caminho)}&aula=${lesson.id}&curso=${course.id}`}
+          href={`/suporte?de=${encodeURIComponent(caminho)}&aula=${lesson.id}&curso=${course.id}`}
           className="self-start text-caption text-ink-4 transition-colors hover:text-ink-2"
         >
           Algum problema nesta aula?

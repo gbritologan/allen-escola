@@ -83,8 +83,8 @@ export async function abrirChamado(
       .join('\n'),
   })
 
-  revalidatePath('/ajuda')
-  redirect(`/ajuda/${thread.id}`)
+  revalidatePath('/suporte')
+  redirect(`/suporte/${thread.id}`)
 }
 
 /** Responder no próprio chamado. Reabre sozinho, pelo trigger no banco. */
@@ -111,7 +111,7 @@ export async function responder(formData: FormData) {
     texto: `${corpo}\n\n—\n${process.env.NEXT_PUBLIC_SITE_URL}/admin/suporte/${threadId}`,
   })
 
-  revalidatePath(`/ajuda/${threadId}`)
+  revalidatePath(`/suporte/${threadId}`)
 }
 
 /**

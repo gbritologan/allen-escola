@@ -16,6 +16,23 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'image.mux.com' },
     ],
   },
+  /**
+   * `/ajuda` virou `/suporte`.
+   *
+   * O e-mail de notificação de chamado já saiu com links `/ajuda/<id>` na
+   * caixa de entrada de alguém, e esses links não têm como ser corrigidos
+   * retroativamente. Renomear rota sem redirecionar é quebrar o que já foi
+   * enviado.
+   */
+  async redirects() {
+    return [
+      { source: '/ajuda', destination: '/suporte', permanent: true },
+      { source: '/ajuda/:id', destination: '/suporte/:id', permanent: true },
+      // "Explorar" saiu da sidebar mas a página continua; nenhum redirect
+      // aqui, de propósito.
+    ]
+  },
+
   async headers() {
     return [
       {
