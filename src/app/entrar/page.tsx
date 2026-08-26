@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import { destinoDepoisDoLogin } from '@/core/identity/destino'
 import { Athena } from '@/components/backgrounds/athena'
 import { Aurora } from '@/components/backgrounds/aurora'
 import { Assinatura } from '@/components/brand/marca'
@@ -18,7 +19,7 @@ export default async function EntrarPage({
   if (session) redirect('/')
 
   const { destino, codigo } = await searchParams
-  const destination = destino?.startsWith('/') && !destino.startsWith('//') ? destino : '/'
+  const destination = destinoDepoisDoLogin(destino)
 
   return (
     <main className="relative min-h-dvh overflow-hidden bg-navy-deep">

@@ -1,6 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { destinoDepoisDoLogin } from '@/core/identity/destino'
 import { createClient } from '@/lib/supabase/server'
 
 export interface LoginState {
@@ -113,8 +114,7 @@ export async function verifyCode(prev: LoginState, formData: FormData): Promise<
     }
   }
 
-  // Só destinos internos. Um `?destino=` apontando para fora vira redirecionamento aberto.
-  redirect(destination.startsWith('/') && !destination.startsWith('//') ? destination : '/')
+  redirect(destinoDepoisDoLogin(destination))
 }
 
 export async function signOut() {

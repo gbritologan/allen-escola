@@ -611,3 +611,26 @@ sempre completo. As aulas que você aplicou acendem dentro dele.
 Isso é melhor por três razões. É honesto — o centro mostra o que existe, não o
 que você fez. É estável — não encolhe quando alguém entra. E continua pessoal,
 porque a sua parte acesa está lá dentro, contra o total.
+
+## D-39 · Voltar para onde você estava vale para conteúdo, não para vista
+
+O Gabriel entrou e caiu direto no Mapa. Era a regra "volta para onde queria
+ir" funcionando: ele estava no Mapa, a sessão barrou, ele entrou, voltou ao
+Mapa. Tecnicamente correto, e errado na prática.
+
+A regra é boa e continua: quem clicou no link de uma aula e foi barrado pelo
+login precisa cair naquela aula. É isso que faz um link compartilhado valer
+alguma coisa.
+
+Mas ela só vale quando o destino **guarda algo específico**. O Mapa não guarda
+nada — não tem posição salva, não tem progresso, não é conteúdo. É uma vista,
+e você chega nela escolhendo ir. Ser despejado num céu estrelado de tela cheia
+logo após digitar um código não devolve nada; só desorienta.
+
+Regra: destino que é vista não vale a volta. Hoje a lista tem só `/mapa`.
+
+**Bug encontrado no caminho:** o proxy gravava `?destino=`, o formulário lia
+`destino`, e o callback do link de e-mail lia `next`. Quem digitava o código
+voltava ao lugar certo; quem clicava no link do e-mail caía sempre na home.
+Dois caminhos de entrada, dois comportamentos. Agora os dois passam pela mesma
+função.
