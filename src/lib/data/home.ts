@@ -112,3 +112,67 @@ async function getJourneySummary(userId: string) {
     applications: aplicacoes.count ?? 0,
   }
 }
+
+/**
+ * O banner do topo da Home.
+ *
+ * Publicado, o de menor `position`. Um só: dois banners empilhados no lugar
+ * mais nobre da tela é o começo de um carrossel, e carrossel é onde destaque
+ * vai para não ser visto.
+ */
+export async function getBanner() {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('home_banners')
+    .select('id, eyebrow, title, subtitle, cta_label, cta_href, image_url')
+    .eq('status', 'published')
+    .order('position')
+    .limit(1)
+    .maybeSingle()
+
+  if (!data) return null
+
+  return {
+    id: data.id as string,
+    eyebrow: data.eyebrow as string | null,
+    title: data.title as string | null,
+    subtitle: data.subtitle as string | null,
+    ctaLabel: data.cta_label as string | null,
+    ctaHref: data.cta_href as string | null,
+    imageUrl: data.image_url as string | null,
+  }
+}
+
+/**
+ * Os cursos anunciados e ainda fechados.
+ *
+ * Publicados com `available_at` no futuro. Ficam FORA das outras faixas — ver
+ * "Em breve" misturado ao que já dá para assistir transforma cada clique numa
+ * aposta.
+ */
+export async function getEmBreve() {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('courses')
+    .select(
+      'id, slug, title, summary, cover_url, format, duration_seconds, lesson_count, available_at',
+    )
+    .eq('status', 'published')
+    .gt('available_at', new Date().toISOString())
+    .order('available_at')
+    .limit(6)
+
+  return (data ?? []).map((c) => ({
+    id: c.id as string,
+    slug: c.slug as string,
+    title: c.title as string,
+    summary: c.summary as string | null,
+    coverUrl: c.cover_url as string | null,
+    format: c.format as 'course' | 'masterclass',
+    durationSeconds: c.duration_seconds as number,
+    lessonCount: c.lesson_count as number,
+    instructorName: null,
+    themeNames: [] as string[],
+    availableAt: c.available_at as string | null,
+  }))
+}

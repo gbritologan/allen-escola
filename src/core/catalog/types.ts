@@ -120,6 +120,22 @@ export interface CourseSummary {
   lessonCount: number
   instructorName: string | null
   themeNames: string[]
+  /**
+   * Data em que o curso abre. Nula = já aberto.
+   *
+   * Se estiver no futuro, o curso é "Em breve": aparece no catálogo, mostra a
+   * capa, e não deixa entrar. Uma DATA e não um estado, para o curso abrir
+   * sozinho no dia — status precisaria de alguém lembrando de voltar lá.
+   */
+  availableAt: string | null
+}
+
+/** Ainda não abriu. */
+export function emBreve(
+  curso: { availableAt: string | null },
+  agora: Date = new Date(),
+): boolean {
+  return Boolean(curso.availableAt && new Date(curso.availableAt) > agora)
 }
 
 /** Curso com currículo carregado — o formato que a página do curso consome. */

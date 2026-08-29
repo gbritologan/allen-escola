@@ -853,3 +853,59 @@ tudo — a interface mentindo sobre o banco.
 
 **Preço não aparece em lugar nenhum.** O aluno vê janela e plano; quanto pagou
 é assunto de cobrança, não de sala de aula.
+
+## D-48 · A capa existia no banco e não existia no produto
+
+`courses.cover_url` está lá desde 0003 e é lido em quatro telas. Nunca houve
+como preencher: sem bucket de Storage, sem upload no Studio, e o `CourseCard`
+sequer olhava o campo — desenhava sempre a inicial do curso.
+
+Bucket `imagens` (0019), público, com escrita só para a equipe. Três usos, um
+mecanismo: capa de curso, retrato de instrutor, banner da Home.
+
+**Público** porque capa é vitrine. URL assinada custaria uma ida ao servidor
+por cartão para proteger o que a pessoa já pode ver.
+
+**O nome do arquivo carrega o relógio.** Sem isso, trocar a capa gravaria no
+mesmo caminho, a URL não mudaria, e o CDN serviria a imagem velha por horas —
+quem trocou juraria que o upload falhou.
+
+**Vídeo continua fora** (D-17: mora no provedor, com ticket que expira). Capa é
+cartaz; aula é o produto.
+
+## D-49 · "Em breve" é uma data, não um estado
+
+`available_at` no futuro: o curso aparece no catálogo com a capa e o selo, e
+não deixa entrar.
+
+Não virou um quarto valor do enum de propósito. "Em breve" não é estágio de
+edição como rascunho — é uma data. Como enum, alguém teria que voltar e trocar
+o status na mão no dia certo, e é exatamente o tipo de tarefa que ninguém
+lembra de fazer. Como data, o curso abre sozinho.
+
+**Na página do curso, o currículo some.** Mostrar a lista de aulas com todos os
+links mortos é pior que não mostrar: a pessoa clica, nada acontece, e conclui
+que quebrou. A data ocupa o lugar da lista.
+
+**No cartão, a capa fica dessaturada.** O olho registra "ainda não" antes de
+ler o selo.
+
+**Na Home, "Em breve" vem por último.** É promessa, e promessa antes da entrega
+inverte a ordem do produto.
+
+## D-50 · O banner: espaço reservado que não aparece vazio
+
+Tabela e não constante, porque trocar o destaque da Home é gesto semanal de
+quem escreve (D-04).
+
+**Sem arte, o banner não ocupa espaço nenhum.** Um retângulo com "banner aqui"
+no lugar mais nobre da Home é pior que não ter banner: o aluno não sabe que é
+espaço reservado, ele vê um defeito.
+
+**A medida (1440×360) está escrita em três lugares** — migration, componente e
+Studio — porque é a única arte do produto feita FORA dele. Medida que mora só
+na cabeça de quem programou volta errada.
+
+**Publicar um arquiva os outros.** A Home mostra um banner; dois publicados
+fariam o segundo sumir sem explicação, e quem publicou juraria que não
+funcionou.

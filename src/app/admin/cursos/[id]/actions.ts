@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { slugify } from '@/core/shared/slug'
+import { apagarImagem, enviarImagem } from '@/lib/imagens'
 import { createClient } from '@/lib/supabase/server'
 
 function revalidar(courseId: string) {
@@ -24,6 +25,18 @@ export async function atualizarCurso(formData: FormData) {
   const instructorId = String(formData.get('instructor_id') ?? '')
   const format = String(formData.get('format') ?? 'course')
 
+  /*
+   * "EM BREVE" É UMA DATA, NÃO UM ESTADO.
+   *
+   * Em branco = disponível assim que publicado. Data no futuro = aparece no
+   * catálogo com o selo e não deixa entrar, e vira disponível SOZINHO no dia —
+   * ninguém precisa lembrar de voltar aqui.
+   *
+   * O -03 é obrigatório: `<input type="date">` manda "2026-10-15" sem fuso, e
+   * o Postgres leria como UTC, abrindo o curso às 21h do dia anterior.
+   */
+  const disponivelEm = String(formData.get('available_at') ?? '').trim()
+
   const supabase = await createClient()
   await supabase
     .from('courses')
@@ -34,8 +47,58 @@ export async function atualizarCurso(formData: FormData) {
       description: description || null,
       instructor_id: instructorId || null,
       format: format === 'masterclass' ? 'masterclass' : 'course',
+      available_at: disponivelEm ? `${disponivelEm} 00:00:00-03` : null,
     })
     .eq('id', id)
+
+  revalidar(id)
+}
+
+/**
+ * A capa do curso.
+ *
+ * `cover_url` existia desde 0003 e era lida em quatro telas; nunca houve como
+ * preencher. Toda capa era nula, e todo cartão saía cinza.
+ *
+ * A antiga é apagada depois que a nova entrou — nessa ordem. O contrário
+ * deixaria o curso sem capa nenhuma se o envio falhasse no meio.
+ */
+export async function enviarCapa(formData: FormData) {
+  const id = String(formData.get('id') ?? '')
+  const slug = String(formData.get('slug') ?? 'curso')
+  const arquivo = formData.get('arquivo')
+  if (!id || !(arquivo instanceof File)) return
+
+  const { url } = await enviarImagem(arquivo, 'capas', slug)
+  if (!url) return
+
+  const supabase = await createClient()
+  const { data: antes } = await supabase
+    .from('courses')
+    .select('cover_url')
+    .eq('id', id)
+    .maybeSingle()
+
+  await supabase.from('courses').update({ cover_url: url }).eq('id', id)
+  await apagarImagem(antes?.cover_url)
+
+  revalidar(id)
+}
+
+/** Tirar a capa. Volta ao cartão sem imagem, que é um estado legítimo. */
+export async function removerCapa(formData: FormData) {
+  const id = String(formData.get('id') ?? '')
+  if (!id) return
+
+  const supabase = await createClient()
+  const { data: antes } = await supabase
+    .from('courses')
+    .select('cover_url')
+    .eq('id', id)
+    .maybeSingle()
+
+  await supabase.from('courses').update({ cover_url: null }).eq('id', id)
+  await apagarImagem(antes?.cover_url)
 
   revalidar(id)
 }

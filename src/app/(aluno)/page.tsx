@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { ContinueCard } from '@/components/domain/continue-card'
 import { CourseCard } from '@/components/domain/course-card'
 import { ButtonLink } from '@/components/primitives/button'
-import { getHomeBlocks } from '@/lib/data/home'
+import { Banner } from '@/components/domain/banner'
+import { getBanner, getEmBreve, getHomeBlocks } from '@/lib/data/home'
 import { requireSession } from '@/lib/auth/session'
 
 /**
@@ -17,7 +18,11 @@ import { requireSession } from '@/lib/auth/session'
  */
 export default async function HomePage() {
   const session = await requireSession()
-  const blocks = await getHomeBlocks(session.userId)
+  const [blocks, banner, emBreve] = await Promise.all([
+    getHomeBlocks(session.userId),
+    getBanner(),
+    getEmBreve(),
+  ])
 
   const primeiroNome = (session.profile?.fullName ?? '').trim().split(' ')[0]
 
@@ -28,6 +33,10 @@ export default async function HomePage() {
           {primeiroNome ? `Olá, ${primeiroNome}.` : 'Olá.'}
         </h1>
       </header>
+
+      {/* O destaque. Sem arte publicada ele não ocupa espaço nenhum — a Home
+          fecha em volta como se ele não existisse. */}
+      {banner && <Banner banner={banner} />}
 
       {blocks.map((block) => {
         switch (block.kind) {
@@ -132,6 +141,24 @@ export default async function HomePage() {
             )
         }
       })}
+
+      {/* EM BREVE vem depois de tudo que já dá para fazer. É promessa, e
+          promessa antes de entrega inverte a ordem do produto. */}
+      {emBreve.length > 0 && (
+        <section className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <SectionLabel>Em breve</SectionLabel>
+            <p className="text-body text-ink-3">
+              Já está no seu catálogo. Abre sozinho na data.
+            </p>
+          </div>
+          <Grade>
+            {emBreve.map((c) => (
+              <CourseCard key={c.id} course={c} />
+            ))}
+          </Grade>
+        </section>
+      )}
     </main>
   )
 }

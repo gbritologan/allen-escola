@@ -17,6 +17,7 @@ import {
   moverAula,
   publicarCurso,
 } from './actions'
+import { Capa } from './capa'
 
 export async function generateMetadata({
   params,
@@ -43,7 +44,7 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
       supabase
         .from('courses')
         .select(
-          'id, title, slug, summary, description, format, status, instructor_id, lesson_count, duration_seconds',
+          'id, title, slug, summary, description, format, status, instructor_id, lesson_count, duration_seconds, cover_url, available_at',
         )
         .eq('id', id)
         .maybeSingle(),
@@ -159,6 +160,21 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
               <Textarea id="description" name="description" defaultValue={course.description ?? ''} />
             </Field>
 
+            {/* "Em breve" é uma data e não um botão: assim o curso abre sozinho
+                no dia, sem depender de alguém lembrar de voltar aqui. */}
+            <Field
+              label="Disponível a partir de"
+              htmlFor="available_at"
+              hint="Em branco: disponível assim que publicado. Data no futuro: aparece como 'Em breve' e abre sozinho no dia."
+            >
+              <Input
+                id="available_at"
+                name="available_at"
+                type="date"
+                defaultValue={course.available_at ? String(course.available_at).slice(0, 10) : ''}
+              />
+            </Field>
+
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Instrutor" htmlFor="instructor_id">
                 <select
@@ -197,6 +213,8 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
       </section>
 
       {/* ---------------------------------------------------------------- */}
+      <Capa id={course.id} slug={course.slug} coverUrl={course.cover_url ?? null} />
+
       <section className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <h2 className="text-title font-light">Temas</h2>

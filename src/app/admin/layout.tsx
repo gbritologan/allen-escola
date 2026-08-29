@@ -28,6 +28,7 @@ const NAV = [
   { href: '/admin', label: 'Painel' },
   { href: '/admin/temas', label: 'Temas' },
   { href: '/admin/apps', label: 'Apps' },
+  { href: '/admin/banner', label: 'Banner' },
   { href: '/admin/cursos', label: 'Cursos' },
   { href: '/admin/instrutores', label: 'Instrutores' },
   { href: '/admin/habilidades', label: 'Habilidades' },
