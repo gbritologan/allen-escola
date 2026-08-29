@@ -909,3 +909,62 @@ na cabeça de quem programou volta errada.
 **Publicar um arquiva os outros.** A Home mostra um banner; dois publicados
 fariam o segundo sumir sem explicação, e quem publicou juraria que não
 funcionou.
+
+## D-51 · O vidro veio com o que ele filtra
+
+D-15 dizia: card é superfície opaca, nunca vidro, "porque não há nada se
+movendo por trás dele". O Gabriel pediu vidro como padrão da marca, e eu
+levantei essa mesma objeção antes de fazer.
+
+A resposta não foi ignorar a objeção — foi remover a premissa. Junto com o
+vidro entrou o `AmbienteAllen`: três massas de luz, grandes e moles, respirando
+fora de fase atrás de toda a área do aluno. Ao rolar, cada painel atravessa
+regiões de tom diferente, e é isso que faz vidro parecer vidro em vez de
+plástico fosco.
+
+**CSS e não a Aurora.** A `Aurora` de WebGL do login é bonita e cara: contexto
+GL, shader, laço de animação. Atrás de TODA tela do produto, ela brigaria com a
+navegação rápida de D-41. Três gradientes radiais e uma animação de opacidade o
+compositor resolve na GPU.
+
+**A intensidade precisou subir.** `vigil-breathe` opera em 13–19% de opacidade
+— calibragem de TEXTURA de fundo. Aqui a luz é o assunto, e nessa faixa o vidro
+não tinha o que pegar. Cada massa sobrescreve `--vigil-min/max`.
+
+**Dois níveis de vidro, e a diferença é performance:**
+
+- `liquid-glass` (26px) — poucas superfícies, grandes e fixas: sidebar, dock.
+- `glass-card` (12px) — o que se repete em grade.
+
+`backdrop-filter` faz o navegador recompor o que está atrás de cada elemento.
+Numa grade de doze cartões, 26px derruba o scroll em máquina modesta — e
+ninguém distingue 12 de 26 num cartão de 300px.
+
+**`@supports not (backdrop-filter)`** devolve um painel sólido escuro. Sem esse
+ramo, onde o filtro não existe o vidro vira um retângulo transparente com texto
+ilegível por cima do fundo.
+
+## D-52 · Masterclass não é aula comum com mais enfeite
+
+O Gabriel pediu Masterclass mais premium. A diferença implementada não é
+decoração a mais — é uma ordem de leitura diferente, porque as duas coisas são
+consumidas de formas diferentes.
+
+**Aula comum é ferramenta.** Você chega sabendo o que quer: lê o título,
+assiste, aplica. Título primeiro, vídeo dentro da coluna, peso `font-light` —
+o peso de trabalho.
+
+**Masterclass é sessão.** Você reserva o tempo e mergulha. O vídeo vem
+primeiro, rompendo a coluna, com moldura escura em volta; o título vem depois,
+em `font-hair` — o peso editorial da casa, o mesmo do título do curso. Como a
+legenda de um filme, não como a etiqueta de um item.
+
+**O expert aparece, e só nela.** "Um expert. Um assunto. Um mergulho profundo"
+— na Masterclass quem ensina é parte do que se compra. Em curso comum o
+instrutor já está na página do curso, e repetir em toda aula é ruído mais uma
+consulta por navegação.
+
+**O corpo é o mesmo nos dois.** Para Saber, Para Fazer, materiais e o índice do
+módulo valem igual — o que muda é a ordem e a moldura. Dois returns com o
+conteúdo duplicado seria garantir que a próxima correção entrasse em só um
+deles.

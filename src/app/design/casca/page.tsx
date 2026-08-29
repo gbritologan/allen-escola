@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import { AmbienteAllen } from '@/components/backgrounds/ambiente'
 import { StudentChrome } from '@/components/nav/chrome'
+import { Surface } from '@/components/surfaces/surface'
 import { canOpenAdmin } from '@/core/identity/permissions'
 import { getSession } from '@/lib/auth/session'
 
@@ -21,6 +23,7 @@ export default async function CascaExemploPage() {
 
   return (
     <>
+      <AmbienteAllen />
       <StudentChrome nome="Gabriel" email="gabriel@allenescola.com" ehEquipe />
       <div className="pb-28 md:pb-10 md:pl-60">
         <main className="mx-auto flex max-w-4xl flex-col gap-8 px-6 pt-10 sm:pt-14">
@@ -35,13 +38,10 @@ export default async function CascaExemploPage() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {['Negociação', 'Vendas', 'IA no trabalho', 'Comunicação', 'Liderança', 'Dados'].map(
               (t) => (
-                <div
-                  key={t}
-                  className="flex flex-col gap-2 rounded-[var(--radius-card)] border border-line bg-navy p-5"
-                >
+                <Surface key={t} interactive className="flex flex-col gap-2 p-5">
                   <span className="text-body text-ink">{t}</span>
                   <span className="text-caption text-ink-4">3 aulas · 42min</span>
-                </div>
+                </Surface>
               ),
             )}
           </div>

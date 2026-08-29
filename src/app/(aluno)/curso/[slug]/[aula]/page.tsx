@@ -7,6 +7,7 @@ import { formatDuration, formatPosition } from '@/core/shared/format'
 import { requireSession } from '@/lib/auth/session'
 import { createClient } from '@/lib/supabase/server'
 import { concluirAula, registrarAbertura } from './actions'
+import Image from 'next/image'
 import { Aplicacao } from './aplicacao'
 import { Player } from '@/components/domain/player'
 import { getVideoProvider, videoConfigurado } from '@/lib/video'
@@ -60,10 +61,27 @@ export default async function AulaPage({
 
   const { data: course } = await supabase
     .from('courses')
-    .select('id, slug, title')
+    .select('id, slug, title, format, instructor_id')
     .eq('slug', slug)
     .maybeSingle()
   if (!course) notFound()
+
+  /*
+   * O EXPERT SÓ É BUSCADO NA MASTERCLASS.
+   *
+   * "Um expert. Um assunto. Um mergulho profundo." — na Masterclass quem
+   * ensina é parte do que se compra, e some da tela hoje. Em curso comum o
+   * instrutor já aparece na página do curso, e repetir em toda aula é ruído
+   * mais uma consulta por navegação.
+   */
+  const masterclass = course.format === 'masterclass'
+  const { data: expert } = masterclass && course.instructor_id
+    ? await supabase
+        .from('instructors')
+        .select('name, headline, photo_url')
+        .eq('id', course.instructor_id)
+        .maybeSingle()
+    : { data: null }
 
   const { data: lesson } = await supabase
     .from('lessons')
@@ -145,41 +163,50 @@ export default async function AulaPage({
   const concluida = progresso?.state === 'completed'
   const caminho = `/curso/${course.slug}/${lesson.slug}`
 
-  return (
-    <main className="mx-auto grid max-w-6xl gap-10 px-6 pt-10 sm:pt-14 lg:grid-cols-[minmax(0,1fr)_260px]">
-      <article className="flex flex-col gap-8">
-        <header className="flex flex-col gap-3">
-          <Link
-            href={`/curso/${course.slug}`}
-            className="text-caption text-ink-3 transition-colors hover:text-ink"
-          >
-            ← {course.title}
-          </Link>
-          <span data-numeric className="text-caption uppercase tracking-[0.16em] text-ink-4">
-            Módulo {formatPosition(mod?.position ?? 1)} · Aula {formatPosition(lesson.position)}
-          </span>
-          <h1 className="max-w-[20ch] text-display font-light">{lesson.title}</h1>
-          {lesson.description && (
-            <p className="max-w-[58ch] text-lead font-light text-ink-2">{lesson.description}</p>
-          )}
-        </header>
+  const semVideo = (
+    <div className="flex aspect-video items-center justify-center rounded-[var(--radius-card)] border border-dashed border-line bg-[linear-gradient(140deg,rgba(18,23,61,0.8),rgba(5,7,20,1))]">
+      <span className="px-6 text-center text-label text-ink-4">
+        Esta aula ainda não tem vídeo. O que está escrito abaixo já vale.
+      </span>
+    </div>
+  )
 
-        {/* --- Vídeo ------------------------------------------------------- */}
-        {video ? (
-          <Player
-            src={video.url}
-            poster={video.poster}
-            lessonId={lesson.id}
-            posicaoInicial={progresso?.position_seconds ?? 0}
-          />
-        ) : (
-          <div className="flex aspect-video items-center justify-center rounded-[var(--radius-card)] border border-dashed border-line bg-[linear-gradient(140deg,rgba(18,23,61,0.8),rgba(5,7,20,1))]">
-            <span className="px-6 text-center text-label text-ink-4">
-              Esta aula ainda não tem vídeo. O que está escrito abaixo já vale.
-            </span>
-          </div>
-        )}
+  const player = video ? (
+    <Player
+      src={video.url}
+      poster={video.poster}
+      lessonId={lesson.id}
+      posicaoInicial={progresso?.position_seconds ?? 0}
+    />
+  ) : (
+    semVideo
+  )
 
+  /*
+   * ================== MASTERCLASS ==================
+   *
+   * O Gabriel pediu que a Masterclass fosse mais premium que a aula comum.
+   * A diferença NÃO é enfeite a mais — é uma ordem de leitura diferente,
+   * porque as duas coisas são consumidas de formas diferentes.
+   *
+   * Aula comum é ferramenta: você chega sabendo o que quer, lê o título,
+   * assiste, aplica. Título primeiro, vídeo dentro da coluna.
+   *
+   * Masterclass é sessão: você reserva o tempo e mergulha. Então o vídeo vem
+   * PRIMEIRO e em tela cheia, com a moldura escura em volta — o título aparece
+   * depois, como a legenda de um filme, não como a etiqueta de um item. E o
+   * expert aparece, porque na Masterclass quem ensina é parte do que se compra.
+   */
+  /*
+   * O CORPO E A LATERAL SÃO OS MESMOS NOS DOIS FORMATOS.
+   *
+   * O que muda entre aula comum e Masterclass é a ORDEM e a MOLDURA, nunca o
+   * conteúdo: Para Saber, Para Fazer, materiais e o índice do módulo valem
+   * igual nos dois. Duplicar isso em dois returns seria garantir que uma
+   * correção futura entrasse só em um deles.
+   */
+  const corpo = (
+    <>
         {/* --- Para saber -------------------------------------------------- */}
         {lesson.para_saber?.trim() && (
           <section className="flex flex-col gap-3 border-l-2 border-l-line-strong pl-5">
@@ -282,9 +309,10 @@ export default async function AulaPage({
             </span>
           </Link>
         )}
-      </article>
+    </>
+  )
 
-      {/* --- Neste módulo -------------------------------------------------- */}
+  const lateral = (
       <aside className="flex h-fit flex-col gap-3 lg:sticky lg:top-20">
         <h2 className="text-caption font-medium uppercase tracking-[0.16em] text-ink-3">
           {mod?.title ?? 'Neste módulo'}
@@ -319,6 +347,126 @@ export default async function AulaPage({
         </span>
         {aplicada && <Chip tone="positive">Você aplicou esta aula</Chip>}
       </aside>
+  )
+
+  /*
+   * ================== MASTERCLASS ==================
+   *
+   * A diferença não é enfeite a mais — é uma ordem de leitura diferente,
+   * porque as duas coisas são consumidas de formas diferentes.
+   *
+   * Aula comum é FERRAMENTA: você chega sabendo o que quer, lê o título,
+   * assiste, aplica. Título primeiro, vídeo dentro da coluna.
+   *
+   * Masterclass é SESSÃO: você reserva o tempo e mergulha. O vídeo vem
+   * primeiro, rompendo a coluna, com moldura escura em volta. O título vem
+   * depois — como a legenda de um filme, não como a etiqueta de um item. E o
+   * expert aparece, porque na Masterclass quem ensina é parte do que se compra.
+   */
+  if (masterclass) {
+    return (
+      <main className="flex flex-col">
+        {/* Sem margem negativa: este <main> não tem respiro no topo para
+            comer, e puxar para cima meteria o vídeo embaixo da barra do
+            celular. A moldura escura já é o que separa a sessão do resto. */}
+        <section className="relative bg-[rgba(3,4,14,0.86)] py-8 sm:py-12">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[linear-gradient(to_bottom,rgba(76,65,255,0.14),transparent)]"
+          />
+          <div className="relative mx-auto w-full max-w-5xl px-4 sm:px-6">
+            <Link
+              href={`/curso/${course.slug}`}
+              className="mb-5 inline-block text-caption text-ink-3 transition-colors hover:text-ink"
+            >
+              ← {course.title}
+            </Link>
+            {player}
+          </div>
+        </section>
+
+        <div className="mx-auto grid w-full max-w-6xl gap-10 px-6 py-10 lg:grid-cols-[minmax(0,1fr)_260px]">
+          <article className="flex flex-col gap-8">
+            <header className="flex flex-col gap-4">
+              <span className="text-caption uppercase tracking-[0.22em] text-blue-light">
+                Masterclass
+              </span>
+              {/* `font-hair` é o peso editorial da casa, o mesmo do título do
+                  curso. A aula comum usa `font-light`, que é o de trabalho. */}
+              <h1 className="max-w-[16ch] text-display font-hair leading-[1.05]">{lesson.title}</h1>
+              {lesson.description && (
+                <p className="max-w-[54ch] text-lead font-light text-ink-2">
+                  {lesson.description}
+                </p>
+              )}
+              <span data-numeric className="text-caption uppercase tracking-[0.16em] text-ink-4">
+                Módulo {formatPosition(mod?.position ?? 1)} · Aula {formatPosition(lesson.position)}
+                {lesson.duration_seconds > 0 && ` · ${formatDuration(lesson.duration_seconds)}`}
+              </span>
+            </header>
+
+            {expert && (
+              <div className="flex items-center gap-4 border-y border-line py-5">
+                {expert.photo_url ? (
+                  <Image
+                    src={expert.photo_url}
+                    alt=""
+                    width={52}
+                    height={52}
+                    className="size-[52px] shrink-0 rounded-full object-cover"
+                  />
+                ) : (
+                  <span
+                    aria-hidden
+                    className="flex size-[52px] shrink-0 items-center justify-center rounded-full border border-line text-lead font-light text-ink-3"
+                  >
+                    {expert.name.charAt(0)}
+                  </span>
+                )}
+                <div className="flex min-w-0 flex-col">
+                  <span className="text-body text-ink">{expert.name}</span>
+                  {expert.headline && (
+                    <span className="text-caption text-ink-4">{expert.headline}</span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {corpo}
+          </article>
+
+          {lateral}
+        </div>
+      </main>
+    )
+  }
+
+  // ================== AULA COMUM ==================
+  return (
+    <main className="mx-auto grid max-w-6xl gap-10 px-6 pt-10 sm:pt-14 lg:grid-cols-[minmax(0,1fr)_260px]">
+      <article className="flex flex-col gap-8">
+        <header className="flex flex-col gap-3">
+          <Link
+            href={`/curso/${course.slug}`}
+            className="text-caption text-ink-3 transition-colors hover:text-ink"
+          >
+            ← {course.title}
+          </Link>
+          <span data-numeric className="text-caption uppercase tracking-[0.16em] text-ink-4">
+            Módulo {formatPosition(mod?.position ?? 1)} · Aula {formatPosition(lesson.position)}
+          </span>
+          <h1 className="max-w-[20ch] text-display font-light">{lesson.title}</h1>
+          {lesson.description && (
+            <p className="max-w-[58ch] text-lead font-light text-ink-2">{lesson.description}</p>
+          )}
+        </header>
+
+        {player}
+
+        {corpo}
+      </article>
+
+      {lateral}
     </main>
   )
 }

@@ -32,9 +32,9 @@ export function CourseCard({
     <Link
       href={`/curso/${course.slug}`}
       className={cn(
-        'group flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-line bg-navy',
-        'transition-[border-color,transform] duration-200 ease-[var(--ease-allen)]',
-        'hover:-translate-y-0.5 hover:border-line-strong',
+        'group glass-card flex flex-col overflow-hidden rounded-[var(--radius-card)]',
+        'transition-[border-color,box-shadow,transform] duration-200 ease-[var(--ease-allen)]',
+        'hover:glass-card-hover hover:-translate-y-0.5',
         className,
       )}
     >

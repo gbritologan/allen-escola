@@ -256,3 +256,56 @@
     display: none;
   }
 }
+
+/* ===========================================================================
+   A ESCALA DE VIDRO (revisão de D-15)
+
+   D-15 dizia: card é superfície opaca, nunca vidro, "porque não há nada se
+   movendo por trás dele". O argumento era correto — e a premissa mudou. O
+   Gabriel pediu vidro como padrão da marca, e junto com o pedido entrou o
+   `AmbienteAllen`: um campo de luz que respira atrás do conteúdo. Agora HÁ o
+   que filtrar.
+
+   São dois níveis, e a diferença é performance, não gosto. `backdrop-filter`
+   é caro: o navegador recompõe o que está atrás de cada elemento. Numa grade
+   de doze cartões, blur de 26px derruba o scroll em máquina modesta.
+
+     liquid-glass  pesado (26px) — poucas superfícies, grandes e fixas:
+                   a sidebar, o dock, painéis sobrepostos.
+     glass-card    leve (12px) — o que se repete em grade.
+
+   Vidro sem nada atrás é plástico fosco. Se um dia o ambiente sair, isto
+   volta a ser opaco.
+   =========================================================================== */
+
+@utility glass-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.012) 55%),
+    rgba(12, 16, 40, 0.62);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+    0 16px 40px -28px rgba(0, 4, 30, 0.9);
+}
+
+/* O realce do hover soma luz em vez de trocar a cor de fundo — trocar o fundo
+   de um vidro apaga o que está atrás, que é justamente o ponto dele. */
+@utility glass-card-hover {
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
+    0 22px 50px -26px rgba(0, 4, 30, 0.95),
+    0 0 44px -30px rgba(76, 65, 255, 0.65);
+}
+
+/* Onde `backdrop-filter` não existe (Firefox com a flag desligada, WebViews
+   antigas), o vidro vira um painel escuro sólido em vez de um retângulo
+   transparente com texto ilegível por cima do fundo. */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-card,
+  .liquid-glass {
+    background: rgba(10, 14, 34, 0.96);
+  }
+}

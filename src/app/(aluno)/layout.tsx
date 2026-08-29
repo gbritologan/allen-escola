@@ -1,3 +1,4 @@
+import { AmbienteAllen } from '@/components/backgrounds/ambiente'
 import { StudentChrome } from '@/components/nav/chrome'
 import { canOpenAdmin } from '@/core/identity/permissions'
 import { requireSession } from '@/lib/auth/session'
@@ -31,6 +32,9 @@ export default async function AlunoLayout({ children }: { children: React.ReactN
 
   return (
     <>
+      {/* Atrás de tudo, e é o que dá sentido ao vidro (D-51). */}
+      <AmbienteAllen />
+
       <StudentChrome
         nome={nome}
         email={session.email}

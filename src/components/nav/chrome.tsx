@@ -151,7 +151,7 @@ export function StudentChrome({
   return (
     <>
       {/* ---------- Sidebar (desktop) -------------------------------------- */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-line bg-navy-deep px-3 py-5 md:flex">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-[rgba(255,255,255,0.09)] bg-[rgba(8,11,30,0.72)] px-3 py-5 [backdrop-filter:blur(22px)_saturate(150%)] md:flex">
         <Link href="/" aria-label="Allen Escola" className="px-3 pb-6">
           <Assinatura size={21} />
         </Link>
@@ -248,7 +248,7 @@ export function StudentChrome({
       </nav>
 
       {/* ---------- Barra do celular ---------------------------------------- */}
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b border-line bg-[rgba(5,7,20,0.82)] px-5 [backdrop-filter:blur(16px)] md:hidden">
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b border-[rgba(255,255,255,0.09)] bg-[rgba(8,11,30,0.7)] px-5 [backdrop-filter:blur(20px)_saturate(150%)] md:hidden">
         <Link href="/" aria-label="Allen Escola">
           <Marca size={19} />
         </Link>
