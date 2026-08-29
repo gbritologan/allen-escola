@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { isValidSlug, slugify } from '@/core/shared/slug'
+import { apagarImagem, enviarImagem } from '@/lib/imagens'
 import { createClient } from '@/lib/supabase/server'
 
 export interface InstructorFormState {
@@ -109,5 +110,59 @@ export async function apagarInstrutor(formData: FormData) {
   if ((count ?? 0) > 0) return
 
   await supabase.from('instructors').delete().eq('id', id)
+  revalidatePath('/admin/instrutores')
+}
+
+/**
+ * O retrato do instrutor.
+ *
+ * Era um campo de URL para colar link. Isso significa que a foto morava no
+ * servidor de outra pessoa: quando aquele link caísse — e link colado sempre
+ * cai —, a página do curso ficaria com uma imagem quebrada, e ninguém saberia
+ * por quê. Também era a razão de a lista usar <img> cru com eslint-disable: o
+ * `next/image` exige domínio conhecido, e domínio colado nunca é.
+ *
+ * Agora sobe para o bucket `imagens` (0019), no mesmo mecanismo da capa.
+ */
+export async function enviarRetrato(formData: FormData) {
+  const id = String(formData.get('id') ?? '')
+  const slug = String(formData.get('slug') ?? 'instrutor')
+  const arquivo = formData.get('arquivo')
+  if (!id || !(arquivo instanceof File)) return
+
+  const { url } = await enviarImagem(arquivo, 'retratos', slug)
+  if (!url) return
+
+  const supabase = await createClient()
+  const { data: antes } = await supabase
+    .from('instructors')
+    .select('photo_url')
+    .eq('id', id)
+    .maybeSingle()
+
+  await supabase.from('instructors').update({ photo_url: url }).eq('id', id)
+
+  // Só apaga o que era NOSSO. Link colado antigo aponta para fora e não é
+  // nosso para remover.
+  await apagarImagem(antes?.photo_url)
+
+  revalidatePath('/admin/instrutores')
+  revalidatePath('/explorar')
+}
+
+export async function removerRetrato(formData: FormData) {
+  const id = String(formData.get('id') ?? '')
+  if (!id) return
+
+  const supabase = await createClient()
+  const { data: antes } = await supabase
+    .from('instructors')
+    .select('photo_url')
+    .eq('id', id)
+    .maybeSingle()
+
+  await supabase.from('instructors').update({ photo_url: null }).eq('id', id)
+  await apagarImagem(antes?.photo_url)
+
   revalidatePath('/admin/instrutores')
 }

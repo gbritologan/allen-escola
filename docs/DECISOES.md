@@ -968,3 +968,44 @@ consulta por navegação.
 módulo valem igual — o que muda é a ordem e a moldura. Dois returns com o
 conteúdo duplicado seria garantir que a próxima correção entrasse em só um
 deles.
+
+## D-53 · O que faltava para "pronta" ser verdade
+
+O Gabriel perguntou se a plataforma estava pronta. Auditoria em vez de
+resposta, e ela achou cinco buracos — nenhum deles dependia dele.
+
+**Não existia página de erro nem 404.** Endereço errado devolvia a tela padrão
+do Next: fundo branco, fonte do sistema, "This page could not be found" em
+inglês. Num produto pago em português, isso não parece link errado — parece que
+a empresa sumiu. Pior: exceção não tratada mostrava "Application error: a
+client-side exception has occurred", que é o produto morrendo na mão de quem
+pagou. A tela de erro nova NÃO mostra a mensagem técnica (pode vazar nome de
+tabela) e mostra o `digest`, que é o que liga a tela ao log da Vercel.
+
+**Não existia robots.txt.** `app.allenescola.com` é a plataforma: tudo atrás de
+login. Indexar isso não traz aluno — traz o formulário de login da escola no
+Google e robô batendo em rota autenticada. Agora é `disallow: /`.
+
+**Foto de instrutor era link colado.** A imagem morava no servidor de outra
+pessoa, e link colado sempre cai — um dia a página do curso ficaria com imagem
+quebrada e ninguém saberia por quê. Era também a razão de a lista usar `<img>`
+cru com `eslint-disable`: `next/image` exige domínio conhecido, e domínio colado
+nunca é. Agora sobe para o bucket de 0019, e virou `next/image`.
+
+**Não existia termos nem privacidade.** Com 21 clientes pagantes e dado pessoal
+guardado, essa é a falta mais séria da lista. Os dois documentos foram escritos
+a partir do SCHEMA — `profiles`, `subscriptions`, `lesson_progress`,
+`applications`, `skill_signals`, `support_threads` — não copiados de modelo
+genérico. **Precisam de revisão jurídica antes de valer como contrato**, e isso
+está escrito no código.
+
+Moram em código e não no banco de propósito: mudança de termos é evento raro e
+precisa de rastro. Termo editável por formulário muda sem ninguém saber quando,
+e a data de vigência vira mentira.
+
+Abrem sem login, porque quem está decidindo se assina e quem quer conferir o
+que aceitou não deveriam precisar de conta para ler as regras.
+
+**`profiles.onboarded_at` existe e ninguém escreve nela.** Fica registrado como
+dívida: ou vira boas-vindas de primeiro acesso, ou sai do schema. Coluna que
+promete um comportamento inexistente é pior que coluna nenhuma.

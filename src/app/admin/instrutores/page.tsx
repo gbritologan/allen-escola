@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/primitives/button'
 import { Chip } from '@/components/primitives/chip'
@@ -6,7 +7,7 @@ import { IconeApagar } from '@/components/icons'
 import { Field, Input, Textarea } from '@/components/primitives/field'
 import { Surface } from '@/components/surfaces/surface'
 import { createClient } from '@/lib/supabase/server'
-import { apagarInstrutor, salvarInstrutor } from './actions'
+import { apagarInstrutor, enviarRetrato, salvarInstrutor } from './actions'
 import { NovoInstrutor } from './novo-instrutor'
 
 export const metadata: Metadata = { title: 'Instrutores' }
@@ -90,10 +91,14 @@ export default async function InstrutoresPage() {
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="flex items-center gap-3">
                       {pessoa.photo_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        /* Virou next/image porque o retrato agora mora no
+                           nosso Storage — domínio conhecido. Com link colado
+                           isso era impossível, daí o eslint-disable de antes. */
+                        <Image
                           src={pessoa.photo_url}
                           alt=""
+                          width={44}
+                          height={44}
                           className="size-11 shrink-0 rounded-full object-cover"
                         />
                       ) : (
@@ -134,6 +139,27 @@ export default async function InstrutoresPage() {
                     )}
                   </div>
 
+                  {/* Envio do retrato: form próprio, porque tem ação
+                      própria. Aninhar <form> dentro de <form> é inválido em
+                      HTML e o navegador desfaz do jeito dele. */}
+                  <form action={enviarRetrato} className="flex flex-wrap items-center gap-3 pb-4">
+                    <input type="hidden" name="id" value={pessoa.id} />
+                    <input type="hidden" name="slug" value={pessoa.slug} />
+                    <input
+                      type="file"
+                      name="arquivo"
+                      accept="image/jpeg,image/png,image/webp,image/avif"
+                      required
+                      className="max-w-[15rem] text-caption text-ink-3 file:mr-3 file:rounded-[var(--radius-control)] file:border file:border-line file:bg-transparent file:px-3 file:py-1.5 file:text-caption file:text-ink-2"
+                    />
+                    <button
+                      type="submit"
+                      className="rounded-[var(--radius-control)] border border-line px-3 py-1.5 text-caption text-ink-2 transition-colors hover:border-line-strong hover:text-ink"
+                    >
+                      {pessoa.photo_url ? 'Trocar foto' : 'Enviar foto'}
+                    </button>
+                  </form>
+
                   <form action={salvarInstrutor} className="flex flex-col gap-4">
                     <input type="hidden" name="id" value={pessoa.id} />
 
@@ -147,19 +173,10 @@ export default async function InstrutoresPage() {
                         />
                       </Field>
 
-                      <Field
-                        label="Foto"
-                        htmlFor={`photo-${pessoa.id}`}
-                        hint="Endereço da imagem. Quadrada, de preferência."
-                      >
-                        <Input
-                          id={`photo-${pessoa.id}`}
-                          name="photo_url"
-                          type="url"
-                          defaultValue={pessoa.photo_url ?? ''}
-                          placeholder="https://…"
-                        />
-                      </Field>
+                      {/* O campo de URL saiu: link colado mora no servidor de
+                          outra pessoa e um dia cai. O envio vive fora deste
+                          form, porque tem ação própria. */}
+                      <input type="hidden" name="photo_url" value={pessoa.photo_url ?? ''} />
                     </div>
 
                     <Field

@@ -47,6 +47,15 @@ export default async function ContaPage() {
         />
       </Surface>
 
+      <div className="flex flex-wrap items-center gap-4 text-caption text-ink-4">
+        <Link href="/termos" className="transition-colors hover:text-ink">
+          Termos de uso
+        </Link>
+        <Link href="/privacidade" className="transition-colors hover:text-ink">
+          Privacidade
+        </Link>
+      </div>
+
       {canOpenAdmin(session.role) && (
         <Link
           href="/admin"

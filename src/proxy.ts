@@ -17,6 +17,11 @@ import { roleFromClaim } from '@/core/identity/roles'
 
 const PUBLIC_PREFIXES = [
   '/entrar',
+  // Termos e privacidade abrem sem conta: quem está decidindo se assina, e
+  // quem quer conferir o que aceitou, não deveria precisar de login para ler
+  // as regras.
+  '/termos',
+  '/privacidade',
   '/auth',
   '/_next',
   '/favicon',
