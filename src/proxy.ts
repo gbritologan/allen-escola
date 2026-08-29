@@ -91,6 +91,6 @@ export const config = {
      * Tudo, menos arquivos estáticos e imagens — que não têm sessão para
      * renovar e pagariam o custo à toa.
      */
-    '/((?!_next/static|_next/image|favicon.ico|brand/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|woff2?)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|icon.png|apple-icon.png|robots.txt|brand/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|woff2?)$).*)',
   ],
 }
