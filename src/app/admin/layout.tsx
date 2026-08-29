@@ -32,6 +32,7 @@ const NAV = [
   { href: '/admin/instrutores', label: 'Instrutores' },
   { href: '/admin/habilidades', label: 'Habilidades' },
   { href: '/admin/pessoas', label: 'Pessoas', requer: 'people.manage' as const },
+  { href: '/admin/acessos', label: 'Acessos', requer: 'people.manage' as const },
   { href: '/admin/suporte', label: 'Suporte' },
 ]
 

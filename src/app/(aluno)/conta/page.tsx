@@ -3,9 +3,17 @@ import Link from 'next/link'
 import { Surface } from '@/components/surfaces/surface'
 import { canOpenAdmin } from '@/core/identity/permissions'
 import { ROLE_DESCRIPTION, ROLE_LABEL } from '@/core/identity/roles'
+import { fraseDoAcesso, type EstadoAcesso } from '@/core/identity/acesso'
 import { requireSession } from '@/lib/auth/session'
 
 export const metadata: Metadata = { title: 'Sua conta' }
+
+const ROTULO_ACESSO: Record<EstadoAcesso, string> = {
+  ativo: 'Ativo',
+  aguardando: 'Começa em breve',
+  encerrado: 'Encerrado',
+  suspenso: 'Suspenso',
+}
 
 /**
  * A conta.
@@ -28,10 +36,14 @@ export default async function ContaPage() {
 
       <Surface className="flex flex-col divide-y divide-[var(--color-line)]">
         <Linha rotulo="Papel" valor={ROLE_LABEL[session.role]} nota={ROLE_DESCRIPTION[session.role]} />
+        {/* Era "Ativo" fixo no código, com uma nota dizendo que a cobrança
+            viria depois. Agora que existe gente com prazo combinado, esta
+            linha é a resposta para "até quando eu tenho isso?" — a pergunta
+            que leva alguém a abrir a Conta. */}
         <Linha
           rotulo="Acesso"
-          valor="Ativo"
-          nota="A cobrança entra em um ciclo futuro. Hoje o acesso é liberado por conta."
+          valor={ROTULO_ACESSO[session.acesso?.estado ?? 'ativo']}
+          nota={session.acesso ? fraseDoAcesso(session.acesso) : 'Acesso liberado.'}
         />
       </Surface>
 

@@ -1,6 +1,7 @@
 import 'server-only'
 import { cache } from 'react'
 import { redirect } from 'next/navigation'
+import { avaliarAcesso, type Acesso } from '@/core/identity/acesso'
 import type { Profile, Role } from '@/core/identity/roles'
 import { roleFromClaim } from '@/core/identity/roles'
 import { createClient } from '@/lib/supabase/server'
@@ -10,6 +11,15 @@ export interface Session {
   email: string | null
   role: Role
   profile: Profile | null
+  /**
+   * O estado do acesso — ativo, aguardando o início, encerrado, suspenso.
+   *
+   * Vem junto com a sessão porque três telas precisam dele (a casca do aluno,
+   * a Conta e o Suporte) e buscá-lo três vezes seria três idas ao banco por
+   * navegação. Nulo só se não houver assinatura nenhuma, o que hoje não
+   * acontece: o gatilho de cadastro sempre cria uma.
+   */
+  acesso: Acesso | null
 }
 
 /**
@@ -31,11 +41,18 @@ export const getSession = cache(async (): Promise<Session | null> => {
 
   if (!user) return null
 
-  const { data } = await supabase
-    .from('profiles')
-    .select('id, full_name, avatar_url, role, onboarded_at, created_at')
-    .eq('id', user.id)
-    .maybeSingle()
+  const [{ data }, { data: assinatura }] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('id, full_name, avatar_url, role, onboarded_at, created_at')
+      .eq('id', user.id)
+      .maybeSingle(),
+    supabase
+      .from('subscriptions')
+      .select('status, started_at, ends_at')
+      .eq('user_id', user.id)
+      .maybeSingle(),
+  ])
 
   /**
    * O papel vem do JWT quando o hook está ligado; de `profiles` quando não.
@@ -57,6 +74,13 @@ export const getSession = cache(async (): Promise<Session | null> => {
     userId: user.id,
     email: user.email ?? null,
     role,
+    acesso: assinatura
+      ? avaliarAcesso({
+          status: assinatura.status,
+          startedAt: assinatura.started_at,
+          endsAt: assinatura.ends_at,
+        })
+      : null,
     profile: data
       ? {
           id: data.id,

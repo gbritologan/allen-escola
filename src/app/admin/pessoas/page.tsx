@@ -6,6 +6,7 @@ import { can } from '@/core/identity/permissions'
 import { ASSIGNABLE_ROLES, ROLE_LABEL, roleFromClaim } from '@/core/identity/roles'
 import { formatSince } from '@/core/shared/format'
 import { getSession } from '@/lib/auth/session'
+import { avaliarAcesso, porExtenso } from '@/core/identity/acesso'
 import { createClient } from '@/lib/supabase/server'
 import { alternarAcesso, reenviarConvite, trocarPapel } from './actions'
 import { Convidar } from './convidar'
@@ -44,12 +45,33 @@ export default async function PessoasPage() {
       .from('profiles')
       .select('id, full_name, email, role, last_sign_in_at, created_at')
       .order('created_at', { ascending: false }),
-    supabase.from('subscriptions').select('user_id, status'),
+    supabase.from('subscriptions').select('user_id, status, plan, started_at, ends_at'),
     supabase.from('applications').select('user_id'),
   ])
 
   const lista = perfis ?? []
   const acessoPorPessoa = new Map((assinaturas ?? []).map((s) => [s.user_id, s.status]))
+
+  /*
+   * A JANELA DE ACESSO DE CADA UM.
+   *
+   * "com acesso / sem acesso" respondia se a chave está girada. Não respondia
+   * a pergunta que aparece quando existe gente com prazo: ATÉ QUANDO. Com a
+   * turma fundadora, essa é a pergunta comercial da tela.
+   */
+  const janelaPorPessoa = new Map(
+    (assinaturas ?? []).map((s) => [
+      s.user_id,
+      {
+        plano: s.plan as string,
+        acesso: avaliarAcesso({
+          status: s.status as string,
+          startedAt: s.started_at as string,
+          endsAt: (s.ends_at as string | null) ?? null,
+        }),
+      },
+    ]),
+  )
 
   const aplicacoesPorPessoa = new Map<string, number>()
   for (const a of aplicacoes ?? []) {
@@ -93,6 +115,7 @@ export default async function PessoasPage() {
           {lista.map((pessoa) => {
             const papel = roleFromClaim(pessoa.role)
             const ativo = acessoPorPessoa.get(pessoa.id) === 'active'
+            const janela = janelaPorPessoa.get(pessoa.id)
             const entrou = Boolean(pessoa.last_sign_in_at)
             const feitas = aplicacoesPorPessoa.get(pessoa.id) ?? 0
             const euMesmo = pessoa.id === session.userId
@@ -116,6 +139,10 @@ export default async function PessoasPage() {
                       <Chip tone={ativo ? 'positive' : 'caution'}>
                         {ativo ? 'com acesso' : 'sem acesso'}
                       </Chip>
+                      {janela?.acesso.estado === 'aguardando' && (
+                        <Chip tone="neutral">começa {porExtenso(janela.acesso.inicio)}</Chip>
+                      )}
+                      {janela?.acesso.estado === 'encerrado' && <Chip tone="caution">vencido</Chip>}
                       {!entrou && <Chip tone="caution">nunca entrou</Chip>}
                       {feitas > 0 && (
                         <Chip tone="accent">
@@ -125,10 +152,19 @@ export default async function PessoasPage() {
                     </div>
                   </div>
 
-                  <span data-numeric className="shrink-0 text-caption text-ink-4">
-                    {entrou
-                      ? `último acesso ${formatSince(pessoa.last_sign_in_at, agora)}`
-                      : `convidada ${formatSince(pessoa.created_at, agora)}`}
+                  <span className="flex shrink-0 flex-col items-end text-caption text-ink-4">
+                    <span data-numeric>
+                      {entrou
+                        ? `último acesso ${formatSince(pessoa.last_sign_in_at, agora)}`
+                        : `convidada ${formatSince(pessoa.created_at, agora)}`}
+                    </span>
+                    {janela && (
+                      <span data-numeric title={`Plano ${janela.plano}`}>
+                        {janela.acesso.fim
+                          ? `vence ${porExtenso(janela.acesso.fim)}`
+                          : 'sem prazo'}
+                      </span>
+                    )}
                   </span>
                 </div>
 

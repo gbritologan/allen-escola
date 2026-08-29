@@ -797,3 +797,59 @@ parecia um.
 
 Agora tem contorno, ícone e alvo próprios. Ele se distingue pelo espaço e pela
 forma, não pela falta de contraste — que é a diferença entre sutil e escondido.
+
+## D-46 · A condição de acesso é combinada antes de a pessoa existir
+
+O Gabriel mandou os 21 primeiros clientes: um ano de acesso, de 01/09/2026 a
+01/09/2027, e pediu que o perfil de cada um sinalizasse vencimento.
+
+**O que estava errado.** O gatilho de cadastro (0009) dava a TODO convidado uma
+assinatura `lancamento` ativa e **sem prazo**. Convidar os 21 daria acesso
+perpétuo a quem contratou um ano. E `has_access()` conferia só o fim, nunca o
+início — uma condição que começa em 01/09 já valeria em 28/08.
+
+(Uma correção ao meu próprio diagnóstico inicial: cheguei a dizer que "qualquer
+pessoa do mundo entra". Não é verdade — o login usa `shouldCreateUser: false`,
+então só entra quem foi convidado. O problema era o prazo, não a porta.)
+
+**O problema de fundo** é que a condição é combinada ANTES de a pessoa existir.
+Ela só vira linha em `auth.users` quando abre o e-mail e digita o código — hoje,
+semana que vem, ou nunca. Não havia onde guardar "quando essa pessoa entrar, o
+acesso dela é este".
+
+`access_grants` (0017) é esse lugar: a combinação indexada por e-mail,
+esperando alguém aparecer. O gatilho consulta e aplica.
+
+**O padrão erra para o lado de deixar entrar.** Sem condição registrada, o
+comportamento continua o de antes: ativo, sem prazo. Mudar o padrão para "sem
+acesso" trancaria por fora todo convite feito sem lembrar de criar a condição
+antes. A condição é que aperta; a ausência dela não pune.
+
+**A ordem importa, e a tela diz isso:** condição primeiro, convite depois. O
+gatilho consulta a condição UMA vez, no nascimento da conta. Para quem já
+entrou, salvar a condição aplica na assinatura existente na hora — senão salvar
+não faria nada visível e pareceria bug.
+
+**Fuso:** o `<input type="date">` entrega `2026-09-01` sem fuso. Sem o `-03`
+explícito o Postgres lê como UTC e o acesso abriria às 21h do dia anterior no
+Brasil.
+
+## D-47 · Sala de espera: a ausência não explica a si mesma
+
+Sem acesso válido, a RLS esconde tudo — e a pessoa vê a Home sem cursos, o Mapa
+sem estrelas, a Busca sem resultados. Tecnicamente correto, e indistinguível de
+um produto quebrado.
+
+Alguém que pagou e vê um produto vazio não conclui "meu acesso começa dia 1º".
+Conclui que comprou algo que não funciona, e escreve para o suporte no mesmo
+minuto.
+
+A sala de espera diz a data. Fica na casca do aluno — um lugar só decide isso;
+espalhar a checagem por dez páginas é como nove esquecem.
+
+A equipe passa direto: `has_access()` já abre para `is_staff()`, e travar a
+interface faria o admin ver a sala de espera enquanto o Postgres o deixa ver
+tudo — a interface mentindo sobre o banco.
+
+**Preço não aparece em lugar nenhum.** O aluno vê janela e plano; quanto pagou
+é assunto de cobrança, não de sala de aula.
