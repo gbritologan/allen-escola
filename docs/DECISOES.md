@@ -1009,3 +1009,47 @@ que aceitou não deveriam precisar de conta para ler as regras.
 **`profiles.onboarded_at` existe e ninguém escreve nela.** Fica registrado como
 dívida: ou vira boas-vindas de primeiro acesso, ou sai do schema. Coluna que
 promete um comportamento inexistente é pior que coluna nenhuma.
+
+## D-54 · Segunda auditoria: uma promessa quebrada e muito ruído
+
+O Gabriel perguntou de novo se estava pronta. Segunda auditoria, agora com os
+advisors do próprio Supabase.
+
+**O achado real foi um erro meu.** Eu disse a ele que "os apps também entram na
+Busca junto com os cursos". Não entravam. A tabela `apps` ganhou `search_doc` na
+0015 e a página de Busca nunca foi ligada nele — consultava só `courses` e
+`lessons`. Índice que ninguém lê é trabalho jogado fora, e pior: quem procurasse
+pelo nome de uma ferramenta da Allen não a acharia. Corrigido, e os Apps
+aparecem ANTES das Aulas: quem digita o nome de uma ferramenta quer a
+ferramenta, não a aula que fala dela.
+
+**O ERROR do linter de segurança não é defeito.** `public.curriculum` é
+`SECURITY DEFINER` de propósito, e está documentado na 0010: é a vitrine — só
+título, posição e duração de conteúdo PUBLICADO, sem vídeo, sem Para Saber, sem
+Para Fazer, com `revoke from public, anon`. Ignora a RLS de `lessons` porque é
+exatamente isso que uma página de vendas precisa fazer. O linter não tem como
+saber a intenção. Cheguei a chamar de vazamento antes de ler a migration — era
+minha pressa, não um bug.
+
+**Os WARN de `SECURITY DEFINER` executável são as próprias funções da RLS** —
+`has_access`, `auth_role`, `has_course_access`. Elas PRECISAM ser definer para
+funcionar dentro de política. Chamá-las por RPC devolve o acesso de quem
+chamou, sobre si mesmo.
+
+**Proteção de senha vazada: não se aplica.** O login é por código no e-mail.
+Não existe senha para vazar.
+
+**As 33 advertências de performance não são acionáveis hoje**, e registrar isso
+é mais útil que agir sobre elas:
+
+- "Índice não usado" em quase tudo significa que as tabelas estão vazias e as
+  consultas nunca rodaram. `apps_search_idx` está sem uso porque não há apps.
+- "Chave estrangeira sem índice" importa com volume. Com 21 alunos e 4 aulas,
+  criar doze índices é pagar custo de escrita e disco por um ganho que não
+  existe.
+- "Múltiplas políticas permissivas" é o padrão consistente do schema — uma de
+  leitura pública, uma de gestão da equipe. Fundir tornaria as regras mais
+  difíceis de ler para economizar microssegundos em tabelas de duas linhas.
+
+Revisitar quando houver centenas de alunos e milhares de linhas. Otimizar antes
+disso é adivinhação com custo.

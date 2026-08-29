@@ -63,7 +63,7 @@ async function Resultados({ termo }: { termo: string }) {
     .replace(/[\u0300-\u036f]/g, '')
     .trim()
 
-  const [{ data: cursos }, { data: aulas }] = await Promise.all([
+  const [{ data: cursos }, { data: aulas }, { data: apps }] = await Promise.all([
     supabase
       .from('courses')
       .select('id, slug, title, summary, cover_url, format, duration_seconds, lesson_count, available_at')
@@ -74,12 +74,22 @@ async function Resultados({ termo }: { termo: string }) {
       .select('id, title, description, duration_seconds, course_id')
       .textSearch('search_doc', consulta, { type: 'websearch', config: 'portuguese' })
       .limit(12),
+    // Os Apps ganharam `search_doc` na 0015 justamente para isto — e a busca
+    // ficou sem consultá-los. Índice que ninguém lê é trabalho jogado fora, e
+    // pior: quem procurasse pelo nome de uma ferramenta da Allen não a acharia.
+    supabase
+      .from('apps')
+      .select('id, slug, name, tagline')
+      .eq('status', 'published')
+      .textSearch('search_doc', consulta, { type: 'websearch', config: 'portuguese' })
+      .limit(8),
   ])
 
   const encontrouCursos = cursos ?? []
   const encontrouAulas = aulas ?? []
+  const encontrouApps = apps ?? []
 
-  if (encontrouCursos.length === 0 && encontrouAulas.length === 0) {
+  if (encontrouCursos.length === 0 && encontrouAulas.length === 0 && encontrouApps.length === 0) {
     return (
       <section className="flex flex-col gap-2">
         <p className="text-lead font-light text-ink-2">Nada para “{termo}”.</p>
@@ -127,6 +137,28 @@ async function Resultados({ termo }: { termo: string }) {
               />
             ))}
           </div>
+        </section>
+      )}
+
+      {/* Apps antes de Aulas: quem digita o nome de uma ferramenta quer a
+          ferramenta, não a aula que fala dela. */}
+      {encontrouApps.length > 0 && (
+        <section className="flex flex-col gap-4">
+          <h2 className="text-caption font-medium uppercase tracking-[0.16em] text-ink-3">Apps</h2>
+          <Surface className="flex flex-col divide-y divide-[var(--color-line)]">
+            {encontrouApps.map((app) => (
+              <Link
+                key={app.id}
+                href={`/apps/${app.slug}`}
+                className="group flex flex-col gap-0.5 px-5 py-3.5 transition-colors hover:bg-[rgba(243,245,252,0.03)]"
+              >
+                <span className="text-body text-ink-2 group-hover:text-ink">{app.name}</span>
+                {app.tagline && (
+                  <span className="line-clamp-1 text-caption text-ink-4">{app.tagline}</span>
+                )}
+              </Link>
+            ))}
+          </Surface>
         </section>
       )}
 
