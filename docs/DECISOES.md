@@ -779,7 +779,7 @@ e acompanha zoom e arrasto de graça. O Studio renderiza as mesmas strings num
 (migration 0016), escolhido num seletor visual no Studio — um `<select>` com
 nomes seria adivinhação, ninguém escolhe desenho lendo "Ânfora".
 
-## D-44 · Favicon: o quadrado navy, não a marca solta
+## D-44 · Favicon (revisto em D-56)
 
 Não existia favicon nenhum — nem `icon`, nem `apple-icon`. Agora existe, gerado
 do símbolo da marca sobre um quadrado navy de cantos arredondados.
@@ -1092,3 +1092,24 @@ atrás do login e depende de progresso real — eu não conseguia VER o que esta
 construindo. Agora `/design/inicio` monta a mesma tela com dados de mentira, e
 as duas desenham o MESMO código em vez de duas cópias que divergem na primeira
 correção.
+
+## D-56 · O favicon é a marca solta (revê D-44)
+
+D-44 pôs a marca clara sobre um quadrado navy arredondado. O argumento era
+contraste: a marca é #000DFF sobre transparente, e em aba escura ela perde
+definição.
+
+O Gabriel pediu sem o quadrado, em azul. É a marca dele, e o argumento contra
+tinha um limite: o quadrado navy resolvia contraste e, em troca, fazia o ícone
+parecer um app genérico de fundo escuro em vez do símbolo da Allen. Símbolo sem
+moldura é mais limpo quando funciona — e a 512px, com o azul cheio, funciona.
+
+**O que o código faz por baixo:** a marca é 301×269, não é quadrada. Ela é
+recortada no `getbbox()` antes de medir (folga embutida no PNG faria a margem
+sair errada), redimensionada pela maior dimensão e centralizada numa tela
+quadrada transparente. Sem isso o navegador esmaga a proporção ao reduzir para
+32px.
+
+**A ressalva fica registrada:** em aba de navegador em tema escuro, azul sobre
+transparente tem menos contraste que a versão anterior. Se um dia isso
+incomodar, o caminho de volta é este parágrafo.
