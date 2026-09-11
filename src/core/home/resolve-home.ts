@@ -9,12 +9,21 @@ import type { ContinueTarget } from '../progress/types'
  * Quando a recomendação inteligente chegar, troca-se esta função — a interface
  * não muda uma linha.
  *
- * Ordem de prioridade que o briefing pede:
- *   1. Continuar de onde parou
- *   2. Masterclass
- *   3. Recomendações
- *   4. Explorar por tema
- *   5. Minha jornada
+ * ORDEM (revista a pedido do Gabriel, com a referência do Arkom na mão):
+ *   1. O painel — onde eu estou, em quatro números
+ *   2. Continuar de onde parou
+ *   3. Masterclass
+ *   4. Recomendações
+ *   5. Explorar por tema
+ *
+ * A jornada era o ÚLTIMO bloco e virou o primeiro. O motivo: ela responde
+ * "onde eu estou", que é a pergunta com que a pessoa abre a plataforma. No
+ * rodapé, ela respondia essa pergunta para quem já tinha rolado a página
+ * inteira procurando por outra coisa.
+ *
+ * E ela aparece SEMPRE, inclusive zerada. Um placar que começa em zero num
+ * produto sobre fazer não é vazio — é o convite. Esconder até existir número
+ * também esconderia o que a escola mede.
  */
 
 export type HomeBlock =
@@ -23,18 +32,31 @@ export type HomeBlock =
   | { kind: 'masterclass'; courses: CourseSummary[] }
   | { kind: 'recommended'; title: string; reason: string | null; courses: CourseSummary[] }
   | { kind: 'themes'; themes: Theme[] }
-  | { kind: 'journey'; inProgress: number; completed: number; applications: number }
+  | {
+      kind: 'journey'
+      inProgress: number
+      completed: number
+      applications: number
+      lessonsCompleted: number
+    }
 
 export interface HomeInput {
   continueTarget: ContinueTarget | null
   masterclasses: CourseSummary[]
   recommended: CourseSummary[]
   themes: Theme[]
-  journey: { inProgress: number; completed: number; applications: number }
+  journey: {
+    inProgress: number
+    completed: number
+    applications: number
+    lessonsCompleted: number
+  }
 }
 
 export function resolveHome(input: HomeInput): HomeBlock[] {
   const blocks: HomeBlock[] = []
+
+  blocks.push({ kind: 'journey', ...input.journey })
 
   if (input.continueTarget) {
     blocks.push({ kind: 'continue', target: input.continueTarget })
@@ -62,10 +84,6 @@ export function resolveHome(input: HomeInput): HomeBlock[] {
 
   if (input.themes.length > 0) {
     blocks.push({ kind: 'themes', themes: input.themes })
-  }
-
-  if (input.journey.inProgress > 0 || input.journey.completed > 0) {
-    blocks.push({ kind: 'journey', ...input.journey })
   }
 
   return blocks

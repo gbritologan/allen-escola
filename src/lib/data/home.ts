@@ -89,7 +89,7 @@ async function getContinueTarget(userId: string): Promise<ContinueTarget | null>
 async function getJourneySummary(userId: string) {
   const supabase = await createClient()
 
-  const [emAndamento, concluidos, aplicacoes] = await Promise.all([
+  const [emAndamento, concluidos, aplicacoes, aulasVistas] = await Promise.all([
     supabase
       .from('enrollments')
       .select('course_id', { count: 'exact', head: true })
@@ -104,12 +104,20 @@ async function getJourneySummary(userId: string) {
       .from('applications')
       .select('lesson_id', { count: 'exact', head: true })
       .eq('user_id', userId),
+    // A quarta métrica do painel. Entra no mesmo Promise.all: é uma consulta a
+    // mais, não uma ida a mais — as quatro viajam juntas.
+    supabase
+      .from('lesson_progress')
+      .select('lesson_id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('state', 'completed'),
   ])
 
   return {
     inProgress: emAndamento.count ?? 0,
     completed: concluidos.count ?? 0,
     applications: aplicacoes.count ?? 0,
+    lessonsCompleted: aulasVistas.count ?? 0,
   }
 }
 

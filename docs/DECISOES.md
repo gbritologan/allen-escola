@@ -1053,3 +1053,42 @@ Não existe senha para vazar.
 
 Revisitar quando houver centenas de alunos e milhares de linhas. Otimizar antes
 disso é adivinhação com custo.
+
+## D-55 · A Home abre dizendo onde você está
+
+O Gabriel mandou a referência do Arkom e pediu: saudação pela hora, espaço de
+banner, mini dashboard, e o "continue de onde parou".
+
+**Duas dessas já existiam e ele não via**, o que é informação por si só: o
+banner (D-50) não aparecia porque nenhum estava publicado, e o "continue" não
+aparecia porque ele nunca tinha começado um curso — via o "Comece por aqui",
+que é o ramo correto para aluno novo. Nada quebrado; faltava conteúdo.
+
+**O que mudou de verdade foi a ORDEM.** A jornada era o último bloco e virou o
+primeiro. O motivo: ela responde "onde eu estou", que é a pergunta com que se
+abre a plataforma. No rodapé, ela só respondia para quem já tinha rolado a
+página inteira procurando outra coisa.
+
+E ela aparece **sempre**, inclusive zerada. Antes havia uma condição
+(`inProgress > 0 || completed > 0`) que a escondia de aluno novo. Um placar que
+começa em zero, num produto sobre fazer, não é vazio — é o convite. Esconder
+até existir número também esconde o que a escola mede.
+
+**Quatro números, e o terceiro é azul.** Cursos em andamento, aulas concluídas,
+**aplicações feitas**, cursos concluídos. Aplicações tem tratamento próprio
+porque é a única das quatro que a Allen mede e as outras escolas não — igual às
+demais, o painel viraria mais um placar de consumo.
+
+**A saudação tem uma armadilha de fuso.** A Home renderiza no SERVIDOR, e o
+servidor da Vercel roda em UTC: `getHours()` devolveria 0 para quem está às 21h
+em São Paulo, e o aluno leria "Bom dia" na hora de dormir. O fuso é explícito
+(`America/Sao_Paulo`) e há teste para exatamente esse caso. Resolver no cliente
+consertaria o fuso e criaria outro problema: o texto piscaria na hidratação.
+
+Os cortes são 5h e 18h, não 6h e 19h: a régua é o hábito brasileiro.
+
+**O desenho saiu da página.** `BlocosDaHome` existe separado porque a Home mora
+atrás do login e depende de progresso real — eu não conseguia VER o que estava
+construindo. Agora `/design/inicio` monta a mesma tela com dados de mentira, e
+as duas desenham o MESMO código em vez de duas cópias que divergem na primeira
+correção.
