@@ -95,8 +95,8 @@ async function Resultados({ termo }: { termo: string }) {
         <p className="text-lead font-light text-ink-2">Nada para “{termo}”.</p>
         <p className="text-body text-ink-4">
           Tente uma palavra mais curta, ou{' '}
-          <Link href="/explorar" className="text-blue-light hover:underline">
-            explore por tema
+          <Link href="/cursos" className="text-blue-light hover:underline">
+            veja os cursos
           </Link>
           .
         </p>
@@ -171,7 +171,7 @@ async function Resultados({ termo }: { termo: string }) {
               return (
                 <Link
                   key={a.id}
-                  href={curso ? `/curso/${curso.slug}` : '/explorar'}
+                  href={curso ? `/curso/${curso.slug}` : '/cursos'}
                   className="flex flex-col gap-0.5 px-5 py-3.5 transition-colors hover:bg-[rgba(243,245,252,0.03)]"
                 >
                   <span className="text-body text-ink">{a.title}</span>

@@ -74,7 +74,36 @@ export async function proxy(request: NextRequest) {
   }
 
   if (user && pathname.startsWith('/admin')) {
-    const role = roleFromClaim(user.app_metadata?.['allen_role'])
+    /*
+     * O PAPEL VEM DA CLAIM, E CAI PARA `profiles` QUANDO ELA NÃO EXISTE.
+     *
+     * Este era o bug: o proxy lia SÓ `app_metadata.allen_role`. Essa claim só
+     * existe se o hook de token estiver ligado no painel do Supabase — e ele
+     * não está. Resultado: `roleFromClaim(undefined)` devolve 'student', e o
+     * admin era redirecionado do /admin para a Home.
+     *
+     * O sintoma é cruel porque não parece erro: a pessoa clica em "Admin" e vê
+     * a Início. Nenhuma mensagem, nenhum 403 — parece que o botão não faz nada.
+     *
+     * `getSession()` já tinha esse fallback (era a mesma armadilha, e estava
+     * documentada lá). O proxy ficou para trás, e como ele roda ANTES da
+     * página, a correção de lá nunca chegava a rodar.
+     *
+     * O SELECT extra só acontece em rota /admin e só quando a claim falta —
+     * ligar o hook no painel elimina a consulta sozinho.
+     */
+    const claim = user.app_metadata?.['allen_role']
+    let role = roleFromClaim(claim)
+
+    if (!claim) {
+      const { data: perfil } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .maybeSingle()
+      role = roleFromClaim(perfil?.role)
+    }
+
     if (!canOpenAdmin(role)) {
       const url = request.nextUrl.clone()
       url.pathname = '/'

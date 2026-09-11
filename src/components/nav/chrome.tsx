@@ -7,6 +7,7 @@ import {
   IconeAjuda,
   IconeApps,
   IconeBuscar,
+  IconeExplorar,
   IconeInicio,
   IconeJornada,
   IconeMapa,
@@ -45,20 +46,21 @@ import { cn } from '@/lib/utils'
  * "Ajuda" virou "Suporte". Não é maquiagem: a página tem artigos E abertura de
  * chamado com histórico. "Ajuda" prometia menos do que ela entrega.
  *
- * "Explorar" saiu. Era o catálogo genérico, e três coisas já fazem esse
- * trabalho melhor — o Mapa mostra onde você está, a Busca acha pelo nome, e a
- * Home recomenda. A PÁGINA CONTINUA: seis lugares do produto linkam para ela
- * ("Ver tudo", "Explorar cursos", vazio da Busca). O que saiu foi a cadeira
- * permanente na sidebar, não a rota.
+ * "Explorar" saiu em D-42 por ter nome vago, e VOLTOU como "Cursos" (D-57), a
+ * pedido do Gabriel. O nome novo é o que ela deveria ter tido desde o início:
+ * diz o que tem dentro. Tirar o catálogo da sidebar tinha sido um erro meu —
+ * o Mapa, a Busca e a Home respondem outras perguntas, e nenhuma delas é
+ * "o que existe para eu estudar?".
  *
- * "Masterclass" entrou. Já existia como formato de curso, escondido atrás de
- * uma seção da Home — o formato mais caro de produzir era o mais difícil de
- * achar.
+ * "Masterclass" virou "CAPACITAÇÕES" e continua sendo o FORMATO, não o
+ * catálogo. São duas prateleiras separadas de propósito: a pessoa procura
+ * cada uma num momento diferente, e o banco já as separa em `courses.format`.
  */
 const DESTINOS = [
   { href: '/', label: 'Início', Icone: IconeInicio },
   { href: '/mapa', label: 'Mapa', Icone: IconeMapa },
-  { href: '/masterclass', label: 'Masterclass', Icone: IconeMasterclass },
+  { href: '/cursos', label: 'Cursos', Icone: IconeExplorar },
+  { href: '/capacitacoes', label: 'Capacitações', Icone: IconeMasterclass },
   { href: '/apps', label: 'Apps', Icone: IconeApps },
   { href: '/jornada', label: 'Jornada', Icone: IconeJornada },
   { href: '/buscar', label: 'Buscar', Icone: IconeBuscar },
@@ -66,17 +68,20 @@ const DESTINOS = [
 ] as const
 
 /**
- * No celular cabem quatro, e a lista agora tem sete.
+ * No celular cabem quatro, e a lista agora tem OITO.
  *
- * Escolhidos a dedo em vez de filtrados por exclusão: com sete destinos, uma
- * regra do tipo "todos menos dois" deixaria cinco no dock e viraria sopa —
+ * Escolhidos a dedo em vez de filtrados por exclusão: com oito destinos,
+ * qualquer regra de exclusão deixaria seis no dock e viraria sopa —
  * exatamente o problema que tirou a barra horizontal do produto.
+ *
+ * Cursos entra no lugar de Apps: é o destino que responde "o que eu faço
+ * agora", e no celular essa é a pergunta.
  */
 const DOCK = [
   DESTINOS[0], // Início
   DESTINOS[1], // Mapa
-  DESTINOS[3], // Apps
-  DESTINOS[4], // Jornada
+  DESTINOS[2], // Cursos
+  DESTINOS[5], // Jornada
 ] as const
 
 function estaAtivo(pathname: string, href: string) {

@@ -95,7 +95,7 @@ export default async function InicioExemploPage() {
             title: 'Fundamentos de IA',
             subtitle: 'Programe com palavras — do primeiro prompt ao que roda sozinho.',
             ctaLabel: 'Ver a masterclass',
-            ctaHref: '/masterclass',
+            ctaHref: '/capacitacoes',
             // Sem arte de verdade ainda: a prévia usa a Athena da marca só
             // para o bloco existir e dar para julgar proporção.
             imageUrl: '/brand/athena.webp',

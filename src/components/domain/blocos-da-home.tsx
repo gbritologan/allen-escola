@@ -120,7 +120,7 @@ export function BlocosDaHome({
               <section key="recommended" className="flex flex-col gap-4">
                 <div className="flex items-end justify-between gap-4">
                   <SectionLabel>{block.title}</SectionLabel>
-                  <Link href="/explorar" className="text-label text-ink-3 hover:text-ink">
+                  <Link href="/cursos" className="text-label text-ink-3 hover:text-ink">
                     Ver tudo
                   </Link>
                 </div>

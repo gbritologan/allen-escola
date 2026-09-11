@@ -144,7 +144,7 @@ export default async function AdminBannerPage() {
                 <Field
                   label="Destino"
                   htmlFor={`href-${b.id}`}
-                  hint="Caminho interno, ex.: /masterclass. Em branco, o banner não é clicável."
+                  hint="Caminho interno, ex.: /capacitacoes. Em branco, o banner não é clicável."
                 >
                   <Input id={`href-${b.id}`} name="cta_href" defaultValue={b.cta_href ?? ''} />
                 </Field>

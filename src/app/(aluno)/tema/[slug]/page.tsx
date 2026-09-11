@@ -25,7 +25,7 @@ export default async function TemaPage({ params }: { params: Promise<{ slug: str
   return (
     <main className="mx-auto flex max-w-6xl flex-col gap-12 px-6 pt-10 sm:pt-14">
       <header className="flex flex-col gap-4">
-        <Link href="/explorar" className="text-caption text-ink-3 hover:text-ink">
+        <Link href="/cursos" className="text-caption text-ink-3 hover:text-ink">
           ← Explorar
         </Link>
         <h1 className="max-w-[16ch] text-display font-hair">{theme.name}</h1>

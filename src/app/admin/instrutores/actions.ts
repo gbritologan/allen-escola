@@ -85,7 +85,7 @@ export async function salvarInstrutor(formData: FormData) {
     .eq('id', id)
 
   revalidatePath('/admin/instrutores')
-  revalidatePath('/explorar')
+  revalidatePath('/cursos')
 }
 
 /**
@@ -147,7 +147,7 @@ export async function enviarRetrato(formData: FormData) {
   await apagarImagem(antes?.photo_url)
 
   revalidatePath('/admin/instrutores')
-  revalidatePath('/explorar')
+  revalidatePath('/cursos')
 }
 
 export async function removerRetrato(formData: FormData) {

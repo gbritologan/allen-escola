@@ -28,6 +28,11 @@ const nextConfig: NextConfig = {
     return [
       { source: '/ajuda', destination: '/suporte', permanent: true },
       { source: '/ajuda/:id', destination: '/suporte/:id', permanent: true },
+      // `/masterclass` virou `/capacitacoes` (D-57). A rota antiga chegou a
+      // estar no ar e pode ter virado link em banner ou e-mail.
+      { source: '/masterclass', destination: '/capacitacoes', permanent: true },
+      // `/explorar` virou `/cursos` (D-57).
+      { source: '/explorar', destination: '/cursos', permanent: true },
       // "Explorar" saiu da sidebar mas a página continua; nenhum redirect
       // aqui, de propósito.
     ]

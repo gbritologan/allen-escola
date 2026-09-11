@@ -77,7 +77,7 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
   return (
     <main className="mx-auto flex max-w-4xl flex-col gap-12 px-6 pt-10 sm:pt-14">
       <header className="flex flex-col gap-5">
-        <Link href="/explorar" className="text-caption text-ink-3 hover:text-ink">
+        <Link href="/cursos" className="text-caption text-ink-3 hover:text-ink">
           ← Explorar
         </Link>
 

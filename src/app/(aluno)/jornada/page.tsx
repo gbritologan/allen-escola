@@ -95,7 +95,7 @@ export default async function JornadaPage() {
           <p className="max-w-[52ch] text-lead font-light text-ink-2">
             Sua jornada começa na primeira aula.
           </p>
-          <ButtonLink href="/explorar">Explorar cursos</ButtonLink>
+          <ButtonLink href="/cursos">Ver os cursos</ButtonLink>
         </section>
       ) : (
         <>
