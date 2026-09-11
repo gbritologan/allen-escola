@@ -1113,3 +1113,70 @@ quadrada transparente. Sem isso o navegador esmaga a proporção ao reduzir para
 **A ressalva fica registrada:** em aba de navegador em tema escuro, azul sobre
 transparente tem menos contraste que a versão anterior. Se um dia isso
 incomodar, o caminho de volta é este parágrafo.
+
+## D-57 · Cursos e Capacitações: duas prateleiras
+
+O Gabriel mandou os vídeos do Arkom e pediu que a aba "Masterclass" virasse
+"Capacitações".
+
+Eu li como "Capacitações = o catálogo inteiro", porque é o que a palavra
+significa lá, e cheguei a construir assim. Ele corrigiu: quer **as duas
+prateleiras separadas**. Está certo — são coisas procuradas em momentos
+diferentes, e o banco já as separa em `courses.format`.
+
+- **`/cursos`** — o catálogo geral. Era `/explorar`, que perdeu a cadeira na
+  sidebar em D-42 por ter nome vago. "Cursos" é o nome que ela deveria ter tido
+  desde o início: diz o que tem dentro. **Tirar o catálogo da sidebar foi erro
+  meu** — o Mapa, a Busca e a Home respondem outras perguntas, e nenhuma delas
+  é "o que existe para eu estudar?".
+- **`/capacitacoes`** — o formato de mergulho, antes chamado Masterclass.
+
+A faixa de Masterclass saiu de dentro de `/cursos`: com destino próprio,
+repetir faria a mesma coisa aparecer em dois lugares sem ninguém saber qual é
+o certo.
+
+`/masterclass` e `/explorar` redirecionam. Oito destinos na sidebar; o dock do
+celular continua com quatro, agora com Cursos no lugar de Apps.
+
+## D-58 · O proxy não sabia quem é admin
+
+O Gabriel clicou em "Admin" e viu a Início. Sem erro, sem 403 — como se o botão
+não fizesse nada.
+
+O proxy lia o papel **só** de `app_metadata.allen_role`. Essa claim só existe
+se o hook de token estiver ligado no painel do Supabase, e ele não está.
+`roleFromClaim(undefined)` devolve `'student'`, e o admin era redirecionado.
+
+Confirmado no banco: a claim está nula nos dois usuários, e o papel dele é
+`admin`.
+
+O cruel é que **essa armadilha já estava documentada** — em `getSession()`, com
+o fallback para `profiles.role` implementado e o comentário explicando
+exatamente este cenário. O proxy ficou de fora, e como ele roda ANTES da
+página, a correção de lá nunca chegava a rodar.
+
+O SELECT extra só acontece em rota `/admin` e só quando a claim falta. Ligar o
+hook no painel elimina a consulta sozinho.
+
+## D-59 · O nó do Mapa inverteu o contraste
+
+Referência do Arkom, e o pedido foi explícito: "principalmente os ícones".
+
+A âncora era um anel vazado com o símbolo traçado por cima. Funcionava e
+sumia: traço fino sobre céu escuro **compete** com as estrelas em vez de mandar
+nelas.
+
+O acerto da referência é **contraste invertido** — o nó é claro e o símbolo é
+escuro, então ele lê antes de qualquer outra coisa. Aqui o disco não é creme: é
+o matiz da constelação em luminosidade alta, o que traz a inversão sem perder a
+cor por setor (D-37). O estado continua no brilho: apagada é disco fosco, acesa
+queima.
+
+O anel de seleção fica FORA do disco, com folga. Encostado, engrossaria a borda
+e leria como parte do nó, não como estado.
+
+**No painel, o símbolo entra junto.** Sem ele, quem clica confia que o painel
+abriu sobre o que foi clicado; com ele, a ligação é instantânea. Curso e aula
+herdam o símbolo da constelação — é o que amarra a aula ao setor de onde veio.
+E entrou o caminho ("de que constelação isto faz parte"): num céu com seis
+setores, "Abertura" sozinho não diz de onde veio.

@@ -330,25 +330,52 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
 
         if (a.tipo === 'tema') {
           /*
-           * A ÂNCORA DA CONSTELAÇÃO É ANEL, NÃO DISCO.
+           * A ÂNCORA É UM DISCO CLARO COM O SÍMBOLO ESCURO DENTRO.
            *
-           * Disco cheio de 34 unidades seria uma bola que engole o céu ao
-           * redor. O anel ocupa o mesmo espaço — a hierarquia que o Gabriel
-           * pediu — e deixa o miolo livre para o símbolo, como na referência.
+           * Era um anel vazado com o ícone traçado por cima. Funcionava, mas
+           * sumia: traço fino sobre céu escuro compete com as estrelas em vez
+           * de mandar nelas. O Gabriel mandou a referência do Arkom e disse
+           * "principalmente os ícones" — e lá o acerto é de CONTRASTE
+           * INVERTIDO: o nó é claro e o símbolo é escuro, então ele lê antes
+           * de qualquer coisa na tela.
+           *
+           * Aqui o disco não é creme: é o MATIZ da constelação em luminosidade
+           * alta. Assim a inversão de contraste entra sem que o mapa perca a
+           * cor por setor (D-37), e o estado continua no brilho — apagada, a
+           * constelação é um disco fosco; acesa, ela queima.
            */
           const rr = raio * (1 + pulso)
-          ctx!.fillStyle = `hsl(${a.hue} 60% 12% / ${a.estado === 'apagado' ? 0.5 : 0.72})`
+          const aceso = a.estado === 'aceso'
+          const luz = aceso ? 88 : a.estado === 'visto' ? 62 : 42
+          const sat = aceso ? 70 : a.estado === 'visto' ? 18 : 12
+
+          // O halo externo é o que cola o disco no céu. Sem ele o nó parece
+          // um adesivo colado por cima do fundo.
+          const brilho = ctx!.createRadialGradient(sx, sy, rr * 0.7, sx, sy, rr * 2.4)
+          brilho.addColorStop(0, `hsl(${a.hue} ${sat}% ${luz}% / ${aceso ? 0.42 : 0.16})`)
+          brilho.addColorStop(1, 'rgba(0,0,0,0)')
+          ctx!.fillStyle = brilho
+          ctx!.beginPath()
+          ctx!.arc(sx, sy, rr * 2.4, 0, Math.PI * 2)
+          ctx!.fill()
+
+          ctx!.fillStyle = `hsl(${a.hue} ${sat}% ${luz}%)`
           ctx!.beginPath()
           ctx!.arc(sx, sy, rr, 0, Math.PI * 2)
           ctx!.fill()
 
-          ctx!.strokeStyle = corDoAstro(a.hue, a.estado, ativo)
-          ctx!.lineWidth = Math.max(1, 2.2 * c.z)
-          ctx!.beginPath()
-          ctx!.arc(sx, sy, rr, 0, Math.PI * 2)
-          ctx!.stroke()
+          // O símbolo em navy, recortado do disco.
+          desenharIcone(ctx!, a.icone, sx, sy, rr * 1.15, '#050714')
 
-          desenharIcone(ctx!, a.icone, sx, sy, rr * 1.05, corDoAstro(a.hue, a.estado, ativo))
+          // O anel de seleção fica FORA do disco, com folga — encostado, ele
+          // engrossaria a borda e leria como parte do nó, não como estado.
+          if (ativo) {
+            ctx!.strokeStyle = `hsl(${a.hue} 82% 72%)`
+            ctx!.lineWidth = Math.max(1.2, 2 * c.z)
+            ctx!.beginPath()
+            ctx!.arc(sx, sy, rr * 1.42, 0, Math.PI * 2)
+            ctx!.stroke()
+          }
         } else {
           ctx!.fillStyle = corDoAstro(a.hue, a.estado, ativo)
           ctx!.beginPath()
@@ -506,6 +533,26 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
       .slice(0, 6)
   }, [busca, mapa.astros])
 
+  /** O nome da constelação a que um astro pertence. */
+  function nomeDoTema(temaId: string | null) {
+    if (!temaId) return null
+    return mapa.astros.find((a) => a.tipo === 'tema' && a.id === temaId)?.rotulo ?? null
+  }
+
+  /**
+   * O símbolo que o painel mostra.
+   *
+   * Tema tem o próprio; curso e aula herdam o da constelação — é o que liga
+   * visualmente a aula ao setor de onde ela veio.
+   */
+  function simboloDoPainel(a: Astro) {
+    const chave =
+      a.tipo === 'tema'
+        ? a.icone
+        : mapa.astros.find((x) => x.tipo === 'tema' && x.id === a.temaId)?.icone
+    return chave ? (ICONES_TEMA[chave] ?? null) : null
+  }
+
   function irParaTema(i: number) {
     const t = temas[i]
     if (!t) return
@@ -596,12 +643,52 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
             </button>
           </div>
 
-          <h2 className="mt-2 text-title font-light text-ink">{selecionado.rotulo}</h2>
+          {/*
+           * O SÍMBOLO ENTRA NO PAINEL.
+           *
+           * É o mesmo desenho do nó no céu, no mesmo matiz. Sem ele, quem
+           * clica precisa confiar que o painel abriu sobre o que foi clicado;
+           * com ele, a ligação entre o que está no céu e o que está escrito é
+           * instantânea. Foi o que o Gabriel apontou na referência.
+           */}
+          <div className="mt-3 flex items-center gap-3">
+            {simboloDoPainel(selecionado) && (
+              <span
+                aria-hidden
+                className="flex size-11 shrink-0 items-center justify-center rounded-full"
+                style={{
+                  background: `hsl(${selecionado.hue} ${
+                    selecionado.estado === 'aceso' ? 70 : 18
+                  }% ${selecionado.estado === 'aceso' ? 88 : 58}%)`,
+                }}
+              >
+                <svg viewBox="0 0 24 24" className="size-6 fill-navy-deep">
+                  {simboloDoPainel(selecionado)!.d.map((d, i) => (
+                    <path key={i} d={d} fillRule="evenodd" />
+                  ))}
+                </svg>
+              </span>
+            )}
+            <div className="flex min-w-0 flex-col">
+              <h2 className="truncate text-title font-light text-ink">{selecionado.rotulo}</h2>
+              {/* O caminho: de que constelação isto faz parte. Num céu com
+                  seis setores, "Abertura" sozinho não diz de onde veio. */}
+              {selecionado.tipo !== 'tema' && nomeDoTema(selecionado.temaId) && (
+                <span className="truncate text-caption text-ink-4">
+                  {nomeDoTema(selecionado.temaId)}
+                </span>
+              )}
+            </div>
+          </div>
 
           {selecionado.detalhe && (
-            <p data-numeric className="mt-1 text-caption text-ink-4">
+            <p data-numeric className="mt-3 text-caption text-ink-4">
               {selecionado.detalhe}
             </p>
+          )}
+
+          {selecionado.subtitulo && (
+            <p className="mt-2 text-body text-ink-2">{selecionado.subtitulo}</p>
           )}
 
           {/* O estado dito em palavras. A cor sozinha não é acessível, e
