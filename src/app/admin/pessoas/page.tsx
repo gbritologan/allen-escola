@@ -8,6 +8,8 @@ import { formatSince } from '@/core/shared/format'
 import { getSession } from '@/lib/auth/session'
 import { avaliarAcesso, porExtenso } from '@/core/identity/acesso'
 import { createClient } from '@/lib/supabase/server'
+import { BotaoAcao } from '@/components/primitives/botao-acao'
+import { BotaoPapel } from '@/components/primitives/botao-papel'
 import { alternarAcesso, reenviarConvite, trocarPapel } from './actions'
 import { Convidar } from './convidar'
 
@@ -174,12 +176,9 @@ export default async function PessoasPage() {
                   {!entrou && pessoa.email && (
                     <form action={reenviarConvite}>
                       <input type="hidden" name="email" value={pessoa.email} />
-                      <button
-                        type="submit"
-                        className="rounded-[var(--radius-control)] border border-line px-3 py-1.5 text-caption text-ink-3 transition-colors hover:border-line-strong hover:text-ink"
-                      >
+                      <BotaoAcao trabalhando="Enviando…" feito="Convite enviado">
                         Reenviar convite
-                      </button>
+                      </BotaoAcao>
                     </form>
                   )}
 
@@ -188,12 +187,12 @@ export default async function PessoasPage() {
                     <form action={alternarAcesso}>
                       <input type="hidden" name="user_id" value={pessoa.id} />
                       <input type="hidden" name="ativo" value={String(ativo)} />
-                      <button
-                        type="submit"
-                        className="rounded-[var(--radius-control)] border border-line px-3 py-1.5 text-caption text-ink-3 transition-colors hover:border-line-strong hover:text-ink"
+                      <BotaoAcao
+                        trabalhando={ativo ? 'Desligando…' : 'Religando…'}
+                        feito={ativo ? 'Desligado' : 'Religado'}
                       >
                         {ativo ? 'Desligar acesso' : 'Religar acesso'}
-                      </button>
+                      </BotaoAcao>
                     </form>
                   )}
 
@@ -204,17 +203,11 @@ export default async function PessoasPage() {
                         <form key={r} action={trocarPapel}>
                           <input type="hidden" name="user_id" value={pessoa.id} />
                           <input type="hidden" name="role" value={r} />
-                          <button
-                            type="submit"
-                            aria-pressed={papel === r}
-                            className={`rounded-[var(--radius-control)] border px-2.5 py-1 text-caption transition-colors duration-150 ${
-                              papel === r
-                                ? 'border-line-strong bg-navy-soft text-ink'
-                                : 'border-line text-ink-4 hover:text-ink-2'
-                            }`}
+                          <BotaoPapel
+                            selecionado={papel === r}
                           >
                             {ROLE_LABEL[r]}
-                          </button>
+                          </BotaoPapel>
                         </form>
                       ))}
                     </div>

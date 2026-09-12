@@ -1606,3 +1606,35 @@ O que dói aqui não é o bug, é onde ele apareceu: na primeira vez que a
 plataforma falou com alguém que não era o dono. Erro de ambiente não fica no
 ambiente — ele viaja dentro do e-mail e estraga a primeira impressão de quem
 recebeu.
+
+## D-75 · O link do e-mail nunca saiu do nosso código
+
+D-74 consertou metade do problema e eu declarei vitória cedo demais. O
+Gabriel reenviou o convite e deu na mesma. Fui aos logs de novo, e desta vez
+olhei o que estava na frente do nariz:
+
+TODA requisição ao GoTrue — inclusive as que vêm dos IPs da Vercel em produção
+— é registrada com `referer: http://localhost:3000`. Servidor em produção não
+manda Referer de localhost. Esse campo não é o Referer do navegador: é o
+destino de redirecionamento JÁ RESOLVIDO pelo GoTrue, que cai no **Site URL**
+do projeto quando o `emailRedirectTo` pedido não está na lista de permissão.
+
+Ou seja: o Site URL do Supabase está em `http://localhost:3000`, e
+`https://app.allenescola.com/auth/callback` não está na lista de redirecionamentos
+permitidos. **Todo link de e-mail do produto aponta para o localhost de quem
+recebe, e nenhuma mudança no nosso código corrige isso** — o GoTrue descarta o
+endereço que mandamos e usa o dele.
+
+Isso passou despercebido por um motivo específico: o login da casa é por
+CÓDIGO, não por link (D-21). O código funciona com o Site URL errado. A falha
+só aparece para quem clica no link — e a primeira pessoa a clicar num link
+desta plataforma foi o sócio do Gabriel.
+
+`enderecoPublico()` (D-74) continua certo e continua necessário: ele garante
+que a gente peça o endereço certo. Mas quem decide é o painel.
+
+**A lição de método:** eu tratei um campo de log como se soubesse o que ele
+significava. "referer" pareceu óbvio, e eu construí um diagnóstico inteiro em
+cima dessa suposição — e mandei o Gabriel refazer o convite por um caminho que
+nunca ia funcionar. O dado estava certo desde a primeira consulta; a leitura é
+que estava errada.
