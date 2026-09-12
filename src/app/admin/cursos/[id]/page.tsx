@@ -18,6 +18,7 @@ import {
   moverAula,
   publicarCurso,
 } from './actions'
+import { AulaExpansivel } from './aula-expansivel'
 import { Capa } from './capa'
 
 export async function generateMetadata({
@@ -40,7 +41,7 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
   const { id } = await params
   const supabase = await createClient()
 
-  const [{ data: course }, { data: instructors }, { data: themes }, { data: modules }] =
+  const [{ data: course }, { data: themes }, { data: modules }] =
     await Promise.all([
       supabase
         .from('courses')
@@ -49,7 +50,6 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
         )
         .eq('id', id)
         .maybeSingle(),
-      supabase.from('instructors').select('id, name').order('name'),
       supabase.from('themes').select('id, name, status').order('position'),
       supabase.from('modules').select('id, title, position, status').eq('course_id', id).order('position'),
     ])
@@ -66,6 +66,23 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
     .select('id, title, position, status, duration_seconds, video_asset_id, para_fazer, module_id')
     .eq('course_id', id)
     .order('position')
+
+  /*
+   * Os materiais de TODAS as aulas, numa consulta só.
+   *
+   * A gaveta de cada aula mostra os arquivos dela. Buscar por aula seria uma
+   * ida ao banco por linha da lista — vinte aulas, vinte consultas.
+   */
+  const { data: materiais } = await supabase
+    .from('materials')
+    .select('id, title, url, kind, lesson_id, position')
+    .in('lesson_id', (lessons ?? []).map((l) => l.id).length ? (lessons ?? []).map((l) => l.id) : ['-'])
+    .order('position')
+
+  const materiaisPorAula = new Map<string, typeof materiais>()
+  for (const m of materiais ?? []) {
+    materiaisPorAula.set(m.lesson_id, [...(materiaisPorAula.get(m.lesson_id) ?? []), m])
+  }
 
   const moduleList = (modules ?? []).map((m) => ({
     ...m,
@@ -191,23 +208,21 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
               />
             </Field>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Instrutor" htmlFor="instructor_id">
-                <select
-                  id="instructor_id"
-                  name="instructor_id"
-                  defaultValue={course.instructor_id ?? ''}
-                  className="h-10 w-full rounded-[var(--radius-control)] border border-line bg-navy-deep px-3 text-body text-ink outline-none focus:border-[rgba(76,65,255,0.7)]"
-                >
-                  <option value="">Sem instrutor</option>
-                  {(instructors ?? []).map((i) => (
-                    <option key={i.id} value={i.id}>
-                      {i.name}
-                    </option>
-                  ))}
-                </select>
-              </Field>
+            {/*
+              O SELETOR DE INSTRUTOR SAIU DAQUI (D-70).
+              
+              O Gabriel disse que escolher instrutor não faz sentido agora, e
+              está certo pelo estado do produto: quem grava é ele, e o campo
+              pedia uma decisão a cada curso para sempre dar a mesma resposta.
+              
+              O VÍNCULO CONTINUA no banco e a página do curso continua mostrando
+              o instrutor quando existe — o que saiu foi a PERGUNTA, não o dado.
+              Quando houver convidados, ele volta. O `instructor_id` viaja
+              escondido para o salvar não apagar o que já estava lá.
+            */}
+            <input type="hidden" name="instructor_id" value={course.instructor_id ?? ''} />
 
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Formato" htmlFor="format">
                 <select
                   id="format"
@@ -301,47 +316,47 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
 
               <div className="flex flex-col divide-y divide-[var(--color-line)]">
                 {mod.lessons.map((lesson, index) => (
-                  <div key={lesson.id} className="flex items-center gap-3 px-4 py-2.5">
-                    <div className="flex flex-col gap-0.5">
-                      {(['up', 'down'] as const).map((dir) => (
-                        <form key={dir} action={moverAula}>
-                          <input type="hidden" name="id" value={lesson.id} />
-                          <input type="hidden" name="module_id" value={mod.id} />
-                          <input type="hidden" name="course_id" value={course.id} />
-                          <input type="hidden" name="direction" value={dir} />
-                          <button
-                            type="submit"
-                            className={iconButton}
-                            disabled={dir === 'up' ? index === 0 : index === mod.lessons.length - 1}
-                            aria-label={`Mover ${lesson.title} para ${dir === 'up' ? 'cima' : 'baixo'}`}
-                          >
-                            <IconeMover
-                              direcao={dir === 'up' ? 'cima' : 'baixo'}
-                              className="size-3"
-                            />
-                          </button>
-                        </form>
-                      ))}
-                    </div>
-
-                    <Link
-                      href={`/admin/cursos/${course.id}/aula/${lesson.id}`}
-                      className="min-w-0 flex-1"
-                    >
-                      <span className="block truncate text-body text-ink-2 hover:text-ink">
-                        {lesson.title}
-                      </span>
-                      <span data-numeric className="text-caption text-ink-4">
-                        {formatDuration(lesson.duration_seconds)}
-                      </span>
-                    </Link>
-
-                    <div className="flex items-center gap-1.5">
-                      {!lesson.video_asset_id && <Chip tone="caution">sem vídeo</Chip>}
-                      {!lesson.para_fazer?.trim() && <Chip>sem Para Fazer</Chip>}
-                      {lesson.status === 'published' && <Chip tone="positive">no ar</Chip>}
-                    </div>
-                  </div>
+                  <AulaExpansivel
+                    key={lesson.id}
+                    courseId={course.id}
+                    indice={index}
+                    total={mod.lessons.length}
+                    aula={{
+                      id: lesson.id,
+                      title: lesson.title,
+                      durationSeconds: lesson.duration_seconds,
+                      videoAssetId: lesson.video_asset_id,
+                      temParaFazer: Boolean(lesson.para_fazer?.trim()),
+                      publicada: lesson.status === 'published',
+                      materiais: (materiaisPorAula.get(lesson.id) ?? []).map((m) => ({
+                        id: m.id,
+                        title: m.title,
+                        url: m.url,
+                        kind: m.kind,
+                      })),
+                    }}
+                    moverPara={(direcao) => (
+                      <form action={moverAula}>
+                        <input type="hidden" name="id" value={lesson.id} />
+                        <input type="hidden" name="module_id" value={mod.id} />
+                        <input type="hidden" name="course_id" value={course.id} />
+                        <input type="hidden" name="direction" value={direcao} />
+                        <button
+                          type="submit"
+                          className={iconButton}
+                          disabled={
+                            direcao === 'up' ? index === 0 : index === mod.lessons.length - 1
+                          }
+                          aria-label={`Mover ${lesson.title} para ${direcao === 'up' ? 'cima' : 'baixo'}`}
+                        >
+                          <IconeMover
+                            direcao={direcao === 'up' ? 'cima' : 'baixo'}
+                            className="size-3"
+                          />
+                        </button>
+                      </form>
+                    )}
+                  />
                 ))}
 
                 <form action={criarAula} className="flex items-center gap-2 px-4 py-3">

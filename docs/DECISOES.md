@@ -1459,3 +1459,57 @@ clicar de novo, ou copiar tudo antes por medo de perder.
 enquanto a ação está em voo (o clique pegou) e "Salvo" por dois segundos (deu
 certo). O segundo some sozinho de propósito — confirmação permanente vira
 ruído, e na visita seguinte a pessoa leria "Salvo" sem ter salvado nada.
+
+## D-70 · Boas-vindas, e a aula que se sobe no lugar
+
+**O ONBOARDING NÃO É CARROSSEL.** Ninguém lê slides explicando onde ficam os
+botões, e quem lê esquece antes de precisar — menu se aprende usando. Três
+passos, e cada um faz um trabalho:
+
+1. **A regra.** "A aula não termina quando o vídeo acaba. Termina quando você
+   faz." É o passo que carrega o peso todo: se a pessoa sair daqui achando que
+   isto é biblioteca de vídeo, ela consome e cancela, e nenhuma tela adiante
+   conserta. A frase é a mesma da landing de propósito — o que foi prometido lá
+   fora é o que se explica aqui dentro.
+2. **Quem é você.** A pergunta sobre empresa, que antes só existia na Conta.
+   Aqui é apresentação; lá era formulário. E dá para pular: obrigar alguém a
+   falar de si para entrar numa escola que já pagou é hostil.
+3. **Por onde começar.** Três cursos, não o catálogo — parede de escolha no
+   momento em que a pessoa menos sabe escolher é o oposto do que o passo pede.
+
+O passo 3 é o que separa isto de onboarding decorativo: **termina DENTRO de um
+curso**, não numa Home zerada. É o único momento em que a pessoa está inteira
+disposta, e gastá-lo num botão "Começar" é desperdício.
+
+`onboarded_at` existia desde 0002 sem ninguém escrever nela — a dívida
+registrada em D-53 fecha aqui.
+
+**A tela vive fora de `(aluno)`**, e isso não é organização: a casca do aluno
+redireciona para cá. Morando lá dentro, o redirecionamento apontaria para si
+mesmo e o primeiro login entraria em laço infinito.
+
+**Vem ANTES da sala de espera:** quem chegou antes da data combinada precisa
+saber que está tudo certo. Explicar a regra da escola para quem ainda não pode
+entrar é conversa fora de hora.
+
+## D-71 · A aula se sobe sem trocar de tela
+
+O Gabriel disse que subir aula estava confuso e pediu algo parecido com a
+Hotmart. A estrutura módulo → aula já existia; o problema era outro: **criar a
+aula e subir o vídeo eram telas diferentes.** Criava aqui, clicava, ia para
+outra página, subia, voltava. Doze aulas = vinte e quatro navegações.
+
+A linha da aula agora abre no lugar e traz as duas coisas que se faz logo
+depois de criar uma aula: o vídeo e os arquivos. O conteúdo só monta ao abrir —
+`EnviarVideo` observa processamento e `Materiais` tem formulário próprio; montar
+isso para doze aulas fechadas seriam doze relógios rodando para ninguém ver.
+
+A página inteira da aula continua, com link daqui: é onde moram o Para Saber, o
+Para Fazer e as habilidades. A gaveta é para o trabalho de SUBIR, não o de
+escrever.
+
+**O seletor de instrutor saiu.** Pedia uma decisão a cada curso para sempre dar
+a mesma resposta — quem grava é ele. O VÍNCULO continua no banco e a página do
+curso continua mostrando o instrutor quando existe: o que saiu foi a pergunta,
+não o dado. O `instructor_id` viaja num campo escondido para salvar não apagar
+o que já estava lá.
