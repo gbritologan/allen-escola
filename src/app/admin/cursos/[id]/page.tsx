@@ -20,6 +20,7 @@ import {
 } from './actions'
 import { AulaExpansivel } from './aula-expansivel'
 import { Capa } from './capa'
+import { SoltarAulas } from './soltar-aulas'
 
 export async function generateMetadata({
   params,
@@ -359,7 +360,11 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
                   />
                 ))}
 
-                <form action={criarAula} className="flex items-center gap-2 px-4 py-3">
+                {/* Vários de uma vez primeiro: é o gesto do trabalho real —
+                    quem sobe um curso tem uma pasta, não um arquivo. */}
+                <SoltarAulas courseId={course.id} moduleId={mod.id} />
+
+                <form action={criarAula} className="flex items-center gap-2 border-t border-line px-4 py-3">
                   <input type="hidden" name="course_id" value={course.id} />
                   <input type="hidden" name="module_id" value={mod.id} />
                   <Input name="title" placeholder="Título da nova aula" className="h-9" required />

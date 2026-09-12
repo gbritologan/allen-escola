@@ -1513,3 +1513,44 @@ a mesma resposta — quem grava é ele. O VÍNCULO continua no banco e a página
 curso continua mostrando o instrutor quando existe: o que saiu foi a pergunta,
 não o dado. O `instructor_id` viaja num campo escondido para salvar não apagar
 o que já estava lá.
+
+## D-72 · Subir um curso é subir uma pasta, não um arquivo
+
+O Gabriel perguntou duas vezes se o envio já estava "igual à Hotmart". Fui
+conferir em vez de responder de novo, e a resposta honesta era: **quase**.
+
+O que já existia e é bom — em um ponto, melhor que a referência:
+
+- barra de progresso com porcentagem
+- **envio retomável** (TUS): internet caiu no meio de 800MB, volta de onde
+  parou. A maioria das plataformas recomeça
+- direto do navegador para o Bunny, sem prender a tela
+
+O que faltava eram duas coisas, e a segunda é a que importa:
+
+**O GESTO.** Era um botão de "escolher arquivo". Funciona, e obriga a passar
+por uma caixa de diálogo do sistema para achar algo que já está visível na
+mesa. Agora aceita arrastar.
+
+**O TRABALHO REAL.** Ninguém sobe *um* vídeo — sobe doze. Um por um, isso eram
+doze criações de aula, doze cliques e doze esperas. Agora arrasta-se a pasta
+inteira: cada arquivo vira uma aula, com o título tirado do nome do arquivo.
+
+**"03 - Abertura da call.mp4" vira "Abertura da call".** Quem exporta vídeo
+numera para ordenar na pasta, e esse número é do sistema de arquivos, não do
+curso — a ordem aqui é a posição. Mas os arquivos SÃO ordenados por esse número
+antes de entrar na fila, porque essa numeração é a ordem pretendida.
+
+**Os envios são em SÉRIE, não em paralelo.** Doze uploads simultâneos dividem a
+banda de subida entre si: em rede brasileira isso são doze barras andando
+devagar e nenhuma terminando. Um de cada vez entrega a primeira aula em minutos
+— e aula pronta é aula que já pode ser revisada.
+
+**Um arquivo que falha não derruba a fila.** Marca erro e segue. Perder dez
+minutos de envio porque o quinto arquivo estava corrompido seria o pior jeito
+de descobrir isso.
+
+`criarAulaParaUpload` existe separada de `criarAula` porque a original termina
+em `redirect()` — perfeito para quem clicou em "criar aula" e vai escrever
+agora, fatal para uma fila: o primeiro redirecionaria e os outros sete
+morreriam no caminho.

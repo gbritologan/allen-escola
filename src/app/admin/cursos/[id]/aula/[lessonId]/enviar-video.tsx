@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { Button } from '@/components/primitives/button'
+import { cn } from '@/lib/utils'
 import { IconeApagar } from '@/components/icons'
 import { formatDuration } from '@/core/shared/format'
 import { prepararUpload, removerVideo, verificarProcessamento } from './video-actions'
@@ -28,6 +29,15 @@ type Etapa =
  * 3. `tus-js-client` entra por import dinâmico — só é baixado por quem
  *    realmente vai enviar um vídeo, e nunca pelo aluno.
  */
+/**
+ * Área de soltar arquivo.
+ *
+ * O envio já era bom — barra de progresso, retomável, sem prender a tela. O
+ * que faltava para parecer com o que o Gabriel conhece era o GESTO: na
+ * Hotmart você arrasta o arquivo para dentro. Botão de "escolher arquivo"
+ * funciona e obriga a passar por uma caixa de diálogo do sistema para achar
+ * algo que já está visível na mesa.
+ */
 export function EnviarVideo({
   lessonId,
   courseId,
@@ -45,6 +55,7 @@ export function EnviarVideo({
     assetIdAtual ? { nome: 'pronto', duracao: duracaoAtual || null } : { nome: 'parado' },
   )
   const inputRef = useRef<HTMLInputElement>(null)
+  const [arrastando, setArrastando] = useState(false)
 
   async function aoEscolher(arquivo: File) {
     setEtapa({ nome: 'preparando' })
@@ -115,12 +126,34 @@ export function EnviarVideo({
       />
 
       {etapa.nome === 'parado' && (
-        <div className="flex flex-col items-start gap-2">
-          <Button type="button" variant="secondary" onClick={() => inputRef.current?.click()}>
-            Escolher arquivo de vídeo
+        <div
+          onDragOver={(e) => {
+            e.preventDefault()
+            setArrastando(true)
+          }}
+          onDragLeave={() => setArrastando(false)}
+          onDrop={(e) => {
+            e.preventDefault()
+            setArrastando(false)
+            const f = Array.from(e.dataTransfer.files).find((x) => x.type.startsWith('video/'))
+            if (f) void aoEscolher(f)
+          }}
+          className={cn(
+            'flex flex-col items-center gap-2 rounded-[var(--radius-card)] border border-dashed px-6 py-8 text-center transition-colors duration-150',
+            arrastando
+              ? 'border-[rgba(76,65,255,0.7)] bg-[rgba(76,65,255,0.08)]'
+              : 'border-line',
+          )}
+        >
+          <span className="text-body text-ink-2">
+            {arrastando ? 'Solte o arquivo' : 'Arraste o vídeo para cá'}
+          </span>
+          <Button type="button" variant="secondary" size="sm" onClick={() => inputRef.current?.click()}>
+            ou escolher do computador
           </Button>
           <span className="text-caption text-ink-4">
-            Sobe direto para o Bunny. Você pode continuar escrevendo enquanto isso.
+            Sobe direto para o Bunny, e o envio continua se a internet cair. Você pode escrever
+            o resto enquanto ele sobe.
           </span>
         </div>
       )}

@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { slugify } from '@/core/shared/slug'
 import { apagarImagem, enviarImagem } from '@/lib/imagens'
+import { can } from '@/core/identity/permissions'
+import { getSession } from '@/lib/auth/session'
 import { createClient } from '@/lib/supabase/server'
 
 function revalidar(courseId: string) {
@@ -285,4 +287,65 @@ export async function moverAula(formData: FormData) {
     supabase.from('lessons').update({ position: current.position }).eq('id', target.id),
   ])
   revalidar(courseId)
+}
+
+/**
+ * Cria uma aula e DEVOLVE o id, sem redirecionar.
+ *
+ * `criarAula` termina com `redirect()` — ótimo para quem clicou em "Criar
+ * aula" e quer escrever agora. Péssimo para soltar oito vídeos de uma vez: o
+ * primeiro redirecionaria e os outros sete morreriam no caminho.
+ *
+ * O título vem do NOME DO ARQUIVO, limpo. "03 - Abertura da call.mp4" vira
+ * "Abertura da call": quem exporta vídeo numera para ordenar na pasta, e esse
+ * número é do sistema de arquivos, não do curso — a ordem aqui é a posição.
+ */
+export async function criarAulaParaUpload(
+  courseId: string,
+  moduleId: string,
+  nomeDoArquivo: string,
+): Promise<{ id: string; title: string } | null> {
+  const session = await getSession()
+  if (!session || !can(session.role, 'content.write')) return null
+
+  const title =
+    nomeDoArquivo
+      .replace(/\.[^.]+$/, '')
+      .replace(/^[\s\d]*[-_.)]\s*/, '')
+      .replace(/[_-]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim() || 'Aula sem título'
+
+  const supabase = await createClient()
+  const { data: last } = await supabase
+    .from('lessons')
+    .select('position')
+    .eq('module_id', moduleId)
+    .order('position', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  const base = slugify(title)
+  const { data: clash } = await supabase
+    .from('lessons')
+    .select('id')
+    .eq('course_id', courseId)
+    .eq('slug', base)
+    .maybeSingle()
+
+  const posicao = (last?.position ?? 0) + 1
+  const { data: lesson } = await supabase
+    .from('lessons')
+    .insert({
+      module_id: moduleId,
+      course_id: courseId,
+      title,
+      slug: clash ? `${base}-${posicao}` : base,
+      position: posicao,
+      status: 'draft',
+    })
+    .select('id, title')
+    .single()
+
+  return lesson ? { id: lesson.id as string, title: lesson.title as string } : null
 }
