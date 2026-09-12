@@ -5,6 +5,7 @@ import { can } from '@/core/identity/permissions'
 import { ASSIGNABLE_ROLES, type Role } from '@/core/identity/roles'
 import { getSession } from '@/lib/auth/session'
 import { createAnonClient, createClient } from '@/lib/supabase/server'
+import { urlPublica } from '@/lib/url-publica'
 
 export interface ConviteState {
   error: string | null
@@ -62,7 +63,7 @@ export async function convidarPessoa(
       // Vira `raw_user_meta_data`, e `handle_new_user` o transforma no nome do
       // perfil. Sem isto a lista de pessoas nasce como uma coluna de e-mails.
       data: nome ? { full_name: nome } : undefined,
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+      emailRedirectTo: `${urlPublica()}/auth/callback`,
     },
   })
 
@@ -105,7 +106,7 @@ export async function reenviarConvite(formData: FormData) {
     email,
     options: {
       shouldCreateUser: false,
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+      emailRedirectTo: `${urlPublica()}/auth/callback`,
     },
   })
 

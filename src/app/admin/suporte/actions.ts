@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { enviarEmail } from '@/lib/email/enviar'
 import { getSession } from '@/lib/auth/session'
 import { createClient } from '@/lib/supabase/server'
+import { urlPublica } from '@/lib/url-publica'
 
 /**
  * RESPONDER.
@@ -65,7 +66,7 @@ export async function responderChamado(formData: FormData) {
           '',
           '—',
           'Responda por aqui ou continue a conversa em',
-          `${process.env.NEXT_PUBLIC_SITE_URL}/suporte/${threadId}`,
+          `${urlPublica()}/suporte/${threadId}`,
         ].join('\n'),
       })
     }

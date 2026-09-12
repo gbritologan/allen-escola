@@ -1579,3 +1579,30 @@ do "está tudo bem" é pior que painel nenhum.
 Uma falha silenciosa que custa uma tarde de quem produz é pior que um erro na
 tela. O aviso não conserta a chave; ele impede a pessoa de descobrir sozinha,
 tentando.
+
+## D-74 · E-mail que sai para fora nunca aponta para a minha máquina
+
+O Gabriel convidou o sócio e o sócio viu "o Safari não pode abrir a página
+porque não pode se conectar com o servidor".
+
+Os logs do Supabase deram a resposta em uma linha: o convite saiu com
+`referer: http://localhost:3000`. Ele foi disparado do servidor de
+desenvolvimento, e o `emailRedirectTo` virou `http://localhost:3000/auth/callback`
+— o localhost DO SÓCIO, onde não há nada rodando.
+
+`NEXT_PUBLIC_SITE_URL` apontar para localhost em desenvolvimento está certo.
+O erro foi usar essa variável para montar um link que sai para a caixa de
+entrada de outra pessoa.
+
+Então a regra passa a ser explícita, e mora no código: **e-mail para terceiros
+usa `enderecoPublico()`**, que troca qualquer hostname local pelo endereço
+canônico. Vale para convite, reenvio de convite e notificação de suporte.
+
+`/entrar` fica de fora de propósito: ali a pessoa manda o código para si
+mesma, e quem está em localhost é quem está desenvolvendo — e quer voltar
+para lá.
+
+O que dói aqui não é o bug, é onde ele apareceu: na primeira vez que a
+plataforma falou com alguém que não era o dono. Erro de ambiente não fica no
+ambiente — ele viaja dentro do e-mail e estraga a primeira impressão de quem
+recebeu.

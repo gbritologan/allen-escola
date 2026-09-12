@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { caixaDoSuporte, enviarEmail } from '@/lib/email/enviar'
 import { getSession } from '@/lib/auth/session'
 import { createClient } from '@/lib/supabase/server'
+import { urlPublica } from '@/lib/url-publica'
 
 export interface ChamadoState {
   error: string | null
@@ -77,7 +78,7 @@ export async function abrirChamado(
       corpo,
       '',
       '—',
-      `Responder em ${process.env.NEXT_PUBLIC_SITE_URL}/admin/suporte/${thread.id}`,
+      `Responder em ${urlPublica()}/admin/suporte/${thread.id}`,
     ]
       .filter(Boolean)
       .join('\n'),
@@ -108,7 +109,7 @@ export async function responder(formData: FormData) {
     para: caixaDoSuporte(),
     assunto: `[Allen] resposta de ${session.email ?? 'aluno'}`,
     responderPara: session.email ?? undefined,
-    texto: `${corpo}\n\n—\n${process.env.NEXT_PUBLIC_SITE_URL}/admin/suporte/${threadId}`,
+    texto: `${corpo}\n\n—\n${urlPublica()}/admin/suporte/${threadId}`,
   })
 
   revalidatePath(`/suporte/${threadId}`)
