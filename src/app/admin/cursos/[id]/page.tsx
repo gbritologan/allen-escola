@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { BotaoSalvar } from '@/components/primitives/botao-salvar'
 import { Button } from '@/components/primitives/button'
 import { Chip } from '@/components/primitives/chip'
 import { IconeApagar, IconeMover } from '@/components/icons'
@@ -220,9 +221,9 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
               </Field>
             </div>
 
-            <Button type="submit" variant="secondary" className="self-start">
-              Salvar
-            </Button>
+            <div className="self-start">
+              <BotaoSalvar />
+            </div>
           </form>
         </Surface>
       </section>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
+import { BotaoSalvar } from '@/components/primitives/botao-salvar'
 import { Button } from '@/components/primitives/button'
 import { Field, Input } from '@/components/primitives/field'
 import { Surface } from '@/components/surfaces/surface'
@@ -179,9 +180,7 @@ export default async function ContaPage() {
           </Field>
 
           <div>
-            <Button type="submit" size="sm">
-              Salvar
-            </Button>
+            <BotaoSalvar />
           </div>
         </form>
       </section>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { BotaoSalvar } from '@/components/primitives/botao-salvar'
 import { Button } from '@/components/primitives/button'
 import { Chip } from '@/components/primitives/chip'
 import { Field, Input, Textarea } from '@/components/primitives/field'
@@ -190,9 +191,7 @@ export default async function AdminAppsPage() {
               </Field>
 
               <div>
-                <Button type="submit" size="sm">
-                  Salvar
-                </Button>
+                <BotaoSalvar>Salvar</BotaoSalvar>
               </div>
             </form>
           </Surface>

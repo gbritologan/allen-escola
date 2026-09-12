@@ -44,8 +44,33 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!session) redirect('/entrar?destino=/admin')
   if (!canOpenAdmin(session.role)) redirect('/')
 
+  /*
+   * Coluna no celular (fila em cima, conteúdo embaixo), linha no desktop
+   * (barra à esquerda). Sem o `flex-col`, a fila horizontal entraria como
+   * coluna ao lado do conteúdo.
+   */
   return (
-    <div className="flex min-h-dvh bg-navy-deep">
+    <div className="flex min-h-dvh flex-col bg-navy-deep md:flex-row">
+      {/*
+        NO CELULAR A BARRA VIRA UMA FILA ROLÁVEL NO TOPO.
+        
+        Ela era `hidden md:flex` e ponto: no telefone o Studio ficava SEM
+        navegação nenhuma — quem entrasse numa tela ficava preso nela, sem nem
+        voltar para o painel. Uma barra lateral de 224px não cabe em 375px, mas
+        "não cabe" não é motivo para sumir; é motivo para virar outra coisa.
+      */}
+      <nav className="sticky top-0 z-30 flex gap-1 overflow-x-auto border-b border-line bg-[rgba(8,11,30,0.9)] px-3 py-2 [backdrop-filter:blur(16px)] md:hidden">
+        {NAV.filter((item) => !item.requer || can(session.role, item.requer)).map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="shrink-0 rounded-[var(--radius-control)] px-3 py-1.5 text-caption text-ink-3 transition-colors hover:bg-[rgba(243,245,252,0.05)] hover:text-ink"
+          >
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+
       <aside className="sticky top-0 hidden h-dvh w-56 shrink-0 flex-col gap-6 border-r border-line px-4 py-6 md:flex">
         <Link href="/admin" className="px-2">
           {/* Rail é superfície chapada: aqui a marca vai na variante clara. */}

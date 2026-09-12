@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Button } from '@/components/primitives/button'
+import { BotaoSalvar } from '@/components/primitives/botao-salvar'
 import { Chip } from '@/components/primitives/chip'
 import { IconeApagar } from '@/components/icons'
 import { Field, Input, Textarea } from '@/components/primitives/field'
@@ -199,9 +199,9 @@ export default async function InstrutoresPage() {
                       <Textarea id={`bio-${pessoa.id}`} name="bio" defaultValue={pessoa.bio ?? ''} />
                     </Field>
 
-                    <Button type="submit" variant="secondary" size="sm" className="self-start">
-                      Salvar
-                    </Button>
+                    <div className="self-start">
+                      <BotaoSalvar />
+                    </div>
                   </form>
 
                   {cursos.length > 0 && (

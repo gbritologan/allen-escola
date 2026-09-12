@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { BotaoSalvar } from '@/components/primitives/botao-salvar'
 import { Button } from '@/components/primitives/button'
 import { Chip } from '@/components/primitives/chip'
 import { Field, Input } from '@/components/primitives/field'
@@ -151,9 +152,7 @@ export default async function AdminBannerPage() {
               </div>
 
               <div>
-                <Button type="submit" size="sm">
-                  Salvar textos
-                </Button>
+                <BotaoSalvar>Salvar textos</BotaoSalvar>
               </div>
             </form>
           </Surface>

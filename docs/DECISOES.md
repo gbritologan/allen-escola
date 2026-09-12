@@ -1434,3 +1434,28 @@ erro de compilação, sem teste falhando, sem nenhum sinal.
 
 Agora é por href. Lista por posição é uma dependência invisível entre duas
 coisas distantes no arquivo, e a única defesa contra ela é alguém reparar.
+
+## D-69 · Pente-fino: três defeitos que ninguém reportou
+
+Auditoria pedida pelo Gabriel. O que ela achou não estava em nenhuma lista de
+bugs — são coisas que degradam em silêncio.
+
+**O Studio não tinha NENHUM `loading.tsx`.** Exatamente o buraco que a área do
+aluno tinha antes de D-41, com o mesmo custo duplo: o clique não dá sinal até o
+servidor responder, e o Next não faz prefetch de rota dinâmica sem fronteira de
+loading — então toda navegação começava do zero. Pesa mais aqui: quem
+administra passa a tarde trocando de tela.
+
+**O Studio sumia inteiro no celular.** A barra era `hidden md:flex` e não havia
+alternativa: no telefone, quem entrasse numa tela ficava preso, sem nem voltar
+ao painel. Uma barra de 224px não cabe em 375px — mas "não cabe" é motivo para
+virar outra coisa, não para desaparecer. Virou fila rolável no topo.
+
+**Cinco telas tinham "Salvar" mudo.** Você clicava, a página revalidava, e nada
+mudava. Quem escreve conteúdo fica sem saber se o texto foi — e o reflexo é
+clicar de novo, ou copiar tudo antes por medo de perder.
+
+`BotaoSalvar` dá dois sinais, que respondem perguntas diferentes: "Salvando…"
+enquanto a ação está em voo (o clique pegou) e "Salvo" por dois segundos (deu
+certo). O segundo some sozinho de propósito — confirmação permanente vira
+ruído, e na visita seguinte a pessoa leria "Salvo" sem ter salvado nada.
