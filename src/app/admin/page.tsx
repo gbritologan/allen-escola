@@ -3,6 +3,7 @@ import { Chip } from '@/components/primitives/chip'
 import { Surface } from '@/components/surfaces/surface'
 import { formatDuration } from '@/core/shared/format'
 import { createClient } from '@/lib/supabase/server'
+import { SaudeVideo } from './saude-video'
 
 /**
  * O painel não é um dashboard de métricas — é uma lista do que está travando a
@@ -66,6 +67,10 @@ export default async function AdminPage() {
         <span className="text-caption uppercase tracking-[0.16em] text-ink-3">Allen Admin</span>
         <h1 className="text-display font-light">Painel</h1>
       </header>
+
+      {/* Antes de tudo: se o envio de vídeo está quebrado, saber disso vale
+          mais que qualquer número abaixo. */}
+      <SaudeVideo />
 
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[

@@ -1554,3 +1554,28 @@ de descobrir isso.
 em `redirect()` — perfeito para quem clicou em "criar aula" e vai escrever
 agora, fatal para uma fila: o primeiro redirecionaria e os outros sete
 morreriam no caminho.
+
+## D-73 · "Configurado" não é "funcionando"
+
+O Gabriel não conseguia subir aula e perguntou se aquilo funcionava mesmo. Fui
+diagnosticar em vez de responder: **a chave do Bunny é inválida.** 401 tanto no
+endpoint de biblioteca quanto no de conta — não é chave do tipo errado, é chave
+errada.
+
+O envio nunca teve chance: a primeira coisa que ele faz é pedir ao Bunny para
+criar o vídeo, e o Bunny recusa.
+
+**O erro de método é meu, e vale registrar.** Eu tinha conferido as variáveis de
+ambiente na Vercel e concluído que "o upload de vídeo está funcional". As
+variáveis EXISTIAM — nenhuma delas foi testada. Cheguei a escrever, em outro
+contexto, que "configurado não é testado", e mesmo assim tratei presença de
+variável como prova de funcionamento.
+
+Daí o `SaudeVideo` no painel do Studio: ele faz uma chamada autenticada barata e
+avisa quando o provedor recusa. Falha fechada — qualquer resposta que não seja
+sucesso ou 404-esperado vira aviso, porque painel de saúde que erra para o lado
+do "está tudo bem" é pior que painel nenhum.
+
+Uma falha silenciosa que custa uma tarde de quem produz é pior que um erro na
+tela. O aviso não conserta a chave; ele impede a pessoa de descobrir sozinha,
+tentando.
