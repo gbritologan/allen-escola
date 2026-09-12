@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Player } from '@/components/domain/player'
@@ -38,7 +39,7 @@ export default async function AppPage({ params }: { params: Promise<{ slug: stri
   // por status aqui, e filtrar esconderia o rascunho da própria equipe.
   const { data: app } = await supabase
     .from('apps')
-    .select('id, slug, name, tagline, description, como_usar, access_url, video_asset_id, status')
+    .select('id, slug, name, tagline, description, como_usar, access_url, video_asset_id, logo_url, status')
     .eq('slug', slug)
     .maybeSingle()
 
@@ -63,7 +64,20 @@ export default async function AppPage({ params }: { params: Promise<{ slug: stri
         ← Apps
       </Link>
 
-      <header className="flex flex-col gap-3">
+      <header className="flex flex-col gap-4">
+        {/* A marca aparece aqui também: é o que liga esta página ao cartão de
+            onde a pessoa veio. */}
+        {app.logo_url && (
+          <div className="flex size-16 items-center justify-center overflow-hidden rounded-[var(--radius-control)] bg-[rgba(243,245,252,0.06)] p-2.5">
+            <Image
+              src={app.logo_url}
+              alt=""
+              width={52}
+              height={52}
+              className="size-full object-contain"
+            />
+          </div>
+        )}
         <h1 className="text-display font-light">{app.name}</h1>
         {app.tagline && (
           <p className="max-w-[54ch] text-lead font-light text-ink-2">{app.tagline}</p>

@@ -1222,3 +1222,30 @@ mesmo momento — o vídeo acabou. Espalhados, cada um vira uma decisão isolada
 marcador de texto, o marcador aparecia três vezes e o corte duplicou 170 linhas.
 Reparado por linha. A lição é velha e eu repeti: corte por índice de texto em
 arquivo grande precisa de marcador único, não do primeiro que aparece.
+
+## D-61 · Apps vira catálogo: logo, teaser, link
+
+O Gabriel definiu a tela em uma frase: a pessoa vê a **logo** do app, o
+**teaser** que explica o que ele é, e um **link dedicado** que leva até ele.
+
+A tabela `apps` (0015) já tinha nome, `tagline` e `access_url`. Faltava a
+marca, e ela ganhou coluna própria (0022) em vez de reaproveitar qualquer
+noção de capa. **Logo não é capa:** capa é cartaz, tem proporção e pode ser
+cortada; logo é marca — precisa respirar, não pode ser cortada, e aparece
+pequena. Tratar as duas como a mesma coisa é o caminho mais curto para uma
+logo esmagada dentro de um 16:9.
+
+No cartão ela é `object-contain` num quadrado com folga e **fundo próprio**:
+logo com fundo transparente sobre vidro escuro some quando a marca é escura.
+
+**A ordem dentro do cartão é a frase dele**, e não é arbitrária: num catálogo
+de ferramentas a marca é o que se reconhece antes de ler.
+
+**Duas ações, não uma.** "Abrir o app" leva para fora e é o que a maioria quer.
+"Como usar" leva à página interna com a demonstração em vídeo e o passo a passo
+— e **só aparece quando esse conteúdo existe**. Cartão que promete "como usar"
+e abre página vazia é pior que cartão sem a opção.
+
+**Sem `access_url`, o botão vira etiqueta "Em breve"** em vez de um botão que
+não faz nada. Um app pode ser anunciado antes de abrir (era a razão de o campo
+ser opcional em 0015), e um botão morto é pior que uma promessa honesta.

@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import { Button } from '@/components/primitives/button'
 import { Chip } from '@/components/primitives/chip'
 import { Field, Input, Textarea } from '@/components/primitives/field'
 import { Surface } from '@/components/surfaces/surface'
 import { CONTENT_STATUS_LABEL, type ContentStatus } from '@/core/shared/types'
 import { createClient } from '@/lib/supabase/server'
-import { alternarPublicacao, moverApp, salvarApp } from './actions'
+import { alternarPublicacao, enviarLogo, moverApp, removerLogo, salvarApp } from './actions'
 import { NovoApp } from './novo-app'
 
 export const metadata: Metadata = { title: 'Apps' }
@@ -21,7 +22,7 @@ export default async function AdminAppsPage() {
   const supabase = await createClient()
   const { data: apps } = await supabase
     .from('apps')
-    .select('id, slug, name, tagline, description, como_usar, access_url, video_asset_id, status, position')
+    .select('id, slug, name, tagline, description, como_usar, access_url, video_asset_id, logo_url, status, position')
     .order('position')
 
   const lista = apps ?? []
@@ -78,6 +79,52 @@ export default async function AdminAppsPage() {
                   </Button>
                 </form>
               </div>
+            </div>
+
+            {/* A logo tem ação própria, então form próprio: <form> dentro de
+                <form> é inválido em HTML. */}
+            <div className="flex flex-wrap items-center gap-4 border-y border-line py-4">
+              <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-control)] bg-[rgba(243,245,252,0.06)] p-2">
+                {app.logo_url ? (
+                  <Image
+                    src={app.logo_url}
+                    alt=""
+                    width={44}
+                    height={44}
+                    className="size-full object-contain"
+                  />
+                ) : (
+                  <span className="text-caption text-ink-4">logo</span>
+                )}
+              </div>
+
+              <form action={enviarLogo} className="flex flex-wrap items-center gap-3">
+                <input type="hidden" name="id" value={app.id} />
+                <input type="hidden" name="slug" value={app.slug} />
+                <input
+                  type="file"
+                  name="arquivo"
+                  accept="image/png,image/webp,image/avif,image/jpeg"
+                  required
+                  className="max-w-[14rem] text-caption text-ink-3 file:mr-3 file:rounded-[var(--radius-control)] file:border file:border-line file:bg-transparent file:px-3 file:py-1.5 file:text-caption file:text-ink-2"
+                />
+                <Button type="submit" size="sm" variant="secondary">
+                  {app.logo_url ? 'Trocar logo' : 'Enviar logo'}
+                </Button>
+              </form>
+
+              {app.logo_url && (
+                <form action={removerLogo}>
+                  <input type="hidden" name="id" value={app.id} />
+                  <Button type="submit" size="sm" variant="ghost">
+                    Remover
+                  </Button>
+                </form>
+              )}
+
+              <span className="text-caption text-ink-4">
+                Quadrada, de preferência com fundo transparente.
+              </span>
             </div>
 
             <form action={salvarApp} className="flex flex-col gap-4">

@@ -2,7 +2,14 @@
 
 import { revalidatePath } from 'next/cache'
 import { isValidSlug, slugify } from '@/core/shared/slug'
+import { apagarImagem, enviarImagem } from '@/lib/imagens'
 import { createClient } from '@/lib/supabase/server'
+
+/** Os dois lugares que mudam quando um app muda. */
+function revalidar() {
+  revalidatePath('/admin/apps')
+  revalidatePath('/apps')
+}
 
 export interface AppFormState {
   error: string | null
@@ -129,4 +136,42 @@ export async function moverApp(formData: FormData) {
 
   revalidatePath('/admin/apps')
   revalidatePath('/apps')
+}
+
+/**
+ * A logo do app.
+ *
+ * Mesmo mecanismo da capa de curso (0019), pasta própria. A antiga sai só
+ * depois que a nova entrou — o contrário deixaria o app sem marca nenhuma se
+ * o envio falhasse no meio.
+ */
+export async function enviarLogo(formData: FormData) {
+  const id = String(formData.get('id') ?? '')
+  const slug = String(formData.get('slug') ?? 'app')
+  const arquivo = formData.get('arquivo')
+  if (!id || !(arquivo instanceof File)) return
+
+  const { url } = await enviarImagem(arquivo, 'logos', slug)
+  if (!url) return
+
+  const supabase = await createClient()
+  const { data: antes } = await supabase.from('apps').select('logo_url').eq('id', id).maybeSingle()
+
+  await supabase.from('apps').update({ logo_url: url }).eq('id', id)
+  await apagarImagem(antes?.logo_url)
+
+  revalidar()
+}
+
+export async function removerLogo(formData: FormData) {
+  const id = String(formData.get('id') ?? '')
+  if (!id) return
+
+  const supabase = await createClient()
+  const { data: antes } = await supabase.from('apps').select('logo_url').eq('id', id).maybeSingle()
+
+  await supabase.from('apps').update({ logo_url: null }).eq('id', id)
+  await apagarImagem(antes?.logo_url)
+
+  revalidar()
 }
