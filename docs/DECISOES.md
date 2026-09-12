@@ -1249,3 +1249,27 @@ e abre página vazia é pior que cartão sem a opção.
 **Sem `access_url`, o botão vira etiqueta "Em breve"** em vez de um botão que
 não faz nada. Um app pode ser anunciado antes de abrir (era a razão de o campo
 ser opcional em 0015), e um botão morto é pior que uma promessa honesta.
+
+## D-62 · O disco do Mapa é sempre claro; o estado está na saturação
+
+O Gabriel mandou a captura: a âncora de Vendas era um borrão roxo sem ícone
+nenhum. Duas causas, e a segunda é erro meu.
+
+**Nenhum tema tinha ícone.** Os cinco estavam com `icon = null` — o seletor foi
+construído em D-43 e nunca usado. Atribuí padrões (olho, máscara, templo,
+tocha, estandarte), que ele troca em um clique no Studio. Lição: campo opcional
+que ninguém preenche é campo que não existe. Quando o padrão razoável é óbvio,
+ele devia ter nascido preenchido.
+
+**E o disco escurecia com o estado.** Eu tinha amarrado a LUZ ao estado
+(88 / 62 / 42) para ficar coerente com D-37. Isso quebrava a única coisa que o
+disco existe para fazer: sustentar um símbolo ESCURO em cima. Sem nada
+aplicado — que é o estado de todo aluno novo — o disco vinha a 42% e o ícone
+sumia dentro dele.
+
+Agora a luz varia pouco (78–92), o bastante para o ícone sempre ler, e o estado
+migrou para a **saturação**: apagada é quase cinza, acesa é o tom cheio.
+
+A tese de D-37 continua de pé — a constelação ganha COR ao ser feita — e some o
+efeito colateral de ela ganhar também legibilidade. **Codificar duas coisas no
+mesmo canal só funciona enquanto uma delas não é pré-requisito da outra.**

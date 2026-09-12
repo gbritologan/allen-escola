@@ -346,8 +346,25 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
            */
           const rr = raio * (1 + pulso)
           const aceso = a.estado === 'aceso'
-          const luz = aceso ? 88 : a.estado === 'visto' ? 62 : 42
-          const sat = aceso ? 70 : a.estado === 'visto' ? 18 : 12
+
+          /*
+           * O DISCO É SEMPRE CLARO. O ESTADO ESTÁ NA SATURAÇÃO.
+           *
+           * Erro meu na primeira versão: amarrei a LUZ do disco ao estado
+           * (88 / 62 / 42). Ficava coerente com D-37 — estado no brilho — e
+           * quebrava a única coisa que o disco existe para fazer: sustentar um
+           * símbolo ESCURO em cima. Sem nada aplicado, o disco vinha a 42% de
+           * luz e o ícone desaparecia dentro dele. O Gabriel viu exatamente
+           * isso: um borrão roxo sem ícone.
+           *
+           * Agora a luz varia pouco (78–92), o bastante para o ícone sempre
+           * ler, e o estado migra para a SATURAÇÃO: apagada é quase cinza,
+           * acesa é o tom cheio. A tese de D-37 continua de pé — a constelação
+           * ganha COR ao ser feita — e some o efeito colateral de ela ganhar
+           * também legibilidade.
+           */
+          const luz = aceso ? 92 : a.estado === 'visto' ? 84 : 78
+          const sat = aceso ? 74 : a.estado === 'visto' ? 26 : 8
 
           // O halo externo é o que cola o disco no céu. Sem ele o nó parece
           // um adesivo colado por cima do fundo.
@@ -364,7 +381,8 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
           ctx!.arc(sx, sy, rr, 0, Math.PI * 2)
           ctx!.fill()
 
-          // O símbolo em navy, recortado do disco.
+          // O símbolo em navy, recortado do disco. Sempre legível agora que
+          // o disco não escurece com o estado.
           desenharIcone(ctx!, a.icone, sx, sy, rr * 1.15, '#050714')
 
           // O anel de seleção fica FORA do disco, com folga — encostado, ele
