@@ -44,7 +44,7 @@ export const getSession = cache(async (): Promise<Session | null> => {
   const [{ data }, { data: assinatura }] = await Promise.all([
     supabase
       .from('profiles')
-      .select('id, full_name, avatar_url, role, onboarded_at, created_at')
+      .select('id, full_name, avatar_url, role, onboarded_at, created_at, is_business, company_url, pioneer')
       .eq('id', user.id)
       .maybeSingle(),
     supabase
@@ -89,6 +89,9 @@ export const getSession = cache(async (): Promise<Session | null> => {
           role: roleFromClaim(data.role),
           onboardedAt: data.onboarded_at,
           createdAt: data.created_at,
+          isBusiness: data.is_business ?? null,
+          companyUrl: data.company_url ?? null,
+          pioneer: Boolean(data.pioneer),
         }
       : null,
   }

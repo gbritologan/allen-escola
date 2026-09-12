@@ -24,6 +24,9 @@ export const metadata: Metadata = {
 // `Pessoas` é o único item com dono: conteudista administra conteúdo, não quem
 // entra na escola. Esconder aqui é conveniência — quem barra de verdade é o
 // redirect dentro da página, e a RLS embaixo dele.
+// `Habilidades` SAIU daqui (D-64). A tela continua existindo e é alcançada do
+// editor de aula, que é onde a necessidade aparece: você percebe que falta uma
+// habilidade enquanto mapeia a aula, não navegando por um menu.
 const NAV = [
   { href: '/admin', label: 'Painel' },
   { href: '/admin/temas', label: 'Temas' },
@@ -31,7 +34,6 @@ const NAV = [
   { href: '/admin/banner', label: 'Banner' },
   { href: '/admin/cursos', label: 'Cursos' },
   { href: '/admin/instrutores', label: 'Instrutores' },
-  { href: '/admin/habilidades', label: 'Habilidades' },
   { href: '/admin/pessoas', label: 'Pessoas', requer: 'people.manage' as const },
   { href: '/admin/acessos', label: 'Acessos', requer: 'people.manage' as const },
   { href: '/admin/suporte', label: 'Suporte' },

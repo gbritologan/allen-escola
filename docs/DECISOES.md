@@ -1296,3 +1296,52 @@ espaçado, legível atravessado.
 
 Agora 26px de base com teto de 1,8×, piso de 15px, e o espaçamento subiu de
 0,22em para 0,3em. O subtítulo acompanhou.
+
+## D-64 · Habilidades sai da barra do Studio
+
+O Gabriel disse que a tela não fazia sentido ali, e o diagnóstico é concreto:
+**o trabalho de verdade acontece em outro lugar.** Ligar uma habilidade a uma
+aula é feito no editor da AULA. `/admin/habilidades` só cria, renomeia e apaga
+nomes — cinco palavras — ocupando uma cadeira num Studio de nove itens.
+
+Ela saiu da barra e ganhou link no editor de aula, ao lado do mapeamento: é ali
+que a necessidade aparece. Você percebe que falta uma habilidade enquanto mapeia
+a aula, não navegando por um menu.
+
+A rota continua. Nada foi apagado.
+
+## D-65 · O perfil ganha rosto, contexto e selo
+
+**A foto** fecha um buraco antigo: `avatar_url` existia desde 0002 e nunca teve
+caminho de escrita — o mesmo padrão da capa de curso (D-48). Campo lido em
+vários lugares, impossível de preencher.
+
+Para isso o bucket precisou de uma fresta: aluno escreve em `avatares/`, e só
+ali. D-48 dizia "abrir escrita para depois é como bucket vira lixão" — o
+princípio continua; o que mudou é que agora existe um motivo real, e a permissão
+é estreita o bastante para não virar porta.
+
+**Empresário é RÁDIO, não caixa.** "Não respondeu" e "respondeu que não" são
+estados diferentes, e uma caixa só sabe representar um. Por isso a coluna é
+`boolean` anulável e não `not null default false`.
+
+**O site ganha `https://` sozinho** quando a pessoa digita só o domínio.
+"suaempresa.com.br" num href vira link relativo e leva para uma página que não
+existe dentro do próprio app — é o erro mais comum de campo de URL.
+
+**O SELO DE PIONEIRO NÃO É PREFERÊNCIA, É FATO.** Ele não aparece em nenhum
+formulário: mora em `access_grants`, desce para `profiles` no cadastro e só é
+lido. Se fosse editável, deixaria de significar alguma coisa.
+
+E `pioneer = profiles.pioneer or excluded.pioneer` no conflito: selo ganho não
+se perde num segundo login.
+
+**A tela se divide em duas metades** — em cima o que a Allen sabe e a pessoa não
+muda (papel, acesso, selo); embaixo o que é dela. Misturar faria parecer que o
+prazo de acesso é editável, e a primeira coisa que alguém tentaria seria
+esticá-lo.
+
+**A arte do selo** foi extraída do JPEG da pasta com alfa vindo da luminância
+invertida, não de corte binário: a arte tem traço fino, e um corte duro comeria
+as bordas. O meio-tom da antisserrilha vira semitransparente, que é o que
+preserva o traço.

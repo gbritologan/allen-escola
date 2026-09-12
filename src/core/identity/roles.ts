@@ -33,6 +33,16 @@ export interface Profile {
   role: Role
   onboardedAt: Timestamp | null
   createdAt: Timestamp
+  /** Nulo = ainda não respondeu, que é diferente de ter respondido "não". */
+  isBusiness: boolean | null
+  companyUrl: string | null
+  /**
+   * Comprou no período pioneiro.
+   *
+   * É FATO COMERCIAL, não preferência: vem da condição de acesso e não é
+   * editável pelo aluno. Por isso mora aqui e não num campo de formulário.
+   */
+  pioneer: boolean
 }
 
 export function isStaff(role: Role): boolean {

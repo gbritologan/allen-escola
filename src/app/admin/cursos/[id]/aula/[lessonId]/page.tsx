@@ -205,6 +205,12 @@ export default async function EditorDeAulaPage({
             O que esta aula desenvolve. É daqui que sai o histórico do aluno — aula sem habilidade
             marcada não registra nada.
           </p>
+          <Link
+            href="/admin/habilidades"
+            className="self-start text-caption text-blue-light hover:underline"
+          >
+            Criar ou renomear habilidades →
+          </Link>
         </div>
         <Surface className="p-5">
           <Habilidades
