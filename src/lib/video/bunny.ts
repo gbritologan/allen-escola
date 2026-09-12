@@ -150,6 +150,18 @@ export const bunnyProvider: VideoProvider = {
     }
   },
 
+  posterUrl(assetId) {
+    const { host, tokenKey } = config()
+    const base = `https://${host}/${assetId}/thumbnail.jpg`
+    if (!tokenKey) return base
+
+    // A miniatura vive sob o mesmo caminho protegido do vídeo, então precisa
+    // da mesma assinatura. TTL curto: ela é carregada agora ou não é.
+    const expires = Math.floor(Date.now() / 1000) + DEFAULT_PLAYBACK_TTL_SECONDS
+    const { token, caminho } = assinarReproducao(tokenKey, assetId, expires)
+    return `${base}?token=${token}&expires=${expires}&token_path=${encodeURIComponent(caminho)}`
+  },
+
   async deleteAsset(assetId) {
     const { libraryId, apiKey } = config()
     await fetch(`${API}/library/${libraryId}/videos/${assetId}`, {

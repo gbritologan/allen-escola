@@ -1180,3 +1180,45 @@ abriu sobre o que foi clicado; com ele, a ligação é instantânea. Curso e aul
 herdam o símbolo da constelação — é o que amarra a aula ao setor de onde veio.
 E entrou o caminho ("de que constelação isto faz parte"): num céu com seis
 setores, "Abertura" sozinho não diz de onde veio.
+
+## D-60 · A aula ganha a coluna de três abas
+
+Do vídeo de Capacitações que o Gabriel mandou. Duas etapas num commit só,
+porque ele pediu para não parar.
+
+**ABAS, NÃO BLOCOS EMPILHADOS.** A coluna tem 320px, e a lista de aulas de um
+curso longo já enche a altura inteira. Empilhados, materiais e anotações
+ficariam abaixo da dobra — presentes e invisíveis, o pior dos dois mundos.
+"Aulas" abre primeiro porque responde "o que vem agora", a pergunta que se faz
+assistindo; anotação é gesto deliberado, e quem vai escrever procura.
+
+**A MINIATURA NÃO PRECISOU DE COLUNA NOVA.** Ela sai do mesmo ticket que serve
+o vídeo, e `createPlaybackTicket` não faz requisição — é HMAC local. Virou
+`posterUrl()` no contrato do provedor (D-17), **síncrono de propósito**: uma
+Promise ali convidaria a um `await` em laço sobre vinte aulas.
+
+**ANOTAÇÕES (0021): uma por aula, não um histórico.** O gesto é reabrir e
+reescrever. Chave composta `(user_id, lesson_id)` em vez de id próprio: a
+unicidade vira estrutura, não uma regra que alguém precisa lembrar de aplicar.
+Texto vazio APAGA a linha — senão quem limpou continuaria com linha no banco e
+a aba diria "salvo" sobre o nada.
+
+A anotação é privada até da equipe. É o caderno da pessoa, e a página de
+privacidade promete isso.
+
+**AVALIAÇÃO separada do progresso.** `lesson_progress` é o que a pessoa FEZ;
+isto é o que ela ACHOU. Misturar faria a régua de progresso depender de
+opinião. Cinco `<form>` em vez de estado de cliente: funciona com teclado e sem
+hidratar. **Clicar na mesma estrela tira a nota** — sem isso, quem clicasse
+errado ficaria preso, e a saída óbvia não faria nada.
+
+**O CAMINHO no topo** substitui o "← Curso". Numa aula a pessoa precisa saber
+onde está em quatro níveis; "Abertura" sozinho não diz de que módulo veio.
+
+**CONCLUIR, AVALIAR E AVANÇAR ficam juntos**, numa barra sob o vídeo: são o
+mesmo momento — o vídeo acabou. Espalhados, cada um vira uma decisão isolada.
+
+**Erro meu no caminho, registrado:** ao reorganizar o arquivo com um corte por
+marcador de texto, o marcador aparecia três vezes e o corte duplicou 170 linhas.
+Reparado por linha. A lição é velha e eu repeti: corte por índice de texto em
+arquivo grande precisa de marcador único, não do primeiro que aparece.

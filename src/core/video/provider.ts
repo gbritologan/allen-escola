@@ -52,6 +52,18 @@ export interface VideoProvider {
     ttlSeconds?: number
   }): Promise<PlaybackTicket>
 
+  /**
+   * A MINIATURA, SEM IDA À REDE.
+   *
+   * Existe separado de `createPlaybackTicket` por causa da lista de aulas: ali
+   * são dez, vinte miniaturas de uma vez, e nenhuma delas precisa da playlist.
+   * Como a assinatura é HMAC local, isto é síncrono de propósito — uma Promise
+   * aqui só convidaria a um `await` em laço.
+   *
+   * Devolve `null` quando o provedor não expõe capa para o asset.
+   */
+  posterUrl(assetId: string): string | null
+
   deleteAsset(assetId: string): Promise<void>
 }
 

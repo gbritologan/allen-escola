@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { requireSession } from '@/lib/auth/session'
 import { createClient } from '@/lib/supabase/server'
 
 /**
@@ -164,4 +165,76 @@ export async function salvarPosicao(lessonId: string, segundos: number, duracao:
       .eq('user_id', user.id)
       .eq('lesson_id', lessonId)
   }
+}
+
+/**
+ * A ANOTAÇÃO DA AULA.
+ *
+ * Uma por aula por pessoa: o gesto é reabrir e reescrever, não acumular. Por
+ * isso é upsert e não insert.
+ *
+ * Texto vazio APAGA a linha em vez de guardar uma string em branco. Sem isso,
+ * quem limpou a anotação continuaria com uma linha no banco e a aba mostraria
+ * "anotação salva" sobre o nada.
+ */
+export async function salvarAnotacao(formData: FormData) {
+  const lessonId = String(formData.get('lesson_id') ?? '')
+  const caminho = String(formData.get('caminho') ?? '')
+  const texto = String(formData.get('body') ?? '').trim()
+  if (!lessonId) return
+
+  const session = await requireSession()
+  const supabase = await createClient()
+
+  if (!texto) {
+    await supabase
+      .from('lesson_notes')
+      .delete()
+      .eq('user_id', session.userId)
+      .eq('lesson_id', lessonId)
+  } else {
+    await supabase
+      .from('lesson_notes')
+      .upsert(
+        { user_id: session.userId, lesson_id: lessonId, body: texto },
+        { onConflict: 'user_id,lesson_id' },
+      )
+  }
+
+  if (caminho) revalidatePath(caminho)
+}
+
+/**
+ * A nota da aula, de 1 a 5.
+ *
+ * Clicar na mesma estrela de novo TIRA a nota. Sem isso, quem clicasse errado
+ * numa escala de estrelas ficaria preso à primeira escolha — e a saída óbvia
+ * (clicar de novo) não faria nada.
+ */
+export async function avaliarAula(formData: FormData) {
+  const lessonId = String(formData.get('lesson_id') ?? '')
+  const caminho = String(formData.get('caminho') ?? '')
+  const estrelas = Number(formData.get('stars') ?? 0)
+  const atual = Number(formData.get('atual') ?? 0)
+  if (!lessonId || estrelas < 1 || estrelas > 5) return
+
+  const session = await requireSession()
+  const supabase = await createClient()
+
+  if (estrelas === atual) {
+    await supabase
+      .from('lesson_ratings')
+      .delete()
+      .eq('user_id', session.userId)
+      .eq('lesson_id', lessonId)
+  } else {
+    await supabase
+      .from('lesson_ratings')
+      .upsert(
+        { user_id: session.userId, lesson_id: lessonId, stars: estrelas },
+        { onConflict: 'user_id,lesson_id' },
+      )
+  }
+
+  if (caminho) revalidatePath(caminho)
 }

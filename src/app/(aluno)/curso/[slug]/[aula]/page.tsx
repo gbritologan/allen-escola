@@ -1,15 +1,16 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Chip } from '@/components/primitives/chip'
-import { Surface } from '@/components/surfaces/surface'
 import { formatDuration, formatPosition } from '@/core/shared/format'
 import { requireSession } from '@/lib/auth/session'
 import { createClient } from '@/lib/supabase/server'
 import { concluirAula, registrarAbertura } from './actions'
 import Image from 'next/image'
 import { Aplicacao } from './aplicacao'
+import { Avaliar } from './avaliar'
+import { PainelLateral } from './painel-lateral'
 import { Player } from '@/components/domain/player'
+import { cn } from '@/lib/utils'
 import { getVideoProvider, videoConfigurado } from '@/lib/video'
 
 export async function generateMetadata({
@@ -101,8 +102,12 @@ export default async function AulaPage({
       supabase.from('modules').select('title, position').eq('id', lesson.module_id).maybeSingle(),
       supabase
         .from('lessons')
-        .select('id, slug, title, position, module_id, duration_seconds')
+        // `video_asset_id` entra por causa da miniatura na coluna da direita:
+        // ela é derivada do próprio provedor, sem campo de capa por aula e sem
+        // ida à rede (a assinatura é HMAC local).
+        .select('id, slug, title, position, module_id, duration_seconds, video_asset_id')
         .eq('course_id', course.id)
+        .eq('status', 'published')
         .order('position'),
       supabase
         .from('lesson_progress')
@@ -123,10 +128,70 @@ export default async function AulaPage({
         .order('position'),
     ])
 
+  // O que a coluna da direita precisa, em paralelo com o resto.
+  const [{ data: anotacao }, { data: nota }, { data: progressoDoCurso }, { data: aplicadasNoCurso }] =
+    await Promise.all([
+      supabase
+        .from('lesson_notes')
+        .select('body')
+        .eq('user_id', session.userId)
+        .eq('lesson_id', lesson.id)
+        .maybeSingle(),
+      supabase
+        .from('lesson_ratings')
+        .select('stars')
+        .eq('user_id', session.userId)
+        .eq('lesson_id', lesson.id)
+        .maybeSingle(),
+      supabase
+        .from('lesson_progress')
+        .select('lesson_id, state')
+        .eq('user_id', session.userId),
+      supabase.from('applications').select('lesson_id').eq('user_id', session.userId),
+    ])
+
+  const vistas = new Set(
+    (progressoDoCurso ?? []).filter((p) => p.state === 'completed').map((p) => p.lesson_id),
+  )
+  const aplicadas = new Set((aplicadasNoCurso ?? []).map((a) => a.lesson_id))
+
   const doModulo = (irmas ?? []).filter((l) => l.module_id === lesson.module_id)
+
+
   const todas = irmas ?? []
   const indice = todas.findIndex((l) => l.id === lesson.id)
   const proxima = todas[indice + 1]
+
+  /*
+   * A LISTA DA COLUNA DA DIREITA.
+   *
+   * A miniatura sai do mesmo ticket que serve o vídeo. `createPlaybackTicket`
+   * não faz requisição — é só HMAC —, então gerar uma por aula é barato. Sem
+   * chave de token configurada o Bunny devolve a thumbnail aberta, e a lista
+   * continua funcionando.
+   */
+  const podeVideo = videoConfigurado()
+  const aulasDoModulo = doModulo.map((l) => {
+    let poster: string | null = null
+    if (l.video_asset_id && podeVideo) {
+      try {
+        poster = getVideoProvider().posterUrl(l.video_asset_id)
+      } catch {
+        poster = null
+      }
+    }
+    return {
+      id: l.id as string,
+      slug: l.slug as string,
+      title: l.title as string,
+      durationSeconds: l.duration_seconds as number,
+      posterUrl: poster,
+      concluida: vistas.has(l.id),
+      aplicada: aplicadas.has(l.id),
+    }
+  })
+
+  const anterior = todas[indice - 1]
 
   /**
    * O ticket de reprodução é criado a cada visita e expira em 90 minutos.
@@ -181,22 +246,6 @@ export default async function AulaPage({
   ) : (
     semVideo
   )
-
-  /*
-   * ================== MASTERCLASS ==================
-   *
-   * O Gabriel pediu que a Masterclass fosse mais premium que a aula comum.
-   * A diferença NÃO é enfeite a mais — é uma ordem de leitura diferente,
-   * porque as duas coisas são consumidas de formas diferentes.
-   *
-   * Aula comum é ferramenta: você chega sabendo o que quer, lê o título,
-   * assiste, aplica. Título primeiro, vídeo dentro da coluna.
-   *
-   * Masterclass é sessão: você reserva o tempo e mergulha. Então o vídeo vem
-   * PRIMEIRO e em tela cheia, com a moldura escura em volta — o título aparece
-   * depois, como a legenda de um filme, não como a etiqueta de um item. E o
-   * expert aparece, porque na Masterclass quem ensina é parte do que se compra.
-   */
   /*
    * O CORPO E A LATERAL SÃO OS MESMOS NOS DOIS FORMATOS.
    *
@@ -235,53 +284,6 @@ export default async function AulaPage({
           </section>
         )}
 
-        {/* Aula sem Para Fazer é a exceção. Aí concluir é um ato explícito. */}
-        {!temParaFazer && (
-          <form action={concluirAula} className="flex items-center gap-4">
-            <input type="hidden" name="lesson_id" value={lesson.id} />
-            <input type="hidden" name="caminho" value={caminho} />
-            <input type="hidden" name="concluida" value={String(concluida)} />
-            <button
-              type="submit"
-              className="rounded-[var(--radius-control)] border border-line px-4 py-2.5 text-label text-ink-2 transition-colors hover:border-line-strong hover:text-ink"
-            >
-              {concluida ? 'Marcada como vista' : 'Marcar como vista'}
-            </button>
-          </form>
-        )}
-
-        {materiaisOrdenados.length > 0 && (
-          <section className="flex flex-col gap-3">
-            <h2 className="text-caption font-medium uppercase tracking-[0.16em] text-ink-3">
-              Materiais
-            </h2>
-            <Surface className="flex flex-col divide-y divide-[var(--color-line)]">
-              {materiaisOrdenados.map((m) => (
-                <a
-                  key={m.id}
-                  href={m.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-[rgba(243,245,252,0.03)]"
-                >
-                  <span className="min-w-0 truncate text-body text-ink-2 group-hover:text-ink">
-                    {m.title}
-                  </span>
-                  {/* O modelo é a ferramenta do Para Fazer, não um anexo
-                      qualquer — e é o único que ganha destaque. */}
-                  {m.kind === 'template' ? (
-                    <Chip tone="accent">modelo</Chip>
-                  ) : (
-                    <span className="shrink-0 text-caption text-ink-4">
-                      {m.kind === 'link' ? 'link' : 'arquivo'}
-                    </span>
-                  )}
-                </a>
-              ))}
-            </Surface>
-          </section>
-        )}
-
         {/* AJUDA COM CONTEXTO.
             Discreto, no fim, e carregando de onde a pessoa veio: aula, curso e
             caminho. Quem clica aqui não precisa explicar onde estava — e do
@@ -313,42 +315,111 @@ export default async function AulaPage({
   )
 
   const lateral = (
-      <aside className="flex h-fit flex-col gap-3 lg:sticky lg:top-20">
-        <h2 className="text-caption font-medium uppercase tracking-[0.16em] text-ink-3">
-          {mod?.title ?? 'Neste módulo'}
-        </h2>
-        <Surface className="flex flex-col divide-y divide-[var(--color-line)]">
-          {doModulo.map((l) => {
-            const atual = l.id === lesson.id
-            return (
-              <Link
-                key={l.id}
-                href={`/curso/${course.slug}/${l.slug}`}
-                aria-current={atual ? 'page' : undefined}
-                className={
-                  atual
-                    ? 'flex items-baseline gap-3 bg-[rgba(76,65,255,0.1)] px-4 py-3'
-                    : 'flex items-baseline gap-3 px-4 py-3 transition-colors hover:bg-[rgba(243,245,252,0.03)]'
-                }
-              >
-                <span data-numeric className="text-caption text-ink-4">
-                  {formatPosition(l.position)}
-                </span>
-                <span className={atual ? 'flex-1 text-label text-ink' : 'flex-1 text-label text-ink-3'}>
-                  {l.title}
-                </span>
-              </Link>
-            )
-          })}
-        </Surface>
-        <span data-numeric className="text-caption text-ink-4">
-          {formatDuration(lesson.duration_seconds)}
-          {aplicada && ' · aplicada'}
-        </span>
-        {aplicada && <Chip tone="positive">Você aplicou esta aula</Chip>}
-      </aside>
+    <PainelLateral
+      aulas={aulasDoModulo}
+      materiais={materiaisOrdenados.map((m) => ({
+        id: m.id as string,
+        title: m.title as string,
+        url: m.url as string,
+        kind: m.kind as string,
+      }))}
+      aulaAtualId={lesson.id}
+      cursoSlug={course.slug}
+      moduloTitulo={mod?.title ?? 'Este módulo'}
+      anotacao={anotacao?.body ?? ''}
+      caminho={caminho}
+    />
   )
 
+  /**
+   * O CAMINHO, no topo.
+   *
+   * Era só "← Curso". Numa aula, a pessoa precisa saber onde está em quatro
+   * níveis — e o vídeo do Arkom mostra isso resolvido com o caminho completo.
+   * Sem ele, "Abertura" não diz de que módulo nem de que curso veio.
+   */
+  const caminhoDeVolta = (
+    <nav aria-label="Onde você está" className="flex flex-wrap items-center gap-2 text-caption">
+      <Link href="/cursos" className="text-ink-4 transition-colors hover:text-ink">
+        Cursos
+      </Link>
+      <span aria-hidden className="text-ink-4">
+        ›
+      </span>
+      <Link
+        href={`/curso/${course.slug}`}
+        className="text-ink-4 transition-colors hover:text-ink"
+      >
+        {course.title}
+      </Link>
+      {mod?.title && (
+        <>
+          <span aria-hidden className="text-ink-4">
+            ›
+          </span>
+          <span className="text-ink-4">{mod.title}</span>
+        </>
+      )}
+      <span aria-hidden className="text-ink-4">
+        ›
+      </span>
+      <span className="text-ink-2">{lesson.title}</span>
+    </nav>
+  )
+
+  /**
+   * A BARRA DE AÇÕES, debaixo do vídeo.
+   *
+   * Concluir, avaliar e avançar ficam juntos porque são o mesmo momento: o
+   * vídeo acabou. Espalhados pela página, cada um vira uma decisão isolada.
+   */
+  const acoes = (
+    <div className="flex flex-col gap-5 border-y border-line py-5">
+      <div className="flex flex-wrap items-center gap-3">
+        {!temParaFazer && (
+          <form action={concluirAula}>
+            <input type="hidden" name="lesson_id" value={lesson.id} />
+            <input type="hidden" name="caminho" value={caminho} />
+            <input type="hidden" name="concluida" value={String(concluida)} />
+            <button
+              type="submit"
+              className={cn(
+                'flex h-9 items-center gap-2 rounded-full border px-4 text-caption transition-colors',
+                concluida
+                  ? 'border-[rgba(60,200,130,0.45)] text-[#5ed99b]'
+                  : 'border-line text-ink-2 hover:border-line-strong hover:text-ink',
+              )}
+            >
+              {concluida ? '✓ Aula concluída' : 'Concluir aula'}
+            </button>
+          </form>
+        )}
+
+        <div className="ml-auto flex items-center gap-2">
+          {anterior && (
+            <Link
+              href={`/curso/${course.slug}/${anterior.slug}`}
+              aria-label="Aula anterior"
+              className="flex size-9 items-center justify-center rounded-full border border-line text-ink-3 transition-colors hover:border-line-strong hover:text-ink"
+            >
+              ‹
+            </Link>
+          )}
+          {proxima && (
+            <Link
+              href={`/curso/${course.slug}/${proxima.slug}`}
+              aria-label="Próxima aula"
+              className="flex size-9 items-center justify-center rounded-full border border-line text-ink-3 transition-colors hover:border-line-strong hover:text-ink"
+            >
+              ›
+            </Link>
+          )}
+        </div>
+      </div>
+
+      <Avaliar lessonId={lesson.id} caminho={caminho} atual={nota?.stars ?? 0} />
+    </div>
+  )
   /*
    * ================== MASTERCLASS ==================
    *
@@ -375,17 +446,12 @@ export default async function AulaPage({
             className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[linear-gradient(to_bottom,rgba(76,65,255,0.14),transparent)]"
           />
           <div className="relative mx-auto w-full max-w-5xl px-4 sm:px-6">
-            <Link
-              href={`/curso/${course.slug}`}
-              className="mb-5 inline-block text-caption text-ink-3 transition-colors hover:text-ink"
-            >
-              ← {course.title}
-            </Link>
+            <div className="mb-5">{caminhoDeVolta}</div>
             {player}
           </div>
         </section>
 
-        <div className="mx-auto grid w-full max-w-6xl gap-10 px-6 py-10 lg:grid-cols-[minmax(0,1fr)_260px]">
+        <div className="mx-auto grid w-full max-w-6xl gap-10 px-6 py-10 lg:grid-cols-[minmax(0,1fr)_320px]">
           <article className="flex flex-col gap-8">
             <header className="flex flex-col gap-4">
               <span className="text-caption uppercase tracking-[0.22em] text-blue-light">
@@ -432,6 +498,7 @@ export default async function AulaPage({
               </div>
             )}
 
+            {acoes}
             {corpo}
           </article>
 
@@ -443,15 +510,10 @@ export default async function AulaPage({
 
   // ================== AULA COMUM ==================
   return (
-    <main className="mx-auto grid max-w-6xl gap-10 px-6 pt-10 sm:pt-14 lg:grid-cols-[minmax(0,1fr)_260px]">
+    <main className="mx-auto grid max-w-6xl gap-10 px-6 pt-10 sm:pt-14 lg:grid-cols-[minmax(0,1fr)_320px]">
       <article className="flex flex-col gap-8">
         <header className="flex flex-col gap-3">
-          <Link
-            href={`/curso/${course.slug}`}
-            className="text-caption text-ink-3 transition-colors hover:text-ink"
-          >
-            ← {course.title}
-          </Link>
+          {caminhoDeVolta}
           <span data-numeric className="text-caption uppercase tracking-[0.16em] text-ink-4">
             Módulo {formatPosition(mod?.position ?? 1)} · Aula {formatPosition(lesson.position)}
           </span>
@@ -462,6 +524,8 @@ export default async function AulaPage({
         </header>
 
         {player}
+
+        {acoes}
 
         {corpo}
       </article>
