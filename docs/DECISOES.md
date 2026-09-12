@@ -1410,3 +1410,27 @@ até a tela morrer — ele não é recriado a cada estado. Lendo `foco` direto, 
 para sempre o valor do primeiro quadro, e entrar numa constelação não mudaria
 nada na tela. O `focoRef` é o que atravessa essa fronteira. O aviso do lint
 sobre dependências, aqui, era um bug de verdade esperando para acontecer.
+
+## D-68 · Busca não é lugar, é ação
+
+O Gabriel perguntou se "Buscar" merecia uma cadeira inteira na sidebar. Não
+merecia, e o motivo é categórico: **busca não é um destino.** Ninguém acorda
+querendo "ir até a busca" — a pessoa quer achar uma coisa, e a busca é o atalho
+para isso.
+
+Como destino, ela cobrava **dois gestos** (ir na aba, depois digitar) pelo que
+custa um. E ficava invisível exatamente onde serve mais: dentro de um curso, no
+meio de uma aula, olhando o Mapa.
+
+Virou um campo acima dos destinos, presente em toda tela, com `⌘K` de qualquer
+lugar — e o atalho está ESCRITO no campo, porque atalho que ninguém descobre é
+atalho que não existe. A rota `/buscar` continua e faz o trabalho pesado; o que
+mudou foi a porta.
+
+**Um bug que só apareceu porque eu olhei a tela.** O dock do celular escolhia
+os quatro itens por POSIÇÃO (`DESTINOS[4]`). Com "Buscar" fora da lista, os
+índices andaram e o dock passou a mostrar Apps onde devia mostrar Jornada — sem
+erro de compilação, sem teste falhando, sem nenhum sinal.
+
+Agora é por href. Lista por posição é uma dependência invisível entre duas
+coisas distantes no arquivo, e a única defesa contra ela é alguém reparar.

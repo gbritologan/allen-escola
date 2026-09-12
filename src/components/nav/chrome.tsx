@@ -6,7 +6,6 @@ import { Assinatura, Marca } from '@/components/brand/marca'
 import {
   IconeAjuda,
   IconeApps,
-  IconeBuscar,
   IconeExplorar,
   IconeInicio,
   IconeJornada,
@@ -15,6 +14,7 @@ import {
   IconePainel,
   IconeSair,
 } from '@/components/icons'
+import { BuscaRapida } from '@/components/nav/busca-rapida'
 import { cn } from '@/lib/utils'
 
 /**
@@ -55,6 +55,12 @@ import { cn } from '@/lib/utils'
  * "Masterclass" virou "CAPACITAÇÕES" e continua sendo o FORMATO, não o
  * catálogo. São duas prateleiras separadas de propósito: a pessoa procura
  * cada uma num momento diferente, e o banco já as separa em `courses.format`.
+ *
+ * "Buscar" SAIU (D-68). Busca não é lugar, é ação: ninguém quer "ir até a
+ * busca", quer achar uma coisa. Como destino ela cobrava dois gestos pelo que
+ * custa um, e sumia justamente onde serve mais — dentro de um curso, no meio
+ * de uma aula. Virou campo acima dos destinos, presente em toda tela, com
+ * ⌘K de qualquer lugar. A rota `/buscar` continua e faz o trabalho.
  */
 const DESTINOS = [
   { href: '/', label: 'Início', Icone: IconeInicio },
@@ -63,26 +69,22 @@ const DESTINOS = [
   { href: '/capacitacoes', label: 'Capacitações', Icone: IconeMasterclass },
   { href: '/apps', label: 'Apps', Icone: IconeApps },
   { href: '/jornada', label: 'Jornada', Icone: IconeJornada },
-  { href: '/buscar', label: 'Buscar', Icone: IconeBuscar },
   { href: '/suporte', label: 'Suporte', Icone: IconeAjuda },
 ] as const
 
 /**
- * No celular cabem quatro, e a lista agora tem OITO.
+ * No celular cabem quatro, e a lista tem sete.
  *
- * Escolhidos a dedo em vez de filtrados por exclusão: com oito destinos,
- * qualquer regra de exclusão deixaria seis no dock e viraria sopa —
- * exatamente o problema que tirou a barra horizontal do produto.
+ * ESCOLHIDOS POR NOME, NÃO POR POSIÇÃO. A primeira versão usava índices
+ * (`DESTINOS[4]`), e isso quebrou em silêncio no dia em que "Buscar" saiu da
+ * lista: o dock passou a mostrar Apps onde devia mostrar Jornada, sem erro de
+ * compilação e sem teste falhando. Só apareceu porque eu olhei a tela.
  *
- * Cursos entra no lugar de Apps: é o destino que responde "o que eu faço
- * agora", e no celular essa é a pergunta.
+ * Lista por posição é uma dependência invisível entre duas coisas distantes.
+ * Por nome, mexer na ordem dos destinos não tem como estragar o dock.
  */
-const DOCK = [
-  DESTINOS[0], // Início
-  DESTINOS[1], // Mapa
-  DESTINOS[2], // Cursos
-  DESTINOS[5], // Jornada
-] as const
+const NO_DOCK = ['/', '/mapa', '/cursos', '/jornada']
+const DOCK = NO_DOCK.map((href) => DESTINOS.find((d) => d.href === href)!).filter(Boolean)
 
 function estaAtivo(pathname: string, href: string) {
   return href === '/' ? pathname === '/' : pathname.startsWith(href)
@@ -160,6 +162,8 @@ export function StudentChrome({
         <Link href="/" aria-label="Allen Escola" className="px-3 pb-6">
           <Assinatura size={21} />
         </Link>
+
+        <BuscaRapida />
 
         <span className="px-3 pb-2 text-caption uppercase tracking-[0.18em] text-ink-4">
           Sua escola
