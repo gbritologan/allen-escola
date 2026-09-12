@@ -44,7 +44,7 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
       supabase
         .from('courses')
         .select(
-          'id, title, slug, summary, description, format, status, instructor_id, lesson_count, duration_seconds, cover_url, available_at',
+          'id, title, slug, summary, description, format, status, instructor_id, lesson_count, duration_seconds, cover_url, available_at, release_after_days',
         )
         .eq('id', id)
         .maybeSingle(),
@@ -162,6 +162,21 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
 
             {/* "Em breve" é uma data e não um botão: assim o curso abre sozinho
                 no dia, sem depender de alguém lembrar de voltar aqui. */}
+            <Field
+              label="Liberar só depois de (dias)"
+              htmlFor="release_after_days"
+              hint="Contado a partir da entrada de CADA aluno, não de uma data fixa. Ex.: 8 — quem assina hoje só abre este curso daqui a oito dias. Em branco: abre junto com o acesso."
+            >
+              <Input
+                id="release_after_days"
+                name="release_after_days"
+                type="number"
+                min={0}
+                defaultValue={course.release_after_days ?? ''}
+                placeholder="8"
+              />
+            </Field>
+
             <Field
               label="Disponível a partir de"
               htmlFor="available_at"

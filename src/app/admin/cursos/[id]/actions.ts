@@ -37,6 +37,15 @@ export async function atualizarCurso(formData: FormData) {
    */
   const disponivelEm = String(formData.get('available_at') ?? '').trim()
 
+  /*
+   * A blindagem dos 7 dias. Vazio = abre junto com o acesso.
+   *
+   * É prazo POR ALUNO, contado da entrada dele — diferente de `available_at`,
+   * que é data de calendário igual para todos. A trava de verdade está na RLS
+   * (0024); este campo só grava o número.
+   */
+  const liberarApos = String(formData.get('release_after_days') ?? '').trim()
+
   const supabase = await createClient()
   await supabase
     .from('courses')
@@ -48,6 +57,7 @@ export async function atualizarCurso(formData: FormData) {
       instructor_id: instructorId || null,
       format: format === 'masterclass' ? 'masterclass' : 'course',
       available_at: disponivelEm ? `${disponivelEm} 00:00:00-03` : null,
+      release_after_days: liberarApos === '' ? null : Math.max(0, Number(liberarApos) || 0),
     })
     .eq('id', id)
 

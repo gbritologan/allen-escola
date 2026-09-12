@@ -1345,3 +1345,30 @@ esticá-lo.
 invertida, não de corte binário: a arte tem traço fino, e um corte duro comeria
 as bordas. O meio-tom da antisserrilha vira semitransparente, que é o que
 preserva o traço.
+
+## D-66 · Liberação programada por aluno (a blindagem dos 7 dias)
+
+O Gabriel decidiu: **acesso começa no pagamento**. E pediu o que a Hotmart faz
+— parte do conteúdo abrindo só alguns dias depois, para se blindar do direito
+de arrependimento de 7 dias. Sem isso, alguém assina, raspa o catálogo numa
+tarde e pede reembolso no sexto dia.
+
+**Isto NÃO é o `available_at` de D-49.** Aquele é data de calendário, igual
+para todo mundo, e serve para lançamento ("abre dia 15"). Este é prazo
+**relativo à entrada de cada aluno**: quem assinou hoje libera em oito dias;
+quem assinar em março libera oito dias depois de março. Os dois convivem e se
+somam.
+
+**A trava é na RLS, não na tela.** Conteúdo escondido só na interface está
+disponível para quem abre o inspetor — e o motivo inteiro desta mudança é
+impedir a raspagem antes do reembolso. `ja_liberado()` entra nas políticas de
+`courses` e `lessons`.
+
+A aula exige **os dois prazos**: o dela e o do curso. Um curso liberado em 8
+dias com uma aula em 20 significa 20 para aquela aula — e não uma brecha.
+
+**Equipe passa direto**, senão quem produz não conseguiria revisar o que ainda
+não abriu.
+
+`dias_de_acesso()` ancora em `subscriptions.started_at`, que é a mesma data que
+a Conta mostra ao aluno. Uma fonte só para "desde quando você está aqui".
