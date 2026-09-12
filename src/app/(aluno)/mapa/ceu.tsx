@@ -113,6 +113,36 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
   const ponteiro = useRef({ x: -9999, y: -9999, arrastando: false, moveu: false })
   const hoverId = useRef<string | null>(null)
 
+  /**
+   * O NÍVEL EM QUE A PESSOA ESTÁ.
+   *
+   * `null` = mapa geral, todas as constelações. Um id = aquela constelação em
+   * foco, as outras recuadas. É o "nível 0 / nível 1" do briefing.
+   *
+   * Não virou rota nem store: é UM estado, lido por UM componente. Zustand
+   * aqui seria cerimônia — o briefing recomendava porque o mapa dele é várias
+   * telas; o nosso é uma.
+   */
+  const [foco, setFoco] = useState<string | null>(null)
+
+  /**
+   * Quanto o foco já avançou, de 0 a 1. Fora do React porque muda a 60fps.
+   *
+   * É ele que faz as partículas SE ESPALHAREM durante o voo, em vez de
+   * teleportarem quando ele termina.
+   */
+  const tFoco = useRef(0)
+
+  /*
+   * O FOCO TAMBÉM VIVE NUM REF.
+   *
+   * O laço de desenho é montado uma vez e roda até a tela morrer — ele NÃO é
+   * recriado a cada estado. Se ele lesse `foco` direto, leria para sempre o
+   * valor do primeiro quadro, e entrar numa constelação não mudaria nada na
+   * tela. O ref é o que atravessa essa fronteira.
+   */
+  const focoRef = useRef<string | null>(null)
+
   const [selecionado, setSelecionado] = useState<Astro | null>(null)
   const [zoomLido, setZoomLido] = useState(50)
   const [busca, setBusca] = useState('')
@@ -132,6 +162,28 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
       })),
     [],
   )
+
+  /**
+   * ONDE ESTE ASTRO ESTÁ AGORA.
+   *
+   * Entre o mapa geral e a constelação em foco existe um caminho, não um
+   * corte. Astro da constelação focada viaja de (x,y) para (x1,y1); os das
+   * outras ficam onde estão — elas não se espalham, só recuam.
+   */
+  const posDe = useCallback(
+    (a: { x: number; y: number; x1: number; y1: number; temaId: string | null; id: string }) => {
+      const t = tFoco.current
+      const f = focoRef.current
+      const daFocada = f !== null && (a.temaId === f || a.id === f)
+      if (t <= 0 || !daFocada) return [a.x, a.y] as const
+      return [a.x + (a.x1 - a.x) * t, a.y + (a.y1 - a.y) * t] as const
+    },
+    [],
+  )
+
+  useEffect(() => {
+    focoRef.current = foco
+  }, [foco])
 
   const irPara = useCallback((x: number, y: number, z: number) => {
     alvo.current = { x, y, z: Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z)) }
@@ -211,6 +263,17 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
        * para 0,8 é o mesmo salto perceptivo que de 0,8 para 1,6 — e em linear
        * o segundo trecho leva o dobro do tempo.
        */
+      /*
+       * O RELÓGIO DO FOCO.
+       *
+       * Sobe para 1 quando há constelação em foco, volta para 0 quando não há.
+       * A mesma curva nos dois sentidos: entrar e sair têm o mesmo peso, e é
+       * o que o briefing pede ("exatamente o inverso, mesma duração").
+       */
+      const destinoFoco = focoRef.current ? 1 : 0
+      tFoco.current += (destinoFoco - tFoco.current) * 0.075
+      if (Math.abs(destinoFoco - tFoco.current) < 0.002) tFoco.current = destinoFoco
+
       const c = cam.current
       const al = alvo.current
       const passo = 0.085
@@ -285,8 +348,10 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
         const a = porId.get(l.de)
         const b = porId.get(l.para)
         if (!a || !b) continue
-        const [ax, ay] = paraTela(a.x, a.y)
-        const [bx, by] = paraTela(b.x, b.y)
+        const [axw, ayw] = posDe(a)
+        const [bxw, byw] = posDe(b)
+        const [ax, ay] = paraTela(axw, ayw)
+        const [bx, by] = paraTela(bxw, byw)
         const destacada =
           hoverId.current === a.id ||
           hoverId.current === b.id ||
@@ -302,17 +367,56 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
       }
       ctx!.globalAlpha = 1
 
+      /*
+       * A MARCA D'ÁGUA DO TEMA EM FOCO.
+       *
+       * Nome gigante atrás da constelação, a ~6% de opacidade. Ela não é
+       * enfeite: numa tela que perdeu as outras sete constelações, é o que
+       * responde "onde eu estou" sem ocupar espaço de conteúdo.
+       *
+       * Desenhada ANTES dos astros, senão cobriria as estrelas.
+       */
+      if (focoRef.current && tFoco.current > 0.05) {
+        const t0 = mapa.astros.find((x) => x.tipo === 'tema' && x.id === focoRef.current)
+        if (t0) {
+          const [wx, wy] = paraTela(t0.x, t0.y - 120)
+          ctx!.save()
+          ctx!.font = `300 ${Math.max(60, 190 * c.z)}px var(--font-elvon), Archivo, sans-serif`
+          ctx!.textAlign = 'center'
+          ctx!.letterSpacing = '0.12em'
+          ctx!.fillStyle = `hsl(${t0.hue} 40% 70%)`
+          ctx!.globalAlpha = 0.06 * tFoco.current
+          ctx!.fillText(t0.rotulo.toUpperCase(), wx, wy)
+          ctx!.restore()
+        }
+      }
+
       // --- astros ---------------------------------------------------------
       for (const a of mapa.astros) {
         // O centro já foi desenhado como enxame. Um círculo por cima
         // taparia o enxame inteiro.
         if (a.tipo === 'centro') continue
-        const [sx, sy] = paraTela(a.x, a.y)
+        const [axw, ayw] = posDe(a)
+        const [sx, sy] = paraTela(axw, ayw)
         const raio = Math.max(1.2, a.r * c.z)
         if (sx < -60 || sx > L + 60 || sy < -60 || sy > A + 60) continue
 
         const ativo = hoverId.current === a.id || selecionado?.id === a.id
         const pulso = semMovimento ? 0 : 0.12 * Math.sin(t * 1.1 + ruido(a.id, 4))
+
+        /*
+         * AS OUTRAS CONSTELAÇÕES RECUAM, NÃO SOMEM.
+         *
+         * O briefing manda o resto cair para ~15% de opacidade. Cair a ZERO
+         * seria troca de tela disfarçada — e o ponto do mapa é que ele é um
+         * lugar só, sempre presente. Recuadas, elas continuam dizendo "tem
+         * mais céu aqui fora".
+         */
+        const fAtual = focoRef.current
+        const daFocada = fAtual === null || a.temaId === fAtual || a.id === fAtual
+        const recuo = daFocada ? 1 : 1 - tFoco.current * 0.85
+        if (recuo < 0.04) continue
+        ctx!.globalAlpha = recuo
 
         // Halo só em quem foi aplicado. É o prêmio visual da tese.
         if (a.estado === 'aceso' || ativo) {
@@ -451,6 +555,9 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
           ctx!.fillText(a.rotulo, sx, sy + raio + 20)
           ctx!.globalAlpha = 1
         }
+
+        // O recuo vale por astro; sem zerar aqui ele vazaria para o próximo.
+        ctx!.globalAlpha = 1
       }
 
       setZoomLido(Math.round(c.z * 100))
@@ -461,7 +568,9 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
       cancelAnimationFrame(frame)
       ro.disconnect()
     }
-  }, [mapa, porId, poeira, selecionado])
+    // `posDe` é estável (useCallback sem dependências, lê tudo de refs) — só
+    // entra aqui para o lint enxergar a ligação.
+  }, [mapa, porId, poeira, selecionado, posDe])
 
   // --- Interação ----------------------------------------------------------
 
@@ -475,8 +584,9 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
       let melhor: Astro | null = null
       let menor = Infinity
       for (const a of mapa.astros) {
-        const sx = (a.x - c.x) * c.z + L / 2
-        const sy = (a.y - c.y) * c.z + A / 2
+        const [axw, ayw] = posDe(a)
+        const sx = (axw - c.x) * c.z + L / 2
+        const sy = (ayw - c.y) * c.z + A / 2
         const d = Math.hypot(sx - cx, sy - cy)
         // Alvo mínimo de 14px: ponto de 3px é impossível de acertar no dedo.
         const alcance = Math.max(14, a.r * c.z + 8)
@@ -487,7 +597,7 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
       }
       return melhor
     },
-    [mapa.astros],
+    [mapa.astros, posDe],
   )
 
   function aoMover(e: React.PointerEvent) {
@@ -528,6 +638,18 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
     if (achado.tipo === 'centro') {
       setSelecionado(null)
       ajustar()
+      return
+    }
+
+    /*
+     * TEMA ENTRA, CURSO ABRE O PAINEL.
+     *
+     * Clicar numa constelação no mapa geral não deveria abrir uma ficha — a
+     * pergunta ali é "o que tem dentro", e a resposta é entrar. A ficha vale
+     * para curso e aula, que são destinos finais.
+     */
+    if (achado && achado.tipo === 'tema' && foco !== achado.id) {
+      entrarNoTema(achado.id)
       return
     }
 
@@ -583,6 +705,45 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
     return chave ? (ICONES_TEMA[chave] ?? null) : null
   }
 
+  /**
+   * ENTRAR NA CONSTELAÇÃO.
+   *
+   * A câmera voa para a âncora e o zoom sobe. Não é troca de tela: o `foco`
+   * muda, `tFoco` sobe de 0 a 1 no laço de desenho, e os astros se espalham
+   * DURANTE o voo. Quem olha vê uma coisa só se aproximando.
+   */
+  const entrarNoTema = useCallback(
+    (temaId: string) => {
+      const t = mapa.astros.find((a) => a.tipo === 'tema' && a.id === temaId)
+      if (!t) return
+      setFoco(temaId)
+      setSelecionado(null)
+      irPara(t.x, t.y, 0.62)
+    },
+    [mapa.astros, irPara],
+  )
+
+  /** Voltar ao mapa geral: o inverso exato, mesma duração. */
+  const voltarAoGeral = useCallback(() => {
+    setFoco(null)
+    setSelecionado(null)
+    ajustar()
+  }, [ajustar])
+
+  /*
+   * Esc fecha o painel; Esc de novo sobe um nível. É o que o briefing pede, e
+   * é o que já se espera de qualquer coisa que abre por cima.
+   */
+  useEffect(() => {
+    function aoTeclar(e: KeyboardEvent) {
+      if (e.key !== 'Escape') return
+      if (selecionado) setSelecionado(null)
+      else if (foco) voltarAoGeral()
+    }
+    window.addEventListener('keydown', aoTeclar)
+    return () => window.removeEventListener('keydown', aoTeclar)
+  }, [selecionado, foco, voltarAoGeral])
+
   function irParaTema(i: number) {
     const t = temas[i]
     if (!t) return
@@ -617,6 +778,25 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
         <canvas ref={canvasRef} className="block size-full" />
       </div>
 
+      {/*
+        A MIGALHA.
+
+        Só aparece dentro de uma constelação, e é a saída explícita. O Esc
+        também sobe, mas atalho de teclado não é caminho descobrível — quem
+        entrou clicando precisa de um jeito de sair clicando.
+      */}
+      {foco && (
+        <div className="pointer-events-none absolute left-4 top-4 z-10 flex flex-col gap-1">
+          <button
+            type="button"
+            onClick={voltarAoGeral}
+            className="pointer-events-auto self-start text-caption uppercase tracking-[0.18em] text-ink-3 transition-colors hover:text-ink"
+          >
+            ‹ Todas as constelações
+          </button>
+        </div>
+      )}
+
       {/* --- Busca ---------------------------------------------------------- */}
       <div className="pointer-events-none absolute inset-x-0 top-4 flex justify-center px-4">
         <div className="pointer-events-auto w-full max-w-sm">
@@ -635,8 +815,18 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
                     type="button"
                     onClick={() => {
                       setBusca('')
+                      // Achar um tema pela busca leva PARA DENTRO dele, igual
+                      // ao clique no céu. Dois caminhos para a mesma coisa
+                      // precisam terminar no mesmo lugar.
+                      if (a.tipo === 'tema') {
+                        entrarNoTema(a.id)
+                        return
+                      }
+                      // Curso e aula: entra na constelação deles e abre a ficha,
+                      // senão o astro apareceria sozinho num céu sem contexto.
+                      if (a.temaId) setFoco(a.temaId)
                       setSelecionado(a)
-                      irPara(a.x, a.y, 1.1)
+                      irPara(a.x1, a.y1, 1.1)
                     }}
                     className="flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-caption text-ink-2 transition-colors hover:bg-[rgba(243,245,252,0.05)] hover:text-ink"
                   >

@@ -1372,3 +1372,41 @@ não abriu.
 
 `dias_de_acesso()` ancora em `subscriptions.started_at`, que é a mesma data que
 a Conta mostra ao aluno. Uma fonte só para "desde quando você está aqui".
+
+## D-67 · O Mapa ganha níveis, adaptando o briefing (não copiando)
+
+O Gabriel mandou um briefing detalhado do Mapa e depois o contexto que muda
+tudo: **quem escreveu foi o desenvolvedor do site de referência**, descrevendo
+como ELE fez. É a arquitetura dele, não necessariamente a certa para a Allen.
+
+**O que foi adotado** (a mecânica, que é o valor do documento):
+
+- Câmera única com `{x, y, z}` animado — já existia, ganhou o voo entre níveis
+- Dois lugares por astro: mapa geral e constelação em foco, interpolados
+  DURANTE o voo. As partículas se espalham enquanto a câmera viaja, em vez de
+  teleportarem no fim
+- As outras constelações **recuam para ~15%**, não somem. Cair a zero seria
+  troca de tela disfarçada, e o ponto do mapa é ser um lugar só
+- Marca d'água gigante do tema em foco, migalha de volta, `Esc` subindo um nível
+
+**O que foi recusado, e por quê:**
+
+**Posições autorais em JSON.** O briefing manda desenhar a constelação à mão e
+fixá-la no código. Isso quebraria D-04: tema é dado, criado no Studio às onze
+da noite, e passaria a exigir alguém editando o repositório para aparecer no
+céu. As posições continuam geradas por `ruido()` — determinístico, então a
+constelação é a mesma em toda visita sem deixar de ser automática.
+
+**Clusters entre tema e curso.** A hierarquia dele é tema → cluster → curso. A
+nossa é tema → curso → aula, e os módulos vivem DENTRO do curso. Inventar um
+nível intermediário para imitar o desenho dele criaria uma camada sem dado por
+baixo.
+
+**Zustand.** Ele recomenda store global porque o mapa dele é várias telas. O
+nosso é um componente. Store para um consumidor é cerimônia.
+
+**Uma armadilha que quase passou:** o laço de desenho é montado uma vez e roda
+até a tela morrer — ele não é recriado a cada estado. Lendo `foco` direto, leria
+para sempre o valor do primeiro quadro, e entrar numa constelação não mudaria
+nada na tela. O `focoRef` é o que atravessa essa fronteira. O aviso do lint
+sobre dependências, aqui, era um bug de verdade esperando para acontecer.

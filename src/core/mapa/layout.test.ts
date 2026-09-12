@@ -181,3 +181,39 @@ test('aula nova aparece como ponto em volta da estrela do curso', () => {
   assert.equal(ponto.tipo, 'aula')
   assert.ok(m.linhas.find((l) => l.de === 'c1' && l.para === 'nova'))
 })
+
+test('cada astro tem dois lugares: no mapa geral e com a constelação em foco', () => {
+  const m = montarMapa(TEMAS, CURSOS, [aula('a1', 'c1')], 'G')
+  for (const a of m.astros) {
+    assert.equal(typeof a.x1, 'number', `${a.rotulo} sem x1`)
+    assert.equal(typeof a.y1, 'number', `${a.rotulo} sem y1`)
+  }
+})
+
+test('a âncora do tema NÃO se move: é o ponto para onde a câmera voa', () => {
+  const m = montarMapa(TEMAS, CURSOS, [], 'G')
+  for (const t of m.astros.filter((a) => a.tipo === 'tema')) {
+    assert.equal(t.x1, t.x)
+    assert.equal(t.y1, t.y)
+  }
+})
+
+test('em foco, o curso se afasta da âncora — é o "espalhar" do briefing', () => {
+  const m = montarMapa(TEMAS, CURSOS, [], 'G')
+  const tema = m.astros.find((a) => a.id === 't1')!
+  const curso = m.astros.find((a) => a.id === 'c1')!
+
+  const perto = Math.hypot(curso.x - tema.x, curso.y - tema.y)
+  const longe = Math.hypot(curso.x1 - tema.x1, curso.y1 - tema.y1)
+
+  assert.ok(longe > perto * 2, `esperava espalhar: ${Math.round(perto)} → ${Math.round(longe)}`)
+})
+
+test('o espalhar também é estável entre visitas', () => {
+  const a = montarMapa(TEMAS, CURSOS, [], 'G')
+  const b = montarMapa(TEMAS, CURSOS, [], 'G')
+  assert.deepEqual(
+    a.astros.map((x) => [x.id, x.x1, x.y1]),
+    b.astros.map((x) => [x.id, x.x1, x.y1]),
+  )
+})

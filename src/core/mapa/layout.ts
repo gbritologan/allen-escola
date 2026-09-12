@@ -25,9 +25,24 @@ export interface Astro {
   rotulo: string
   /** Só para tema e curso — o endereço que o clique abre. */
   href: string | null
-  /** Coordenadas no espaço do mapa. A tela aplica pan e zoom por cima. */
+  /** Coordenadas no MAPA GERAL. A tela aplica pan e zoom por cima. */
   x: number
   y: number
+  /**
+   * Coordenadas quando a CONSTELAÇÃO DELE está em foco.
+   *
+   * O briefing do Gabriel pede que, ao entrar num tema, "as partículas se
+   * espalhem para as posições do nível 1 durante o voo". É isto: cada astro
+   * tem dois lugares, e a tela interpola entre eles enquanto a câmera viaja.
+   *
+   * GERADAS, não escritas à mão. O briefing original pedia posições autorais
+   * num JSON — e isso quebraria D-04: tema é dado, criado no Studio às onze da
+   * noite, e passaria a exigir alguém editando código para aparecer no céu. O
+   * desenho continua ESTÁVEL porque vem de `ruido()`, que é determinístico:
+   * a constelação é a mesma em toda visita, sem deixar de ser gerada.
+   */
+  x1: number
+  y1: number
   /** Raio base, em unidades do mapa. */
   r: number
   estado: EstadoAstro
@@ -238,6 +253,8 @@ export function montarMapa(
     href: null,
     x: 0,
     y: 0,
+    x1: 0,
+    y1: 0,
     r: 20,
     estado: aplicadasTotal > 0 ? 'aceso' : 'visto',
     temaId: null,
@@ -288,6 +305,8 @@ export function montarMapa(
       href: `/tema/${tema.slug}`,
       x: tx,
       y: ty,
+      x1: tx,
+      y1: ty,
       /*
        * A ÂNCORA DA CONSTELAÇÃO É GRANDE.
        *
@@ -324,6 +343,22 @@ export function montarMapa(
       const cx = tx + Math.cos(base) * rc
       const cy = ty + Math.sin(base) * rc
 
+      /*
+       * EM FOCO, o leque abre e estica.
+       *
+       * No mapa geral os cursos ficam encolhidos junto da âncora — precisam
+       * caber ao lado de outras sete constelações. Com o tema em foco, a tela
+       * é toda dele: o leque vai de 150° para 200° e o raio quase triplica,
+       * o que transforma um tufo apertado numa constelação que se lê.
+       */
+      const aberturaFoco = Math.PI * 1.1
+      const passoFoco = doTema.length > 1 ? aberturaFoco / (doTema.length - 1) : 0
+      const baseFoco =
+        doTema.length === 1 ? ang : ang - aberturaFoco / 2 + passoFoco * j
+      const rcFoco = rc * 2.6
+      const cx1 = tx + Math.cos(baseFoco) * rcFoco
+      const cy1 = ty + Math.sin(baseFoco) * rcFoco
+
       const suasAulas = aulasPorCurso.get(curso.id) ?? []
       const estado = estadoDoCurso(suasAulas)
 
@@ -334,6 +369,8 @@ export function montarMapa(
         href: `/curso/${curso.slug}`,
         x: cx,
         y: cy,
+        x1: cx1,
+        y1: cy1,
         r: 10,
         estado,
         temaId: tema.id,
@@ -354,6 +391,9 @@ export function montarMapa(
       suasAulas.forEach((aula, k) => {
         const aa = k * passoAula + ruido(aula.id, 0.6)
         const ra = RAIO_AULA + ruido(aula.id + 'r', 16)
+        // Em foco a órbita abre junto com o leque do curso, senão as aulas
+        // ficariam grudadas enquanto o resto se espalha.
+        const raFoco = ra * 1.9
         astros.push({
           id: aula.id,
           tipo: 'aula',
@@ -361,6 +401,8 @@ export function montarMapa(
           href: null,
           x: cx + Math.cos(aa) * ra,
           y: cy + Math.sin(aa) * ra,
+          x1: cx1 + Math.cos(aa) * raFoco,
+          y1: cy1 + Math.sin(aa) * raFoco,
           r: 3.4,
           estado: aula.aplicada ? 'aceso' : aula.vista ? 'visto' : 'apagado',
           temaId: tema.id,
