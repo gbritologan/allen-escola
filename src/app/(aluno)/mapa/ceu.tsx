@@ -414,21 +414,33 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
         // O nome do tema é sempre visível: é o que orienta de longe. Curso só
         // aparece com zoom suficiente, senão o céu vira uma parede de texto.
         if (a.tipo === 'tema') {
-          ctx!.font = `500 ${Math.max(11, 13 * Math.min(1.4, c.z + 0.5))}px var(--font-elvon), Archivo, sans-serif`
+          /*
+           * O NOME DA CONSTELAÇÃO É GRANDE.
+           *
+           * Era 13px com teto de 1.4× — no zoom de encaixe virava 11px, e o
+           * rótulo desaparecia ao lado do disco. Na referência que o Gabriel
+           * mandou, o nome do setor é o SEGUNDO elemento mais forte da tela,
+           * depois do nó: caixa alta, bem espaçado, grande o bastante para se
+           * ler atravessado.
+           *
+           * 26px de base com teto de 1.8×, e um piso de 15px para o zoom de
+           * encaixe continuar legível.
+           */
+          ctx!.font = `300 ${Math.max(15, 26 * Math.min(1.8, c.z + 0.55))}px var(--font-elvon), Archivo, sans-serif`
           ctx!.fillStyle = ativo ? COR.rotuloForte : COR.rotulo
           ctx!.textAlign = 'center'
-          ctx!.letterSpacing = '0.22em'
+          ctx!.letterSpacing = '0.3em'
           ctx!.globalAlpha = 0.92
-          ctx!.fillText(a.rotulo.toUpperCase(), sx, sy - raio - 30)
+          ctx!.fillText(a.rotulo.toUpperCase(), sx, sy - raio - 42)
           ctx!.letterSpacing = '0px'
 
           // A segunda linha. Some no zoom baixo: a esta distância o nome é o
           // que orienta, e a descrição vira sujeira sob ele.
           if (a.subtitulo && c.z > 0.42) {
-            ctx!.font = `400 ${Math.max(9, 10.5 * Math.min(1.3, c.z + 0.4))}px var(--font-elvon), Archivo, sans-serif`
+            ctx!.font = `400 ${Math.max(10, 13 * Math.min(1.4, c.z + 0.45))}px var(--font-elvon), Archivo, sans-serif`
             ctx!.fillStyle = COR.rotulo
-            ctx!.globalAlpha = 0.6
-            ctx!.fillText(cortar(a.subtitulo, 42), sx, sy - raio - 15)
+            ctx!.globalAlpha = 0.62
+            ctx!.fillText(cortar(a.subtitulo, 46), sx, sy - raio - 20)
           }
           ctx!.globalAlpha = 1
         } else if (a.tipo === 'curso' && (c.z > 0.55 || ativo)) {

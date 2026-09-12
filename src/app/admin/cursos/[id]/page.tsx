@@ -98,7 +98,7 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
               <Chip tone={published ? 'positive' : 'neutral'}>
                 {published ? 'Publicado' : 'Rascunho'}
               </Chip>
-              {course.format === 'masterclass' && <Chip tone="accent">Masterclass</Chip>}
+              {course.format === 'masterclass' && <Chip tone="accent">Capacitação</Chip>}
               <span data-numeric className="text-caption text-ink-4">
                 {course.lesson_count} {course.lesson_count === 1 ? 'aula' : 'aulas'} ·{' '}
                 {formatDuration(course.duration_seconds)}
@@ -200,7 +200,7 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
                   className="h-10 w-full rounded-[var(--radius-control)] border border-line bg-navy-deep px-3 text-body text-ink outline-none focus:border-[rgba(76,65,255,0.7)]"
                 >
                   <option value="course">Curso</option>
-                  <option value="masterclass">Masterclass</option>
+                  <option value="masterclass">Capacitação</option>
                 </select>
               </Field>
             </div>

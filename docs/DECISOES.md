@@ -1273,3 +1273,26 @@ migrou para a **saturação**: apagada é quase cinza, acesa é o tom cheio.
 A tese de D-37 continua de pé — a constelação ganha COR ao ser feita — e some o
 efeito colateral de ela ganhar também legibilidade. **Codificar duas coisas no
 mesmo canal só funciona enquanto uma delas não é pré-requisito da outra.**
+
+## D-63 · Só a iconografia original, e o nome grande
+
+Duas correções do Gabriel olhando o Mapa no ar.
+
+**A máscara saiu.** Ela lia como um alienígena de desenho a 22px. Mas o que ele
+apontou é mais importante que o desenho ruim: **ela era invenção minha**. A
+pasta `ICONOGRAFIA ALLEN` tem um repertório, e os três símbolos que falharam
+até agora — louros, elmo, máscara — são justamente os que eu criei "no
+espírito" em vez de derivar de lá.
+
+Os cinco temas passaram a usar só originais: olho, ágora (o balão de fala),
+coluna, tocha e pódio. **Regra que fica: preferir sempre o que existe na
+pasta.** Inventar só quando nenhum original serve, e sabendo que a chance de
+errar é maior.
+
+**O nome da constelação era pequeno demais.** 13px com teto de 1,4× virava 11px
+no zoom de encaixe — o rótulo sumia ao lado do disco. Na referência, o nome do
+setor é o segundo elemento mais forte da tela, depois do nó: caixa alta, bem
+espaçado, legível atravessado.
+
+Agora 26px de base com teto de 1,8×, piso de 15px, e o espaçamento subiu de
+0,22em para 0,3em. O subtítulo acompanhou.

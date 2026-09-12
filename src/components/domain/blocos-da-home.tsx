@@ -102,7 +102,7 @@ export function BlocosDaHome({
             return (
               <section key="masterclass" className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <SectionLabel>Masterclass</SectionLabel>
+                  <SectionLabel>Capacitações</SectionLabel>
                   <p className="text-body text-ink-3">
                     Um expert. Um assunto. Um mergulho profundo.
                   </p>

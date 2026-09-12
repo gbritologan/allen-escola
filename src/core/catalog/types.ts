@@ -35,7 +35,7 @@ export type CourseFormat = 'course' | 'masterclass'
 
 export const COURSE_FORMAT_LABEL: Record<CourseFormat, string> = {
   course: 'Curso',
-  masterclass: 'Masterclass',
+  masterclass: 'Capacitação',
 }
 
 export interface Course {

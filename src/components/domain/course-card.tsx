@@ -79,7 +79,7 @@ export function CourseCard({
 
         <div className="relative flex flex-wrap items-center gap-2">
           {aguardando && <Chip tone="caution">Em breve</Chip>}
-          {masterclass && <Chip tone="accent">Masterclass</Chip>}
+          {masterclass && <Chip tone="accent">Capacitação</Chip>}
         </div>
       </div>
 

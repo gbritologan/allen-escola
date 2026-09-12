@@ -455,7 +455,7 @@ export default async function AulaPage({
           <article className="flex flex-col gap-8">
             <header className="flex flex-col gap-4">
               <span className="text-caption uppercase tracking-[0.22em] text-blue-light">
-                Masterclass
+                Capacitação
               </span>
               {/* `font-hair` é o peso editorial da casa, o mesmo do título do
                   curso. A aula comum usa `font-light`, que é o de trabalho. */}

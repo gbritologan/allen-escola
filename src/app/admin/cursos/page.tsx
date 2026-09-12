@@ -65,7 +65,7 @@ export default async function CursosPage() {
                 <div className="min-w-0 flex-1 flex flex-col gap-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-body font-medium text-ink">{course.title}</span>
-                    {course.format === 'masterclass' && <Chip tone="accent">Masterclass</Chip>}
+                    {course.format === 'masterclass' && <Chip tone="accent">Capacitação</Chip>}
                     <Chip tone={course.status === 'published' ? 'positive' : 'neutral'}>
                       {CONTENT_STATUS_LABEL[course.status as ContentStatus]}
                     </Chip>

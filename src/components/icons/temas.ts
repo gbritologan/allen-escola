@@ -18,7 +18,18 @@
  * 2. SEM O CANTO CHANFRADO. O chanfro é a assinatura dos ícones de INTERFACE.
  *    Uma coluna dórica com o capitel cortado em 45° não é estilo, é erro.
  *
- * DOIS QUE NÃO ENTRARAM: louros e elmo. Tentei duas vezes cada um. A 22px o
+ * TRÊS QUE NÃO ENTRARAM: louros, elmo e máscara.
+ *
+ * A máscara saiu depois, e a lição é a mesma dos outros dois: a 22px ela lia
+ * como um alienígena de desenho, não como teatro grego. O Gabriel viu no mapa
+ * e estava certo — e apontou o que importa mais: ela era INVENÇÃO MINHA. Os
+ * que funcionam são os derivados da pasta `ICONOGRAFIA ALLEN`; os que eu
+ * inventei "no espírito" são os que falharam.
+ *
+ * Regra que fica: preferir sempre o que existe na pasta. Inventar só quando
+ * nenhum dos originais serve, e sabendo que a chance de errar é maior.
+ *
+ * Sobre louros e elmo: Tentei duas vezes cada um. A 22px o
  * louros vira escudo e o elmo vira cadeado — a silhueta perde exatamente o
  * detalhe que a identifica. Catorze ícones que funcionam valem mais que
  * dezesseis com dois que mentem sobre o que são. "Maestria" fica com o pódio,
@@ -160,16 +171,6 @@ export const ICONES_TEMA: Record<string, IconeTema> = {
       'M6.4 11h11.2v2.2H6.4z',
       'M7.6 14.2h8.8l-1.4 2.6H9z',
       'M7 21h10v1.6H7z',
-    ],
-  },
-  mascara: {
-    rotulo: 'Máscara — criação',
-    origem: 'Nova, da máscara do teatro grego. Olhos e boca são FUROS, num caminho só.',
-    d: [
-      'M12 2.4c4.5 0 7.8 2.5 7.8 6.6 0 5.8-3.5 12.6-7.8 12.6S4.2 14.8 4.2 9c0-4.1 3.3-6.6 7.8-6.6z' +
-        'M8.7 7.8a2.3 2 0 1 0 0 4 2.3 2 0 0 0 0-4z' +
-        'M15.3 7.8a2.3 2 0 1 0 0 4 2.3 2 0 0 0 0-4z' +
-        'M8.8 15.2h6.4c0 1.8-1.4 3-3.2 3s-3.2-1.2-3.2-3z',
     ],
   },
   ampulheta: {

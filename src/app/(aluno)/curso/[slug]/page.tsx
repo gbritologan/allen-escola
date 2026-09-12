@@ -83,7 +83,7 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
 
         <div className="flex flex-wrap items-center gap-2">
           {aguardando && <Chip tone="caution">Em breve</Chip>}
-          {masterclass && <Chip tone="accent">Masterclass</Chip>}
+          {masterclass && <Chip tone="accent">Capacitação</Chip>}
           {(themes ?? []).map((t) => (
             <Link
               key={t.slug}

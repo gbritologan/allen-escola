@@ -49,7 +49,7 @@ export function NovoCurso() {
           {(
             [
               ['course', 'Curso', 'Vários módulos, ritmo próprio.'],
-              ['masterclass', 'Masterclass', 'Um expert, um assunto, um mergulho.'],
+              ['masterclass', 'Capacitação', 'Um expert, um assunto, um mergulho.'],
             ] as const
           ).map(([value, label, detail]) => (
             <label
