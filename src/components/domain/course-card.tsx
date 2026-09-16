@@ -9,6 +9,12 @@ import { cn } from '@/lib/utils'
  * O card de curso. Superfície opaca, nunca vidro (D-15) — não há nada se
  * movendo por trás dele.
  *
+ * A moldura é 4:5, de pôster, e isso não é escolha estética: é a proporção em
+ * que a arte da Allen é feita. Enquanto o card era 16:10, toda capa entrava
+ * cortada — no primeiro curso com arte de verdade, o corte comeu metade do
+ * rosto e o título inteiro. Moldura que não bate com a arte transforma
+ * trabalho de design em recorte aleatório.
+ *
  * COM CAPA, a imagem manda. SEM CAPA, a inicial do curso em corpo grande
  * sobre um degradê do navy — placeholder que parece decisão, não ausência.
  * Os dois estados são legítimos e vão conviver por muito tempo: capa é
@@ -40,7 +46,7 @@ export function CourseCard({
     >
       <div
         className={cn(
-          'relative flex aspect-[16/10] items-end overflow-hidden p-4',
+          'relative flex aspect-[4/5] items-start overflow-hidden p-4',
           !course.coverUrl &&
             (masterclass
               ? 'bg-[linear-gradient(145deg,rgba(0,13,255,0.28),rgba(10,15,46,1)_62%)]'
@@ -61,17 +67,18 @@ export function CourseCard({
                 aguardando && 'opacity-70 saturate-50',
               )}
             />
-            {/* O degradê existe para o selo ter contraste sobre qualquer
-                imagem — inclusive uma clara. */}
+            {/* O degradê desce do TOPO, e o selo mora lá em cima.
+                Arte de pôster carrega o título na parte de baixo — era ali
+                que o selo pousava antes, em cima do nome do curso. */}
             <div
               aria-hidden
-              className="absolute inset-0 bg-[linear-gradient(to_top,rgba(5,7,20,0.85),rgba(5,7,20,0)_55%)]"
+              className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(5,7,20,0.8),rgba(5,7,20,0)_42%)]"
             />
           </>
         ) : (
           <span
             aria-hidden
-            className="pointer-events-none absolute -top-6 right-2 font-hair text-[7rem] leading-none text-[rgba(243,245,252,0.06)]"
+            className="pointer-events-none absolute bottom-2 right-3 font-hair text-[9rem] leading-none text-[rgba(243,245,252,0.06)]"
           >
             {course.title.charAt(0)}
           </span>
