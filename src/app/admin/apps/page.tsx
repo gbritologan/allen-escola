@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
+import { CampoImagem } from '@/components/domain/campo-imagem'
 import { BotaoSalvar } from '@/components/primitives/botao-salvar'
 import { Button } from '@/components/primitives/button'
 import { Chip } from '@/components/primitives/chip'
@@ -82,46 +82,21 @@ export default async function AdminAppsPage() {
               </div>
             </div>
 
-            {/* A logo tem ação própria, então form próprio: <form> dentro de
-                <form> é inválido em HTML. */}
             <div className="flex flex-wrap items-center gap-4 border-y border-line py-4">
-              <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-control)] bg-[rgba(243,245,252,0.06)] p-2">
-                {app.logo_url ? (
-                  <Image
-                    src={app.logo_url}
-                    alt=""
-                    width={44}
-                    height={44}
-                    className="size-full object-contain"
-                  />
-                ) : (
-                  <span className="text-caption text-ink-4">logo</span>
-                )}
-              </div>
-
-              <form action={enviarLogo} className="flex flex-wrap items-center gap-3">
-                <input type="hidden" name="id" value={app.id} />
-                <input type="hidden" name="slug" value={app.slug} />
-                <input
-                  type="file"
-                  name="arquivo"
-                  accept="image/png,image/webp,image/avif,image/jpeg"
-                  required
-                  className="max-w-[14rem] text-caption text-ink-3 file:mr-3 file:rounded-[var(--radius-control)] file:border file:border-line file:bg-transparent file:px-3 file:py-1.5 file:text-caption file:text-ink-2"
-                />
-                <Button type="submit" size="sm" variant="secondary">
-                  {app.logo_url ? 'Trocar logo' : 'Enviar logo'}
-                </Button>
-              </form>
-
-              {app.logo_url && (
-                <form action={removerLogo}>
-                  <input type="hidden" name="id" value={app.id} />
-                  <Button type="submit" size="sm" variant="ghost">
-                    Remover
-                  </Button>
-                </form>
-              )}
+              {/* `object-contain`: logo é marca de terceiro, e cortar marca de
+                  terceiro é estragar a marca. */}
+              <CampoImagem
+                atual={app.logo_url}
+                pasta="logos"
+                nomeBase={app.slug}
+                acaoSalvar={enviarLogo}
+                acaoRemover={removerLogo}
+                ocultos={{ id: app.id }}
+                moldura="size-14 shrink-0 p-2"
+                ajuste="object-contain"
+                rotuloVazio="logo"
+                tamanhos="56px"
+              />
 
               <span className="text-caption text-ink-4">
                 Quadrada, de preferência com fundo transparente.

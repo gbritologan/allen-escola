@@ -2,13 +2,13 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { BotaoSalvar } from '@/components/primitives/botao-salvar'
-import { Button } from '@/components/primitives/button'
 import { Field, Input } from '@/components/primitives/field'
 import { Surface } from '@/components/surfaces/surface'
 import { fraseDoAcesso, type EstadoAcesso } from '@/core/identity/acesso'
 import { canOpenAdmin } from '@/core/identity/permissions'
 import { ROLE_DESCRIPTION, ROLE_LABEL } from '@/core/identity/roles'
 import { requireSession } from '@/lib/auth/session'
+import { CampoImagem } from '@/components/domain/campo-imagem'
 import { enviarFoto, removerFoto, salvarPerfil } from './actions'
 
 export const metadata: Metadata = { title: 'Sua conta' }
@@ -109,30 +109,16 @@ export default async function ContaPage() {
           </p>
         </div>
 
-        {/* Dois <form> IRMÃOS, nunca aninhados: form dentro de form é
-            inválido em HTML e o navegador desfaz do jeito dele. */}
-        <div className="flex flex-wrap items-center gap-3">
-          <form action={enviarFoto} className="flex flex-wrap items-center gap-3">
-            <input
-              type="file"
-              name="arquivo"
-              accept="image/jpeg,image/png,image/webp,image/avif"
-              required
-              className="max-w-[15rem] text-caption text-ink-3 file:mr-3 file:rounded-[var(--radius-control)] file:border file:border-line file:bg-transparent file:px-3 file:py-1.5 file:text-caption file:text-ink-2"
-            />
-            <Button type="submit" size="sm" variant="secondary">
-              {perfil?.avatarUrl ? 'Trocar foto' : 'Enviar foto'}
-            </Button>
-          </form>
-
-          {perfil?.avatarUrl && (
-            <form action={removerFoto}>
-              <Button type="submit" size="sm" variant="ghost">
-                Remover
-              </Button>
-            </form>
-          )}
-        </div>
+        <CampoImagem
+          atual={perfil?.avatarUrl ?? null}
+          pasta="avatares"
+          nomeBase={session.userId}
+          acaoSalvar={enviarFoto}
+          acaoRemover={removerFoto}
+          moldura="size-28 rounded-full"
+          rotuloVazio="Sem foto"
+          tamanhos="112px"
+        />
 
         <form action={salvarPerfil} className="flex flex-col gap-5">
           <Field label="Nome completo" htmlFor="full_name">

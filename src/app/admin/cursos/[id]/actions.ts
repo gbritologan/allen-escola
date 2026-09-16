@@ -1,10 +1,10 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import type { EstadoCapa } from './capa-estado'
+import { type EstadoImagem, IMAGEM_PARADA } from '@/core/shared/imagem'
 import { redirect } from 'next/navigation'
 import { slugify } from '@/core/shared/slug'
-import { apagarImagem, enviarImagem } from '@/lib/imagens'
+import { apagarImagem, recusaDaUrl } from '@/lib/imagens'
 import { can } from '@/core/identity/permissions'
 import { getSession } from '@/lib/auth/session'
 import { createClient } from '@/lib/supabase/server'
@@ -94,18 +94,15 @@ export async function atualizarCurso(formData: FormData) {
  * deixaria o curso sem capa nenhuma se o envio falhasse no meio.
  */
 export async function enviarCapa(
-  _prev: EstadoCapa,
+  _prev: EstadoImagem,
   formData: FormData,
-): Promise<EstadoCapa> {
+): Promise<EstadoImagem> {
   const id = String(formData.get('id') ?? '')
-  const slug = String(formData.get('slug') ?? 'curso')
-  const arquivo = formData.get('arquivo')
-  if (!id || !(arquivo instanceof File)) {
-    return { erro: 'Escolha uma imagem primeiro.', url: null }
-  }
+  const url = String(formData.get('url') ?? '')
+  if (!id) return { erro: 'Curso não identificado.', url: null }
 
-  const { url, error } = await enviarImagem(arquivo, 'capas', slug)
-  if (!url) return { erro: error ?? 'Não consegui enviar a imagem.', url: null }
+  const recusa = recusaDaUrl(url, 'capas')
+  if (recusa) return { erro: recusa, url: null }
 
   const supabase = await createClient()
   const { data: antes } = await supabase
@@ -114,14 +111,9 @@ export async function enviarCapa(
     .eq('id', id)
     .maybeSingle()
 
-  const { error: erroBanco } = await supabase
-    .from('courses')
-    .update({ cover_url: url })
-    .eq('id', id)
-
-  if (erroBanco) {
-    // A imagem subiu mas o curso não aponta para ela: é lixo no bucket, e
-    // dizer "deu certo" aqui seria mentira.
+  const { error } = await supabase.from('courses').update({ cover_url: url }).eq('id', id)
+  if (error) {
+    // A imagem já está no bucket; dizer "deu certo" aqui seria mentira.
     await apagarImagem(url)
     return { erro: 'A imagem subiu, mas não consegui gravá-la no curso.', url: null }
   }
@@ -134,9 +126,9 @@ export async function enviarCapa(
 
 /** Tirar a capa. Volta ao cartão sem imagem, que é um estado legítimo. */
 export async function removerCapa(
-  _prev: EstadoCapa,
+  _prev: EstadoImagem,
   formData: FormData,
-): Promise<EstadoCapa> {
+): Promise<EstadoImagem> {
   const id = String(formData.get('id') ?? '')
   if (!id) return { erro: 'Curso não identificado.', url: null }
 
@@ -151,7 +143,7 @@ export async function removerCapa(
   await apagarImagem(antes?.cover_url)
 
   revalidar(id)
-  return { erro: null, url: null }
+  return IMAGEM_PARADA
 }
 
 /** Liga/desliga um tema no curso. N:N, então é toggle e não seleção única. */

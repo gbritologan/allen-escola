@@ -1,7 +1,8 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { apagarImagem, enviarImagem } from '@/lib/imagens'
+import { type EstadoImagem } from '@/core/shared/imagem'
+import { apagarImagem, recusaDaUrl } from '@/lib/imagens'
 import { createClient } from '@/lib/supabase/server'
 
 function revalidar() {
@@ -58,13 +59,16 @@ export async function salvarBanner(formData: FormData) {
 }
 
 /** Sobe a arte. A antiga sai só depois que a nova entrou. */
-export async function enviarArte(formData: FormData) {
+export async function enviarArte(
+  _prev: EstadoImagem,
+  formData: FormData,
+): Promise<EstadoImagem> {
   const id = String(formData.get('id') ?? '')
-  const arquivo = formData.get('arquivo')
-  if (!id || !(arquivo instanceof File)) return
+  const url = String(formData.get('url') ?? '')
+  if (!id) return { erro: 'Banner não identificado.', url: null }
 
-  const { url } = await enviarImagem(arquivo, 'banners', id)
-  if (!url) return
+  const recusa = recusaDaUrl(url, 'banners')
+  if (recusa) return { erro: recusa, url: null }
 
   const supabase = await createClient()
   const { data: antes } = await supabase
@@ -77,6 +81,7 @@ export async function enviarArte(formData: FormData) {
   await apagarImagem(antes?.image_url)
 
   revalidar()
+  return { erro: null, url }
 }
 
 /**

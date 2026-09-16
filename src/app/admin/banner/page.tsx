@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
+import { CampoImagem } from '@/components/domain/campo-imagem'
 import { BotaoSalvar } from '@/components/primitives/botao-salvar'
 import { Button } from '@/components/primitives/button'
 import { Chip } from '@/components/primitives/chip'
@@ -98,29 +98,16 @@ export default async function AdminBannerPage() {
 
             {/* A prévia tem a proporção real. Julgar 4:1 num quadrado é como
                 aprovar capa olhando miniatura. */}
-            <div className="relative aspect-[4/1] w-full overflow-hidden rounded-[var(--radius-card)] border border-line bg-navy">
-              {b.image_url ? (
-                <Image src={b.image_url} alt="" fill sizes="42rem" className="object-cover" />
-              ) : (
-                <div className="flex h-full items-center justify-center">
-                  <span className="text-caption text-ink-4">1440 × 360</span>
-                </div>
-              )}
-            </div>
-
-            <form action={enviarArte} className="flex flex-wrap items-center gap-3">
-              <input type="hidden" name="id" value={b.id} />
-              <input
-                type="file"
-                name="arquivo"
-                accept="image/jpeg,image/png,image/webp,image/avif"
-                required
-                className="max-w-[16rem] text-caption text-ink-3 file:mr-3 file:rounded-[var(--radius-control)] file:border file:border-line file:bg-transparent file:px-3 file:py-1.5 file:text-caption file:text-ink-2"
-              />
-              <Button type="submit" size="sm" variant="secondary">
-                {b.image_url ? 'Trocar arte' : 'Enviar arte'}
-              </Button>
-            </form>
+            <CampoImagem
+              atual={b.image_url}
+              pasta="banners"
+              nomeBase={b.id}
+              acaoSalvar={enviarArte}
+              ocultos={{ id: b.id }}
+              moldura="aspect-[4/1] w-full"
+              rotuloVazio="1440 × 360"
+              tamanhos="42rem"
+            />
 
             <form action={salvarBanner} className="flex flex-col gap-4">
               <input type="hidden" name="id" value={b.id} />

@@ -2,7 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { requireSession } from '@/lib/auth/session'
-import { apagarImagem, enviarImagem } from '@/lib/imagens'
+import { type EstadoImagem, IMAGEM_PARADA } from '@/core/shared/imagem'
+import { apagarImagem, recusaDaUrl } from '@/lib/imagens'
 import { createClient } from '@/lib/supabase/server'
 
 /**
@@ -51,13 +52,21 @@ export async function salvarPerfil(formData: FormData) {
  * (0023). O nome carrega o id de quem enviou: mantém a pasta navegável e
  * impede que um envio sobrescreva o de outra pessoa.
  */
-export async function enviarFoto(formData: FormData) {
+export async function enviarFoto(
+  _prev: EstadoImagem,
+  formData: FormData,
+): Promise<EstadoImagem> {
   const session = await requireSession()
-  const arquivo = formData.get('arquivo')
-  if (!(arquivo instanceof File)) return
+  const url = String(formData.get('url') ?? '')
 
-  const { url } = await enviarImagem(arquivo, 'avatares', session.userId)
-  if (!url) return
+  /*
+   * Aqui a conferência pesa mais que nas outras: esta ação é a única do grupo
+   * que QUALQUER aluno pode chamar. Sem ela, a foto de perfil aceitaria
+   * qualquer endereço da internet — e a RLS do bucket, que só guarda a pasta
+   * `avatares`, não teria como opinar sobre um link que nunca passou por ela.
+   */
+  const recusa = recusaDaUrl(url, 'avatares')
+  if (recusa) return { erro: recusa, url: null }
 
   const supabase = await createClient()
   const { data: antes } = await supabase
@@ -70,9 +79,10 @@ export async function enviarFoto(formData: FormData) {
   await apagarImagem(antes?.avatar_url)
 
   revalidatePath('/conta')
+  return { erro: null, url }
 }
 
-export async function removerFoto() {
+export async function removerFoto(): Promise<EstadoImagem> {
   const session = await requireSession()
   const supabase = await createClient()
 
@@ -86,4 +96,5 @@ export async function removerFoto() {
   await apagarImagem(antes?.avatar_url)
 
   revalidatePath('/conta')
+  return IMAGEM_PARADA
 }

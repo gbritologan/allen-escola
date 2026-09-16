@@ -7,7 +7,8 @@ import { IconeApagar } from '@/components/icons'
 import { Field, Input, Textarea } from '@/components/primitives/field'
 import { Surface } from '@/components/surfaces/surface'
 import { createClient } from '@/lib/supabase/server'
-import { apagarInstrutor, enviarRetrato, salvarInstrutor } from './actions'
+import { CampoImagem } from '@/components/domain/campo-imagem'
+import { apagarInstrutor, enviarRetrato, removerRetrato, salvarInstrutor } from './actions'
 import { NovoInstrutor } from './novo-instrutor'
 
 export const metadata: Metadata = { title: 'Instrutores' }
@@ -139,26 +140,19 @@ export default async function InstrutoresPage() {
                     )}
                   </div>
 
-                  {/* Envio do retrato: form próprio, porque tem ação
-                      própria. Aninhar <form> dentro de <form> é inválido em
-                      HTML e o navegador desfaz do jeito dele. */}
-                  <form action={enviarRetrato} className="flex flex-wrap items-center gap-3 pb-4">
-                    <input type="hidden" name="id" value={pessoa.id} />
-                    <input type="hidden" name="slug" value={pessoa.slug} />
-                    <input
-                      type="file"
-                      name="arquivo"
-                      accept="image/jpeg,image/png,image/webp,image/avif"
-                      required
-                      className="max-w-[15rem] text-caption text-ink-3 file:mr-3 file:rounded-[var(--radius-control)] file:border file:border-line file:bg-transparent file:px-3 file:py-1.5 file:text-caption file:text-ink-2"
+                  <div className="pb-4">
+                    <CampoImagem
+                      atual={pessoa.photo_url}
+                      pasta="retratos"
+                      nomeBase={pessoa.slug}
+                      acaoSalvar={enviarRetrato}
+                      acaoRemover={removerRetrato}
+                      ocultos={{ id: pessoa.id }}
+                      moldura="size-24 rounded-full"
+                      rotuloVazio="Sem foto"
+                      tamanhos="96px"
                     />
-                    <button
-                      type="submit"
-                      className="rounded-[var(--radius-control)] border border-line px-3 py-1.5 text-caption text-ink-2 transition-colors hover:border-line-strong hover:text-ink"
-                    >
-                      {pessoa.photo_url ? 'Trocar foto' : 'Enviar foto'}
-                    </button>
-                  </form>
+                  </div>
 
                   <form action={salvarInstrutor} className="flex flex-col gap-4">
                     <input type="hidden" name="id" value={pessoa.id} />

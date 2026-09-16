@@ -2,7 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { isValidSlug, slugify } from '@/core/shared/slug'
-import { apagarImagem, enviarImagem } from '@/lib/imagens'
+import { type EstadoImagem, IMAGEM_PARADA } from '@/core/shared/imagem'
+import { apagarImagem, recusaDaUrl } from '@/lib/imagens'
 import { createClient } from '@/lib/supabase/server'
 
 export interface InstructorFormState {
@@ -124,14 +125,16 @@ export async function apagarInstrutor(formData: FormData) {
  *
  * Agora sobe para o bucket `imagens` (0019), no mesmo mecanismo da capa.
  */
-export async function enviarRetrato(formData: FormData) {
+export async function enviarRetrato(
+  _prev: EstadoImagem,
+  formData: FormData,
+): Promise<EstadoImagem> {
   const id = String(formData.get('id') ?? '')
-  const slug = String(formData.get('slug') ?? 'instrutor')
-  const arquivo = formData.get('arquivo')
-  if (!id || !(arquivo instanceof File)) return
+  const url = String(formData.get('url') ?? '')
+  if (!id) return { erro: 'Instrutor não identificado.', url: null }
 
-  const { url } = await enviarImagem(arquivo, 'retratos', slug)
-  if (!url) return
+  const recusa = recusaDaUrl(url, 'retratos')
+  if (recusa) return { erro: recusa, url: null }
 
   const supabase = await createClient()
   const { data: antes } = await supabase
@@ -148,11 +151,15 @@ export async function enviarRetrato(formData: FormData) {
 
   revalidatePath('/admin/instrutores')
   revalidatePath('/cursos')
+  return { erro: null, url }
 }
 
-export async function removerRetrato(formData: FormData) {
+export async function removerRetrato(
+  _prev: EstadoImagem,
+  formData: FormData,
+): Promise<EstadoImagem> {
   const id = String(formData.get('id') ?? '')
-  if (!id) return
+  if (!id) return { erro: 'Instrutor não identificado.', url: null }
 
   const supabase = await createClient()
   const { data: antes } = await supabase
@@ -165,4 +172,5 @@ export async function removerRetrato(formData: FormData) {
   await apagarImagem(antes?.photo_url)
 
   revalidatePath('/admin/instrutores')
+  return IMAGEM_PARADA
 }

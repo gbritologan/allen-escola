@@ -1691,3 +1691,47 @@ foi a ocasião, e ela se pagou.
 Nasce publicado e vazio. Tema publicado sem curso aparece no mapa como
 constelação apagada — que é a leitura certa: existe, ainda não tem nada
 dentro.
+
+## D-78 · O arquivo não passa mais pelo servidor
+
+A tela de "alguma coisa quebrou" que o Gabriel viu tinha digest
+`2048868467@E394`. Nos logs da Vercel, ele é uma linha só:
+
+    Error: Body exceeded 1 MB limit
+    statusCode: 413, digest: '2048868467@E394'
+
+**Server Action no Next tem corpo limitado a 1MB.** Nossas telas prometiam
+8MB. Toda imagem acima de 1MB estourava com 413 antes de qualquer código
+nosso rodar — e o que aparecia não era "imagem grande demais", era a página de
+erro genérica, sem relação visível com o arquivo.
+
+Isso explicava os dois sintomas ao mesmo tempo: a capa que "não ficava" (a que
+gravou, em D-76, tinha menos de 1MB) e o erro "em outros momentos" — porque
+são CINCO lugares subindo imagem pelo mesmo caminho: capa de curso, arte do
+banner, retrato de instrutor, logo de app e foto de perfil.
+
+**Levantar `bodySizeLimit` não resolveria.** A Vercel corta a requisição de
+uma função em 4,5MB, e 4,5MB continua abaixo dos 8MB anunciados. Seria trocar
+um teto surpresa por outro.
+
+Então o arquivo deixou de passar pelo servidor. O navegador envia direto para
+o Storage do Supabase, autenticado, com a RLS do bucket decidindo o que pode
+(D-11: quem nega é o Postgres). A Server Action recebe só a URL — algumas
+centenas de bytes — e grava. O upload também parou de gastar tempo de função
+e de trafegar o arquivo duas vezes.
+
+Como a URL agora vem do cliente, o servidor confere se ela é do nosso bucket e
+da pasta certa (`urlDoBucket`). Isso pesa especialmente em `enviarFoto`, a
+única do grupo que qualquer aluno pode chamar: sem a conferência, a foto de
+perfil aceitaria qualquer endereço da internet, e a RLS do bucket não teria
+como opinar sobre um link que nunca passou por ela. Texto vindo do navegador é
+pedido, não fato.
+
+Os cinco lugares passaram a usar um `CampoImagem` só. Eram cinco cópias do
+mesmo campo, e por isso eram cinco cópias do mesmo defeito.
+
+**O que eu erraria de novo se não anotasse:** em D-76 eu disse que a capa
+estava resolvida. Ela não estava — eu tinha consertado o gesto perdido e a
+revalidação, que eram problemas reais, e parei no primeiro diagnóstico que
+explicava o sintoma. O teto de 1MB estava lá o tempo todo, atrás. Sintoma
+explicado não é causa esgotada.

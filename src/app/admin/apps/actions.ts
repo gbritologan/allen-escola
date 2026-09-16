@@ -2,7 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { isValidSlug, slugify } from '@/core/shared/slug'
-import { apagarImagem, enviarImagem } from '@/lib/imagens'
+import { type EstadoImagem, IMAGEM_PARADA } from '@/core/shared/imagem'
+import { apagarImagem, recusaDaUrl } from '@/lib/imagens'
 import { createClient } from '@/lib/supabase/server'
 
 /** Os dois lugares que mudam quando um app muda. */
@@ -145,14 +146,16 @@ export async function moverApp(formData: FormData) {
  * depois que a nova entrou — o contrário deixaria o app sem marca nenhuma se
  * o envio falhasse no meio.
  */
-export async function enviarLogo(formData: FormData) {
+export async function enviarLogo(
+  _prev: EstadoImagem,
+  formData: FormData,
+): Promise<EstadoImagem> {
   const id = String(formData.get('id') ?? '')
-  const slug = String(formData.get('slug') ?? 'app')
-  const arquivo = formData.get('arquivo')
-  if (!id || !(arquivo instanceof File)) return
+  const url = String(formData.get('url') ?? '')
+  if (!id) return { erro: 'App não identificado.', url: null }
 
-  const { url } = await enviarImagem(arquivo, 'logos', slug)
-  if (!url) return
+  const recusa = recusaDaUrl(url, 'logos')
+  if (recusa) return { erro: recusa, url: null }
 
   const supabase = await createClient()
   const { data: antes } = await supabase.from('apps').select('logo_url').eq('id', id).maybeSingle()
@@ -161,11 +164,15 @@ export async function enviarLogo(formData: FormData) {
   await apagarImagem(antes?.logo_url)
 
   revalidar()
+  return { erro: null, url }
 }
 
-export async function removerLogo(formData: FormData) {
+export async function removerLogo(
+  _prev: EstadoImagem,
+  formData: FormData,
+): Promise<EstadoImagem> {
   const id = String(formData.get('id') ?? '')
-  if (!id) return
+  if (!id) return { erro: 'App não identificado.', url: null }
 
   const supabase = await createClient()
   const { data: antes } = await supabase.from('apps').select('logo_url').eq('id', id).maybeSingle()
@@ -174,4 +181,5 @@ export async function removerLogo(formData: FormData) {
   await apagarImagem(antes?.logo_url)
 
   revalidar()
+  return IMAGEM_PARADA
 }

@@ -1,72 +1,34 @@
 import 'server-only'
+import { urlDoBucket } from '@/core/shared/imagem'
 import { createClient } from '@/lib/supabase/server'
 
 /**
- * ENVIO DE IMAGEM PARA O BUCKET `imagens`.
+ * O LADO SERVIDOR DAS IMAGENS.
  *
- * Um lugar só, porque três telas precisam da mesma coisa (capa de curso,
- * retrato de instrutor, banner da Home) e três cópias divergem no dia em que
- * uma delas ganha uma validação a mais.
+ * O ENVIO não mora mais aqui. Desde D-78 o arquivo vai do navegador direto
+ * para o Storage, porque o corpo de uma Server Action é limitado a 1MB no
+ * Next e a 4,5MB na Vercel — tetos abaixo dos 8MB que as telas prometem, e
+ * que estouravam com 413 antes de qualquer código nosso rodar.
  *
- * A RLS do bucket é o portão de verdade (`equipe envia imagens`, 0019). As
- * checagens aqui existem para dar MENSAGEM: um erro de política do Postgres
- * chega como "new row violates row-level security policy", que não ajuda
- * ninguém a entender que o arquivo tinha 12MB.
+ * O que sobrou aqui é o que o servidor tem MESMO que fazer: conferir que a
+ * URL recebida é do nosso bucket, e apagar o que sai de cena.
  */
-
-const TIPOS = ['image/jpeg', 'image/png', 'image/webp', 'image/avif']
-const LIMITE = 8 * 1024 * 1024
-
-export interface ResultadoUpload {
-  url: string | null
-  error: string | null
-}
 
 /**
- * @param pasta  prefixo dentro do bucket: 'capas', 'retratos', 'banners'.
- * @param nomeBase  vira o começo do nome do arquivo — normalmente o slug.
+ * A URL veio do nosso bucket, na pasta certa?
+ *
+ * Quem chama a ação agora manda texto, e texto do cliente é pedido, não fato.
+ * Sem esta conferência, `enviarFoto` — que qualquer aluno pode chamar —
+ * aceitaria qualquer endereço da internet como foto de perfil.
+ *
+ * Devolve o motivo da recusa, ou `null` se a URL serve.
  */
-export async function enviarImagem(
-  arquivo: File,
-  pasta: string,
-  nomeBase: string,
-): Promise<ResultadoUpload> {
-  if (!arquivo || arquivo.size === 0) {
-    return { url: null, error: 'Nenhum arquivo escolhido.' }
-  }
-  if (!TIPOS.includes(arquivo.type)) {
-    return { url: null, error: 'Formato não aceito. Use JPG, PNG, WebP ou AVIF.' }
-  }
-  if (arquivo.size > LIMITE) {
-    const mb = (arquivo.size / 1024 / 1024).toFixed(1)
-    return { url: null, error: `A imagem tem ${mb}MB. O limite é 8MB.` }
-  }
-
-  const extensao = arquivo.type.split('/')[1]!.replace('jpeg', 'jpg')
-
-  /*
-   * O nome carrega um sufixo do relógio.
-   *
-   * Sem ele, trocar a capa gravaria por cima do mesmo caminho e a URL não
-   * mudaria — e o CDN continuaria servindo a imagem velha por horas. Quem
-   * trocou juraria que o upload falhou.
-   */
-  const caminho = `${pasta}/${nomeBase}-${Date.now()}.${extensao}`
-
-  const supabase = await createClient()
-  const { error } = await supabase.storage
-    .from('imagens')
-    .upload(caminho, arquivo, { contentType: arquivo.type, upsert: false })
-
-  if (error) {
-    return {
-      url: null,
-      error: 'Não consegui enviar a imagem. Confirme que você é da equipe e tente de novo.',
-    }
-  }
-
-  const { data } = supabase.storage.from('imagens').getPublicUrl(caminho)
-  return { url: data.publicUrl, error: null }
+export function recusaDaUrl(url: string, pasta: string): string | null {
+  if (!url) return 'Nenhuma imagem enviada.'
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL
+  if (!base) return 'Armazenamento não configurado.'
+  if (!urlDoBucket(url, base, pasta)) return 'Essa imagem não veio do nosso armazenamento.'
+  return null
 }
 
 /**
