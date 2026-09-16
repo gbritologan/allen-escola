@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { pontosDoTexto } from '@/core/catalog/aprendizado'
 import { type EstadoImagem, IMAGEM_PARADA } from '@/core/shared/imagem'
 import { redirect } from 'next/navigation'
 import { slugify } from '@/core/shared/slug'
@@ -66,6 +67,13 @@ export async function atualizarCurso(formData: FormData) {
    */
   const liberarApos = String(formData.get('release_after_days') ?? '').trim()
 
+  /*
+   * O teaser. Uma promessa por linha, e vazio é um estado legítimo — curso
+   * publicado não espera copy. Sem pontos, a seção some da página do aluno em
+   * vez de virar moldura vazia.
+   */
+  const pontos = pontosDoTexto(String(formData.get('learning_points') ?? ''))
+
   const supabase = await createClient()
   await supabase
     .from('courses')
@@ -78,6 +86,7 @@ export async function atualizarCurso(formData: FormData) {
       format: format === 'masterclass' ? 'masterclass' : 'course',
       available_at: disponivelEm ? `${disponivelEm} 00:00:00-03` : null,
       release_after_days: liberarApos === '' ? null : Math.max(0, Number(liberarApos) || 0),
+      learning_points: pontos,
     })
     .eq('id', id)
 
@@ -141,6 +150,68 @@ export async function removerCapa(
 
   await supabase.from('courses').update({ cover_url: null }).eq('id', id)
   await apagarImagem(antes?.cover_url)
+
+  revalidar(id)
+  return IMAGEM_PARADA
+}
+
+/**
+ * O BANNER DA PÁGINA DO CURSO.
+ *
+ * Arte larga no topo, separada da capa de propósito: a capa é 4:5 e vende o
+ * curso de fora, no catálogo; o banner é 4:1 e recebe quem já entrou. São
+ * peças diferentes, feitas em momentos diferentes, e amarrar as duas num
+ * campo só obrigaria a arte de uma a servir para a outra.
+ *
+ * Opcional. Sem banner, a página abre pelo título — que é como ela abre hoje
+ * e não parece falta.
+ */
+export async function enviarBannerCurso(
+  _prev: EstadoImagem,
+  formData: FormData,
+): Promise<EstadoImagem> {
+  const id = String(formData.get('id') ?? '')
+  const url = String(formData.get('url') ?? '')
+  if (!id) return { erro: 'Curso não identificado.', url: null }
+
+  const recusa = recusaDaUrl(url, 'capas')
+  if (recusa) return { erro: recusa, url: null }
+
+  const supabase = await createClient()
+  const { data: antes } = await supabase
+    .from('courses')
+    .select('banner_url')
+    .eq('id', id)
+    .maybeSingle()
+
+  const { error } = await supabase.from('courses').update({ banner_url: url }).eq('id', id)
+  if (error) {
+    await apagarImagem(url)
+    return { erro: 'A imagem subiu, mas não consegui gravá-la no curso.', url: null }
+  }
+
+  await apagarImagem(antes?.banner_url)
+
+  revalidar(id)
+  return { erro: null, url }
+}
+
+export async function removerBannerCurso(
+  _prev: EstadoImagem,
+  formData: FormData,
+): Promise<EstadoImagem> {
+  const id = String(formData.get('id') ?? '')
+  if (!id) return { erro: 'Curso não identificado.', url: null }
+
+  const supabase = await createClient()
+  const { data: antes } = await supabase
+    .from('courses')
+    .select('banner_url')
+    .eq('id', id)
+    .maybeSingle()
+
+  await supabase.from('courses').update({ banner_url: null }).eq('id', id)
+  await apagarImagem(antes?.banner_url)
 
   revalidar(id)
   return IMAGEM_PARADA

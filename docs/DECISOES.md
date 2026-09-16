@@ -1735,3 +1735,51 @@ estava resolvida. Ela não estava — eu tinha consertado o gesto perdido e a
 revalidação, que eram problemas reais, e parei no primeiro diagnóstico que
 explicava o sintoma. O teto de 1MB estava lá o tempo todo, atrás. Sintoma
 explicado não é causa esgotada.
+
+## D-79 · A moldura cede para a arte, não o contrário
+
+A primeira capa de verdade entrou cortada. O card era 16:10; a arte da Allen é
+1080×1350 (4:5). O corte comeu metade do rosto do instrutor e o título inteiro.
+
+A moldura virou 4:5. Quando a proporção da moldura briga com a proporção da
+arte, é sempre a arte que perde — e arte é trabalho que alguém fez. Moldura é
+CSS.
+
+Junto veio uma consequência que só aparece com arte de pôster na mão: o selo
+("Em breve", "Capacitação") morava embaixo, com um degradê subindo. Arte de
+pôster carrega o título na parte de baixo, então o selo pousava exatamente em
+cima do nome do curso. Selo e degradê subiram para o topo.
+
+E a medida escrita no Studio passou a dizer 1080×1350. Arte é feita fora, e
+arte feita fora sem medida escrita volta na proporção errada — foi assim que
+esta chegou.
+
+## D-80 · Teaser e banner do curso: opcionais de verdade
+
+A página do curso abria em sumário e currículo. Faltava o que a pessoa
+pergunta primeiro — "o que eu saio sabendo?" — e sobrava a pergunta que ela
+não faz: título de aula descreve o que a aula É, e ninguém decide investir
+tempo lendo sumário.
+
+Entraram dois campos, os dois opcionais:
+
+- **`learning_points`** (`text[]`) — a promessa, uma por linha no Studio.
+  Aparece ANTES do currículo.
+- **`banner_url`** — arte larga no topo, 4:1.
+
+`learning_points` é array e não bloco de texto porque a promessa do curso é
+uma LISTA, e lista guardada como parágrafo vira parágrafo com travessão, que
+ninguém varre com o olho. A conversão textarea↔array mora em
+`core/catalog/aprendizado.ts`, testada: linha de respiro não pode virar item
+vazio, e travessão digitado no começo sai fora — quem desenha o marcador é a
+interface.
+
+**Banner é peça separada da capa, de propósito.** A capa é 4:5 e vende o curso
+de fora, no catálogo; o banner é 4:1 e recebe quem já entrou. São artes feitas
+em momentos diferentes; um campo só obrigaria uma a servir para a outra.
+
+**"Opcional" aqui significa que a seção SOME, não que ela fica vazia.** Sem
+pontos, não há cabeçalho "O que você vai aprender" pairando sobre nada; sem
+banner, a página abre pelo título, como abria antes de o campo existir.
+Moldura vazia numa tela de aluno não comunica "falta arte" — comunica
+"quebrou".

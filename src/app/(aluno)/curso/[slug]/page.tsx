@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { emBreve } from '@/core/catalog/types'
@@ -37,7 +38,7 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
   const { data: course } = await supabase
     .from('courses')
     .select(
-      'id, slug, title, summary, description, format, duration_seconds, lesson_count, instructor_id, cover_url, available_at',
+      'id, slug, title, summary, description, format, duration_seconds, lesson_count, instructor_id, cover_url, banner_url, learning_points, available_at',
     )
     .eq('slug', slug)
     .maybeSingle()
@@ -73,9 +74,31 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
 
   const masterclass = course.format === 'masterclass'
   const aguardando = emBreve({ availableAt: course.available_at ?? null })
+  const pontos: string[] = course.learning_points ?? []
 
   return (
     <main className="mx-auto flex max-w-4xl flex-col gap-12 px-6 pt-10 sm:pt-14">
+      {/*
+       * O BANNER DO CURSO.
+       *
+       * Opcional, e por isso ele não deixa moldura quando falta: sem arte, a
+       * página abre pelo título, exatamente como abria antes de este campo
+       * existir. Placeholder vazio numa página de aluno não sinaliza "falta
+       * arte" — sinaliza "quebrou".
+       */}
+      {course.banner_url && (
+        <div className="relative -mt-2 aspect-[4/1] w-full overflow-hidden rounded-[var(--radius-card)] border border-line bg-navy">
+          <Image
+            src={course.banner_url}
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 56rem, 100vw"
+            priority
+            className="object-cover"
+          />
+        </div>
+      )}
+
       <header className="flex flex-col gap-5">
         <Link href="/cursos" className="text-caption text-ink-3 hover:text-ink">
           ← Explorar
@@ -125,6 +148,36 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
             no seu catálogo — quando a data chegar, as aulas aparecem aqui, sem você precisar
             fazer nada.
           </p>
+        </section>
+      )}
+
+      {/*
+       * O TEASER — a promessa, antes da lista de aulas.
+       *
+       * Vem ANTES do currículo de propósito. Título de aula descreve o que a
+       * aula É; ninguém decide investir tempo lendo sumário. A pergunta que a
+       * pessoa traz é "o que eu saio sabendo", e ela merece ser respondida
+       * antes de a página pedir qualquer leitura.
+       *
+       * Some inteira quando não há pontos. Seção vazia com cabeçalho é pior
+       * que seção nenhuma: ela promete conteúdo e entrega moldura.
+       */}
+      {pontos.length > 0 && (
+        <section className="flex flex-col gap-5">
+          <h2 className="text-caption font-medium uppercase tracking-[0.16em] text-ink-3">
+            O que você vai aprender
+          </h2>
+          <ul className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
+            {pontos.map((ponto) => (
+              <li key={ponto} className="flex gap-3">
+                <span
+                  aria-hidden
+                  className="mt-[0.7em] h-px w-4 shrink-0 bg-blue-light"
+                />
+                <span className="text-body text-ink-2">{ponto}</span>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 

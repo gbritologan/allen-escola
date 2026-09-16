@@ -15,10 +15,14 @@ import {
   atualizarCurso,
   criarAula,
   criarModulo,
+  enviarBannerCurso,
   moverAula,
   publicarCurso,
+  removerBannerCurso,
 } from './actions'
 import { AulaExpansivel } from './aula-expansivel'
+import { CampoImagem } from '@/components/domain/campo-imagem'
+import { textoDosPontos } from '@/core/catalog/aprendizado'
 import { Capa } from './capa'
 import { SoltarAulas } from './soltar-aulas'
 
@@ -47,7 +51,7 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
       supabase
         .from('courses')
         .select(
-          'id, title, slug, summary, description, format, status, instructor_id, lesson_count, duration_seconds, cover_url, available_at, release_after_days',
+          'id, title, slug, summary, description, format, status, instructor_id, lesson_count, duration_seconds, cover_url, banner_url, learning_points, available_at, release_after_days',
         )
         .eq('id', id)
         .maybeSingle(),
@@ -179,6 +183,24 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
               <Textarea id="description" name="description" defaultValue={course.description ?? ''} />
             </Field>
 
+            {/* O teaser. Uma promessa por linha — quem escreve lista escreve
+                em linhas, e o marcador quem desenha é a interface. Em branco,
+                a seção não aparece para o aluno: curso publicado não espera
+                copy. */}
+            <Field
+              label="O que a pessoa vai aprender"
+              htmlFor="learning_points"
+              hint="Uma promessa por linha, até 12. Aparece no topo da página do curso, antes das aulas. Em branco, a seção simplesmente não existe."
+            >
+              <Textarea
+                id="learning_points"
+                name="learning_points"
+                rows={6}
+                defaultValue={textoDosPontos(course.learning_points)}
+                placeholder={'Estruturar uma fala que prende do primeiro minuto\nLer a plateia enquanto fala\nPerder o medo de improvisar'}
+              />
+            </Field>
+
             {/* "Em breve" é uma data e não um botão: assim o curso abre sozinho
                 no dia, sem depender de alguém lembrar de voltar aqui. */}
             <Field
@@ -246,6 +268,30 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
 
       {/* ---------------------------------------------------------------- */}
       <Capa id={course.id} slug={course.slug} coverUrl={course.cover_url ?? null} />
+
+      {/* O banner é OUTRA peça, não outro tamanho da mesma: a capa vende o
+          curso de fora, no catálogo; o banner recebe quem já entrou. */}
+      <section className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-title font-light">Banner da página</h2>
+          <p className="text-caption text-ink-4">
+            4:1 deitado — 1440×360, a mesma medida do banner da Home. Aparece no topo da página
+            do curso, acima do título. Opcional: sem ele, a página abre pelo título.
+          </p>
+        </div>
+
+        <CampoImagem
+          atual={course.banner_url ?? null}
+          pasta="capas"
+          nomeBase={`${course.slug}-banner`}
+          acaoSalvar={enviarBannerCurso}
+          acaoRemover={removerBannerCurso}
+          ocultos={{ id: course.id }}
+          moldura="aspect-[4/1] w-full max-w-2xl"
+          rotuloVazio="1440 × 360"
+          tamanhos="42rem"
+        />
+      </section>
 
       <section className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
