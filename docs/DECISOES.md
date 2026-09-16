@@ -1814,3 +1814,38 @@ olhada.
 298px — que em 4:5 dá 372px de altura, tamanho de pôster de verdade. O `sizes`
 das imagens foi corrigido junto: sem isso o Next continuaria servindo imagem de
 22rem para um card de 19rem, peso a mais na rede de quem está assistindo.
+
+## D-82 · O `sizes` é a nitidez, e a vinheta tinha um teto
+
+Duas queixas na mesma tela depois que o catálogo ficou wide (D-81). Causas
+diferentes, e as duas são consequência direta de alargar a moldura sem revisar
+o que dependia da largura antiga.
+
+**O banner pixelado.** `sizes` estava em `72rem` (1152px) — herança de quando
+a moldura tinha 1152px. Com a moldura em 1552px, o Next continuava entregando
+uma imagem de 1152 e o navegador a esticava. A arte era REDUZIDA e depois
+AMPLIADA, e é isso que serrilha. Não era a arte, nem o upload: era uma linha
+de `sizes` apontando para uma largura que não existia mais.
+
+Fica a regra: `sizes` não é otimização opcional, é o que decide a nitidez — e
+ele é invisível ao ler o JSX, porque nada na página denuncia que está errado.
+Quem mexer em largura de moldura tem que mexer no `sizes` junto.
+
+**A "tarja preta".** A vinheta do `AmbienteAllen` começava a escurecer aos 38%
+e chegava a 72% de preto. Num monitor de 1900px, as bordas do conteúdo já
+caíam em meio-preto — e o que se lia não era "peso nas bordas", era uma tarja
+atrás da página com cara de limitador de largura.
+
+Junto disso, as três massas de luz eram `85vw` com trava em 1100px. Em tela
+grande o `vw` crescia e a trava segurava: a luz parava e o resto virava campo
+morto. **Trava de tamanho num fundo que existe para acompanhar a tela é
+contradição** — o fundo foi feito para o vidro ter o que filtrar, e vidro sobre
+campo morto volta a ser plástico (D-51).
+
+Agora a vinheta começa aos 55%, termina em 52% e cobre uma elipse maior; os
+tetos das massas subiram para 1700/1400/1050px.
+
+**E a medida do banner subiu para 1920×480.** A moldura passa de 1500px em
+monitor grande; continuar pedindo 1440 seria pedir arte que já nasce
+ampliada. Arte de 1440 que já está no ar continua servindo — a diferença é de
+8%.

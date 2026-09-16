@@ -32,7 +32,7 @@ export function AmbienteAllen() {
       {/* O azul da marca, no alto à esquerda. É a massa dominante. */}
       <div
         style={{ ['--vigil-min' as string]: '0.30', ['--vigil-max' as string]: '0.42' }}
-        className="vigil-breathe absolute -left-[18%] -top-[26%] size-[85vw] max-w-[1100px] rounded-full [background:radial-gradient(circle,rgba(76,65,255,0.62)_0%,rgba(76,65,255,0.18)_42%,transparent_68%)]"
+        className="vigil-breathe absolute -left-[18%] -top-[26%] size-[85vw] max-w-[1700px] rounded-full [background:radial-gradient(circle,rgba(76,65,255,0.62)_0%,rgba(76,65,255,0.18)_42%,transparent_68%)]"
       />
 
       {/* O violeta, embaixo à direita, mais lento e mais fraco: contrapeso, não
@@ -44,7 +44,7 @@ export function AmbienteAllen() {
           ['--vigil-min' as string]: '0.26',
           ['--vigil-max' as string]: '0.36',
         }}
-        className="vigil-breathe absolute -bottom-[30%] -right-[14%] size-[70vw] max-w-[900px] rounded-full [background:radial-gradient(circle,rgba(126,72,255,0.42)_0%,rgba(126,72,255,0.12)_45%,transparent_70%)]"
+        className="vigil-breathe absolute -bottom-[30%] -right-[14%] size-[70vw] max-w-[1400px] rounded-full [background:radial-gradient(circle,rgba(126,72,255,0.42)_0%,rgba(126,72,255,0.12)_45%,transparent_70%)]"
       />
 
       {/* Um ciano frio no meio, quase invisível. Ele existe para o vidro ter
@@ -57,12 +57,28 @@ export function AmbienteAllen() {
           ['--vigil-min' as string]: '0.22',
           ['--vigil-max' as string]: '0.30',
         }}
-        className="vigil-breathe absolute left-[38%] top-[34%] size-[52vw] max-w-[700px] rounded-full [background:radial-gradient(circle,rgba(60,170,255,0.3)_0%,transparent_62%)]"
+        className="vigil-breathe absolute left-[38%] top-[34%] size-[52vw] max-w-[1050px] rounded-full [background:radial-gradient(circle,rgba(60,170,255,0.3)_0%,transparent_62%)]"
       />
 
-      {/* A vinheta devolve o peso às bordas. Sem ela o conteúdo boia num campo
-          uniforme e a tela perde o centro. */}
-      <div className="absolute inset-0 [background:radial-gradient(120%_90%_at_50%_40%,transparent_38%,rgba(5,7,20,0.72)_100%)]" />
+      {/*
+        A vinheta devolve o peso às bordas. Sem ela o conteúdo boia num campo
+        uniforme e a tela perde o centro.
+
+        MAS ELA TEM UM LIMITE, e ele apareceu quando o catálogo ficou wide.
+        Começando a escurecer aos 38% e chegando a 72% de preto, num monitor
+        de 1900px ela já estava em meio-preto na altura das bordas do
+        conteúdo — e o que se via não era "peso nas bordas", era uma tarja
+        atrás da página, com cara de limitador de largura.
+
+        Agora ela começa mais tarde (55%), termina mais leve (52%) e cobre uma
+        elipse maior. O centro de gravidade continua; a borda dura, não.
+
+        As três massas de luz também tiveram o teto levantado. Elas eram
+        `85vw` com trava em 1100px — em tela grande o `vw` crescia e a trava
+        segurava, então a luz parava e o resto virava campo morto. Trava de
+        tamanho num fundo que existe para ACOMPANHAR a tela é contradição.
+      */}
+      <div className="absolute inset-0 [background:radial-gradient(150%_115%_at_50%_38%,transparent_55%,rgba(5,7,20,0.52)_100%)]" />
     </div>
   )
 }
