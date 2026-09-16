@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import type { EstadoCapa } from './capa-estado'
 import { redirect } from 'next/navigation'
 import { slugify } from '@/core/shared/slug'
 import { apagarImagem, enviarImagem } from '@/lib/imagens'
@@ -8,10 +9,27 @@ import { can } from '@/core/identity/permissions'
 import { getSession } from '@/lib/auth/session'
 import { createClient } from '@/lib/supabase/server'
 
+/**
+ * Revalidar os DOIS lados.
+ *
+ * Antes só limpava o Studio. O aluno continuava vendo a versão em cache —
+ * então trocar a capa "funcionava" no Admin e não mudava nada no curso, que é
+ * exatamente o lugar onde a capa existe para ser vista.
+ *
+ * As rotas do aluno entram pela FORMA da rota (`/curso/[slug]`), não pelo
+ * caminho concreto: assim um curso que mudou de slug, ou uma capa que aparece
+ * em três listagens, não depende de alguém lembrar de listar cada uma.
+ */
 function revalidar(courseId: string) {
   revalidatePath(`/admin/cursos/${courseId}`)
   revalidatePath('/admin/cursos')
   revalidatePath('/admin')
+
+  revalidatePath('/curso/[slug]', 'page')
+  revalidatePath('/cursos')
+  revalidatePath('/capacitacoes')
+  revalidatePath('/mapa')
+  revalidatePath('/')
 }
 
 // --- Curso -------------------------------------------------------------------
@@ -75,14 +93,19 @@ export async function atualizarCurso(formData: FormData) {
  * A antiga é apagada depois que a nova entrou — nessa ordem. O contrário
  * deixaria o curso sem capa nenhuma se o envio falhasse no meio.
  */
-export async function enviarCapa(formData: FormData) {
+export async function enviarCapa(
+  _prev: EstadoCapa,
+  formData: FormData,
+): Promise<EstadoCapa> {
   const id = String(formData.get('id') ?? '')
   const slug = String(formData.get('slug') ?? 'curso')
   const arquivo = formData.get('arquivo')
-  if (!id || !(arquivo instanceof File)) return
+  if (!id || !(arquivo instanceof File)) {
+    return { erro: 'Escolha uma imagem primeiro.', url: null }
+  }
 
-  const { url } = await enviarImagem(arquivo, 'capas', slug)
-  if (!url) return
+  const { url, error } = await enviarImagem(arquivo, 'capas', slug)
+  if (!url) return { erro: error ?? 'Não consegui enviar a imagem.', url: null }
 
   const supabase = await createClient()
   const { data: antes } = await supabase
@@ -91,16 +114,31 @@ export async function enviarCapa(formData: FormData) {
     .eq('id', id)
     .maybeSingle()
 
-  await supabase.from('courses').update({ cover_url: url }).eq('id', id)
+  const { error: erroBanco } = await supabase
+    .from('courses')
+    .update({ cover_url: url })
+    .eq('id', id)
+
+  if (erroBanco) {
+    // A imagem subiu mas o curso não aponta para ela: é lixo no bucket, e
+    // dizer "deu certo" aqui seria mentira.
+    await apagarImagem(url)
+    return { erro: 'A imagem subiu, mas não consegui gravá-la no curso.', url: null }
+  }
+
   await apagarImagem(antes?.cover_url)
 
   revalidar(id)
+  return { erro: null, url }
 }
 
 /** Tirar a capa. Volta ao cartão sem imagem, que é um estado legítimo. */
-export async function removerCapa(formData: FormData) {
+export async function removerCapa(
+  _prev: EstadoCapa,
+  formData: FormData,
+): Promise<EstadoCapa> {
   const id = String(formData.get('id') ?? '')
-  if (!id) return
+  if (!id) return { erro: 'Curso não identificado.', url: null }
 
   const supabase = await createClient()
   const { data: antes } = await supabase
@@ -113,6 +151,7 @@ export async function removerCapa(formData: FormData) {
   await apagarImagem(antes?.cover_url)
 
   revalidar(id)
+  return { erro: null, url: null }
 }
 
 /** Liga/desliga um tema no curso. N:N, então é toggle e não seleção única. */

@@ -1638,3 +1638,56 @@ significava. "referer" pareceu óbvio, e eu construí um diagnóstico inteiro em
 cima dessa suposição — e mandei o Gabriel refazer o convite por um caminho que
 nunca ia funcionar. O dado estava certo desde a primeira consulta; a leitura é
 que estava errada.
+
+## D-76 · Escolher o arquivo É enviar
+
+O Gabriel disse que a capa não ficava no curso. Os logs do Storage responderam
+antes de qualquer teoria: **nenhuma tentativa de envio de capa chegou ao
+Supabase.** Zero. O arquivo nunca saiu da máquina dele.
+
+O desenho antigo pedia dois gestos — escolher o arquivo num campo, e depois
+clicar num "Enviar" pequeno ao lado. Quem escolhe um arquivo num campo de
+imagem acredita que acabou de enviar a imagem; o nome do arquivo aparece ali,
+afinal. O segundo clique não era esquecido por descuido: ele era invisível,
+porque nada na tela pedia por ele.
+
+E se o envio falhasse, `enviarCapa` dava `return` calado. Nem erro, nem
+imagem, nem pista — o mesmo padrão da chave do Bunny (D-73), na mesma semana.
+
+Três mudanças:
+
+1. **Escolher é enviar.** A prévia local aparece no instante da escolha (o
+   navegador já tem a imagem) e a subida começa sozinha. O botão sobrou como
+   "Tentar de novo", e só aparece depois de uma falha.
+2. **Erro virou frase.** Tamanho e tipo conferidos no cliente, com a medida do
+   arquivo dentro da mensagem; o que vier do servidor também aparece.
+3. **`revalidar()` passou a alcançar o lado do aluno.** Ele só limpava o
+   Studio — então, mesmo quando a capa gravasse, o curso seguiria mostrando a
+   versão em cache. O nome do problema que o Gabriel deu ("não fica NO CURSO")
+   descrevia esse segundo bug com precisão, e ele estava lá, esperando o
+   primeiro ser resolvido para aparecer.
+
+A prévia guarda qual era a capa quando foi criada. É isso que a faz sair de
+cena sozinha quando a gravação termina, sem `useEffect` sincronizando estado
+com estado.
+
+**Nota de arquitetura:** `EstadoCapa`/`CAPA_PARADA` moram em `capa-estado.ts`
+porque arquivo `'use server'` só pode exportar função assíncrona. Exportar uma
+constante de lá quebra o build da rota inteira, com uma mensagem que não
+aponta para a linha culpada.
+
+## D-77 · "Desenvolvimento pessoal" é uma linha de dados, não seis edições
+
+Tema novo, pedido para aparecer "em tudo". Foi um `insert`.
+
+Mapa, seletor de tema do curso, boas-vindas e Studio leem todos de
+`public.themes` — não existe lista fixa de tema em lugar nenhum do código.
+Essa decisão foi tomada lá atrás sem que houvesse ocasião de cobrá-la; esta
+foi a ocasião, e ela se pagou.
+
+Ícone `mestre` (o filósofo da pasta da marca): dos treze do repertório, é o
+único que fala da formação de uma pessoa, e não de um ofício.
+
+Nasce publicado e vazio. Tema publicado sem curso aparece no mapa como
+constelação apagada — que é a leitura certa: existe, ainda não tem nada
+dentro.
