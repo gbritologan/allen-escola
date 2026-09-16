@@ -1783,3 +1783,34 @@ pontos, não há cabeçalho "O que você vai aprender" pairando sobre nada; sem
 banner, a página abre pelo título, como abria antes de o campo existir.
 Moldura vazia numa tela de aluno não comunica "falta arte" — comunica
 "quebrou".
+
+## D-81 · As duas larguras da casa
+
+O Gabriel mandou um print do monitor dele com dois retângulos vermelhos: quase
+700px de vazio de cada lado do conteúdo. Três capas onde cabiam cinco.
+
+A causa era `max-w-6xl` (1152px) em todas as telas, sem distinção. E a
+distinção existe — o produto tem dois tipos de tela, que querem coisas
+opostas:
+
+**Tela de LER** (aula, jornada, conta, suporte) quer LIMITE. Linha muito longa
+faz o olho perder o começo da seguinte, e a pessoa relê sem saber por quê.
+Essas continuam com `max-w-*` por página, perto do texto que elas seguram.
+
+**Tela de ESCOLHER** (Início, Cursos, Capacitações, Apps, Tema) quer ESPAÇO.
+Aqui não se lê, se varre — e cada capa que não coube na linha é uma escolha
+que virou rolagem.
+
+Daí `@utility largura-catalogo`, com teto de 100rem (1600px). O teto importa:
+passando disso, a capa cresce além do que a arte foi feita para ser, e o vazio
+volta disfarçado de imagem gigante.
+
+As colunas acompanharam: 3 no `lg`, 4 no `xl`, 5 no `2xl` para capa; 6 para
+tema, que é o número de temas que existe — porta em fila única se lê de uma
+olhada.
+
+**Medido, não estimado:** subi o servidor local, emulei 1900px e li o DOM. O
+`main` foi de 1152 para 1600, e a grade de capas passou a entregar 5 colunas de
+298px — que em 4:5 dá 372px de altura, tamanho de pôster de verdade. O `sizes`
+das imagens foi corrigido junto: sem isso o Next continuaria servindo imagem de
+22rem para um card de 19rem, peso a mais na rede de quem está assistindo.

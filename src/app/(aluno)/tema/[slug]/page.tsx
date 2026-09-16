@@ -23,7 +23,7 @@ export default async function TemaPage({ params }: { params: Promise<{ slug: str
   const outros = todos.filter((t) => t.id !== theme.id)
 
   return (
-    <main className="mx-auto flex max-w-6xl flex-col gap-12 px-6 pt-10 sm:pt-14">
+    <main className="largura-catalogo flex flex-col gap-12 px-6 pt-10 sm:pt-14">
       <header className="flex flex-col gap-4">
         <Link href="/cursos" className="text-caption text-ink-3 hover:text-ink">
           ← Explorar
@@ -39,7 +39,7 @@ export default async function TemaPage({ params }: { params: Promise<{ slug: str
           Ainda não há cursos publicados neste tema.
         </p>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {cursos.map((c) => (
             <CourseCard key={c.id} course={c} />
           ))}

@@ -20,13 +20,13 @@ import { Skeleton } from '@/components/primitives/skeleton'
  */
 export default function Carregando() {
   return (
-    <main className="mx-auto flex max-w-6xl flex-col gap-14 px-6 pt-10 sm:pt-14">
+    <main className="largura-catalogo flex flex-col gap-14 px-6 pt-10 sm:pt-14">
       <Skeleton className="h-8 w-52" />
 
       {[0, 1].map((secao) => (
         <section key={secao} className="flex flex-col gap-4">
           <Skeleton className="h-3 w-40" />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             {Array.from({ length: 3 }, (_, i) => (
               <Skeleton key={i} className="h-44 rounded-[var(--radius-card)]" />
             ))}

@@ -309,3 +309,26 @@
     background: rgba(10, 14, 34, 0.96);
   }
 }
+
+/* ---------------------------------------------------------------------------
+   AS DUAS LARGURAS DA CASA
+
+   O produto tem dois tipos de tela, e elas querem coisas opostas.
+
+   TELA DE LER (aula, jornada, conta, suporte) quer LIMITE. Linha muito longa
+   faz o olho perder o começo da seguinte, e a pessoa relê sem saber por quê.
+   Essas continuam em `max-w-*` por página, perto do texto que elas seguram.
+
+   TELA DE ESCOLHER (Início, Cursos, Capacitações, Apps, Tema) quer ESPAÇO.
+   Aqui não se lê, se varre — e cada capa que não coube na linha é uma escolha
+   que virou rolagem. Em monitor grande, o `max-w-6xl` de antes deixava quase
+   700px de vazio dos dois lados e espremia três capas onde cabiam cinco.
+
+   100rem (1600px) é o teto: passa disso e a capa começa a crescer além do que
+   a arte foi feita para ser — o vazio volta, disfarçado de imagem gigante.
+--------------------------------------------------------------------------- */
+@utility largura-catalogo {
+  width: 100%;
+  max-width: 100rem;
+  margin-inline: auto;
+}

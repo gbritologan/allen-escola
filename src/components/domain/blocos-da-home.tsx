@@ -30,7 +30,7 @@ export function BlocosDaHome({
   emBreve: CourseSummary[]
 }) {
   return (
-    <main className="mx-auto flex max-w-6xl flex-col gap-14 px-6 pt-10 sm:pt-14">
+    <main className="largura-catalogo flex flex-col gap-14 px-6 pt-10 sm:pt-14">
       {/* A saudação muda com a hora, no fuso de Brasília — o servidor roda em
           UTC, e "Bom dia" às nove da noite é o tipo de descuido que custa
           credibilidade em silêncio. */}
@@ -140,7 +140,9 @@ export function BlocosDaHome({
             return (
               <section key="themes" className="flex flex-col gap-4">
                 <SectionLabel>Explorar por tema</SectionLabel>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {/* Seis temas cabem numa linha só no monitor grande. Tema é
+                    porta, e porta em fila única se lê de uma olhada. */}
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6">
                   {block.themes.map((t) => (
                     <Link
                       key={t.id}
@@ -185,7 +187,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 function Grade({ children }: { children: React.ReactNode }) {
-  return <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{children}</div>
+  return <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">{children}</div>
 }
 
 function Metrica({

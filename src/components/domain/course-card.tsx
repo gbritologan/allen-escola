@@ -59,7 +59,10 @@ export function CourseCard({
               src={course.coverUrl}
               alt=""
               fill
-              sizes="(min-width: 1024px) 22rem, (min-width: 640px) 45vw, 90vw"
+              /* Acompanha as colunas: 5 no 2xl, 4 no xl, 3 no lg. Sem isto o
+                 Next serve imagem de 22rem para um card de 19rem — peso a
+                 mais em cima da rede de quem está assistindo. */
+              sizes="(min-width: 1536px) 19rem, (min-width: 1280px) 22rem, (min-width: 1024px) 24rem, (min-width: 640px) 45vw, 90vw"
               className={cn(
                 'object-cover transition-transform duration-500 ease-[var(--ease-allen)] group-hover:scale-[1.03]',
                 // Em breve fica dessaturado: a capa continua vendendo, e o

@@ -24,7 +24,7 @@ export default async function CursosPage() {
   const [themes, cursos] = await Promise.all([listThemes(), listCourses({ format: 'course' })])
 
   return (
-    <main className="mx-auto flex max-w-6xl flex-col gap-14 px-6 pt-10 sm:pt-14">
+    <main className="largura-catalogo flex flex-col gap-14 px-6 pt-10 sm:pt-14">
       <header className="flex flex-col gap-3">
         <h1 className="text-display font-light">Cursos</h1>
         <p className="max-w-[56ch] text-lead font-light text-ink-2">
@@ -54,7 +54,7 @@ export default async function CursosPage() {
         {cursos.length === 0 ? (
           <p className="text-body text-ink-4">Nenhum curso publicado ainda.</p>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             {cursos.map((c) => (
               <CourseCard key={c.id} course={c} />
             ))}
