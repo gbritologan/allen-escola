@@ -182,5 +182,7 @@ export async function getEmBreve() {
     instructorName: null,
     themeNames: [] as string[],
     availableAt: c.available_at as string | null,
+    // Esta consulta já filtra por publicado logo acima; rascunho não chega aqui.
+    rascunho: false,
   }))
 }

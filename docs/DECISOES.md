@@ -2141,3 +2141,49 @@ padrão em vez de procurar papel.
 
 A lição: numa migração de tema, o que se procura não é uma cor. É todo lugar
 onde alguém escreveu uma cor.
+
+## D-92 · Eu não desenho, e isso precisa ficar escrito
+
+O Gabriel pediu um personagem grego por tema. Desenhei os oito em SVG,
+renderizei antes de publicar, e olhei:
+
+    Atena (elmo coríntio)  saiu como o fantasma do Pac-Man
+    Hermes (elmo alado)    saiu como um dente rosa com chifres
+    Hefesto (martelo)      saiu como a letra T
+    Zeus (raio)            este ficou bom
+
+Revertido antes de chegar nele.
+
+É a **segunda vez** que erro assim. Da primeira, o ícone de Marketing saiu como
+um alienígena e ele teve que me avisar. A diferença desta vez foi olhar antes.
+
+A lição não é "renderizar sempre" — isso é consequência. É que **traduzir "elmo
+coríntio" em curvas de Bézier digitando coordenadas é ilustração**, e
+ilustração não se faz às cegas. Componho, posiciono, coloro, animo, corrijo
+proporção: o código faz isso bem. Desenhar a forma original, não.
+
+O CONCEITO fica: a associação de cada tema a um personagem é editorial e é
+boa, e está registrada em 0032 e em `deuses.ts`. O que saiu foi o meu traço.
+
+E ficou uma descoberta que sobrevive ao erro: fui olhar a pasta ICONOGRAFIA
+ALLEN antes de desenhar — coisa que não tinha feito da primeira vez — e a
+coluna dórica de lá é um BLOCO de azul, sem contorno. A marca é chapada, e eu
+vinha renderizando tudo com traço de 1.4px. Metade do "genérico" que ele
+apontou não era o desenho: era a espessura errada aplicada ao desenho certo.
+
+## D-93 · Regra invisível parece defeito
+
+"Eu clico em voltar para rascunho e o curso continua na aba principal."
+
+Não era revalidação. A RLS diz `is_staff() OR status = 'published'`: a equipe
+lê rascunho de propósito, porque quem produz precisa conferir antes de soltar.
+O Gabriel é admin, então para ele o curso continuou visível. Para um aluno,
+teria sumido.
+
+A regra é boa e não mudou. O que mudou foi ela deixar de ser invisível: o
+cartão do curso agora mostra **"Rascunho · só a equipe vê"** no catálogo do
+aluno.
+
+O padrão vale além deste caso. Quando alguém reporta como defeito um
+comportamento correto, quase sempre o sistema está aplicando uma regra que a
+pessoa não tem como enxergar — e a correção não é mudar a regra, é mostrá-la.

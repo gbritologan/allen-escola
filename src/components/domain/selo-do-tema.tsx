@@ -59,6 +59,11 @@ export function SeloDoTema({
           boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${tom} 22%, transparent)`,
         }}
       >
+        {/* Estes são os ícones do repertório atual, desenhados para traço.
+            A pasta ICONOGRAFIA ALLEN mostra que a marca é CHAPADA (a coluna
+            dórica de lá é um bloco de azul sem contorno) — mas converter
+            contorno em silhueta não é trocar um atributo, é redesenhar. Fica
+            para quando a arte dos oito personagens existir. */}
         {desenho ? (
           <svg viewBox="0 0 24 24" aria-hidden className="size-8" style={{ color: tom }}>
             {desenho.d.map((d) => (
@@ -67,7 +72,7 @@ export function SeloDoTema({
                 d={d}
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="1.4"
+                strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />

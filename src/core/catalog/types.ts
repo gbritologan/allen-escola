@@ -133,6 +133,18 @@ export interface CourseSummary {
    * sozinho no dia — status precisaria de alguém lembrando de voltar lá.
    */
   availableAt: string | null
+  /**
+   * AINDA É RASCUNHO — e só a equipe está vendo isto.
+   *
+   * A RLS deixa `is_staff()` ler curso não publicado, de propósito: quem
+   * produz precisa conferir antes de soltar. O efeito colateral é que o
+   * Gabriel, sendo admin, vê rascunho no catálogo do aluno e não tem como
+   * saber por quê — ele tirou um curso do ar e o curso continuou lá.
+   *
+   * Não era bug de revalidação; era uma regra invisível. A correção não é
+   * mudar a regra (ela é útil), é MOSTRAR que ela está agindo.
+   */
+  rascunho: boolean
 }
 
 /** Ainda não abriu. */

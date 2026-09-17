@@ -88,6 +88,10 @@ export function CourseCard({
         )}
 
         <div className="relative flex flex-wrap items-center gap-2">
+          {/* Rascunho no catálogo do aluno só aparece para a equipe — a RLS
+              cuida disso. O selo existe porque a regra, sem ele, é invisível:
+              tirar um curso do ar e vê-lo continuar na tela parece defeito. */}
+          {course.rascunho && <Chip tone="caution">Rascunho · só a equipe vê</Chip>}
           {aguardando && <Chip tone="caution">Em breve</Chip>}
           {masterclass && <Chip tone="accent">Capacitação</Chip>}
         </div>
