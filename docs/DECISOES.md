@@ -2410,3 +2410,32 @@ disputam o mesmo canal — aqui, a saturação —, quem cede é o que dura meno
 O erro de origem foi não revisar o desenho quando a premissa mudou. A regra de
 8% foi escrita quando a cor não significava nada; ela continuou valendo por
 duas migrações depois de a cor passar a significar tudo.
+
+## D-104 · Superfície colorida tem que carregar a própria tinta
+
+O Gabriel viu, no Studio em tema claro, botões azuis com texto preto — e dicas
+num cinza quase ilegível. Fui medir em vez de olhar, e os dois tinham causa
+diferente.
+
+**Os botões.** Vários pintam `bg-blue` e NÃO declaram cor de texto: herdavam a
+do `body`. No escuro isso dava claro sobre azul e funcionava **por acaso**. No
+claro a herança virou navy sobre azul: contraste **1.46**, ilegível.
+
+A correção não foi caçar cada botão. Foi a superfície azul garantir o próprio
+primeiro plano, numa regra de `@layer base` — o azul não muda com o tema, então
+a tinta dele também não deve. Quem precisar de outra cor declara `text-*`, e a
+utilitária vence por estar em camada posterior: padrão na base, exceção no
+ponto de uso. Depois: **7.71**.
+
+Este é o terceiro sintoma da mesma raiz (D-90): eu invertia tokens sem
+perguntar sobre o que eles são pintados. A regra que faltava, agora explícita:
+**quem define a cor do fundo define a cor do texto.** Herança só funciona
+enquanto fundo e texto mudam juntos.
+
+**As dicas.** Eu tinha espelhado os valores do escuro: `ink-3` e `ink-4`
+clareavam ali, e eu os deixei claros aqui também. Sobre branco, `ink-4` dava
+3,6:1 — abaixo do legível.
+
+O erro conceitual: no escuro, tom baixo é o que se afasta do fundo **por
+cima**; no claro, **por baixo**. Hierarquia se preserva pela distância ao
+fundo, não pelo número. Fechei os dois, mantendo a distância entre eles.

@@ -213,11 +213,17 @@
   --color-navy: #ffffff;
   --color-navy-soft: #eef0f8;
 
-  /* A tinta inverte: o navy profundo vira o texto. */
+  /* A TINTA INVERTE — e os tons baixos precisam FECHAR, não só inverter.
+     Eu tinha espelhado os valores do escuro: ink-3 e ink-4 clareavam ali, e
+     eu os deixei claros aqui também. Sobre branco isso dá 3,6:1 no ink-4 —
+     abaixo do mínimo legível, e foi o "cinza quase ilegível" que o Gabriel
+     viu nas dicas do Studio.
+     No escuro, tom baixo é tom que se afasta do fundo por cima; no claro, por
+     baixo. Hierarquia se preserva pela distância ao fundo, não pelo número. */
   --color-ink: #0a0f2e;
   --color-ink-2: #2b3357;
-  --color-ink-3: #5a6288;
-  --color-ink-4: #7e87ab;
+  --color-ink-3: #474f72;
+  --color-ink-4: #646c8e;
 
   /* `--color-off-white` NÃO é redefinido aqui, e a ausência é a correção de um
      erro meu: eu o tinha invertido para navy, e todo botão azul ficou com
@@ -245,10 +251,13 @@
   /* `--color-sobre-veu` NÃO é redefinido aqui: é a única cor que não muda com
      o tema, porque o que está atrás dela é imagem, e imagem não tem tema. */
 
-  /* Estados ganham um tom mais fechado: os do escuro brilham demais no claro. */
-  --color-positive: #1f9d72;
-  --color-caution: #a8761c;
-  --color-critical: #d13b3b;
+  /* Estados ganham um tom mais fechado: os do escuro brilham demais no claro.
+     E fechados de verdade — eles aparecem em texto pequeno sobre um véu da
+     própria cor a 9%, que sobre branco é quase branco. O primeiro ajuste que
+     fiz aqui só tirou o brilho; ainda faltava contraste. */
+  --color-positive: #157a56;
+  --color-caution: #8a5f12;
+  --color-critical: #b52d2d;
 }
 
 /* A marca tem dois arquivos empilhados; aqui o tema escolhe qual aparece.
@@ -267,6 +276,24 @@
 }
 
 @layer base {
+  /*
+    O AZUL DA MARCA CARREGA A PRÓPRIA TINTA.
+
+    Vários botões pintam `bg-blue` e não declaram cor de texto — eles herdavam
+    a do `body`. No escuro isso dava claro sobre azul e funcionava por acaso;
+    no claro a herança virou navy sobre azul, com contraste de 1.46. Ilegível.
+
+    A correção certa não é caçar cada botão: é a superfície azul garantir o seu
+    próprio primeiro plano, já que o azul não muda com o tema. Quem precisar de
+    outra cor declara `text-*`, e a utilitária vence esta regra por estar numa
+    camada posterior — que é exatamente o comportamento desejado: padrão aqui,
+    exceção lá.
+  */
+  .bg-blue,
+  .bg-blue-light {
+    color: var(--color-off-white);
+  }
+
   html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
