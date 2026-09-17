@@ -2479,3 +2479,42 @@ todo mundo. Trava desproporcional ensina a pessoa a ignorar travas.
 exige a duração no mesmo envio. Reaproveitar faria a lista do curso precisar
 conhecer a duração para não zerá-la — uma tela dependendo de um detalhe de
 outra. Menos poder, menos acoplamento.
+
+## D-107 · Um curso, uma página
+
+Cada aula tinha a própria URL, e clicar numa aula era sair da página: o player
+sumia, a rolagem voltava ao topo, e a sensação era de recomeçar a cada aula.
+O Gabriel pediu o contrário — intercalar aula por aula sem trocar de endereço,
+**por curso**.
+
+Agora o curso é uma página só. A lista de aulas deixou de ser um índice que
+leva para fora: ela é a navegação de dentro.
+
+**O endereço não sumiu, ele parou de navegar.** A aula continua endereçável
+como consulta (`?aula=slug`), escrita com `replaceState` — o navegador aprende
+onde você está sem carregar nada. Isso não é detalhe: o caderno de anotações
+depende de voltar a um MINUTO de uma AULA, e sem endereço cada nota viraria
+uma frase órfã.
+
+`replaceState` e não `pushState`: se cada troca empilhasse histórico, o botão
+Voltar percorreria as doze aulas antes de sair do curso — e quem clica em
+Voltar quer sair do curso, não desfazer a última escolha.
+
+**A rota antiga virou ponte, e não pode deixar de existir.** Toda anotação já
+escrita guarda um link no formato velho, com o minuto junto. Apagar a rota
+transformaria o caderno de alguém numa lista de links mortos, e "mudamos a
+arquitetura" não é explicação que se dê a quem perdeu seis meses de notas.
+Endereço público é contrato: pode mudar de forma, não pode parar de levar ao
+mesmo lugar.
+
+**A segurança não mudou de lugar, e agora isso pesa mais.** Antes, uma rota
+protegida barrava a entrada. Agora o cliente pede qualquer id de aula que
+quiser a `abrirAula()` — e quem recusa continua sendo a RLS, não uma checagem
+nossa. Não escrevi uma: seria um segundo lugar para a regra divergir (D-11).
+
+**Erro cometido no caminho, e vale registrar:** ao converter a rota antiga em
+ponte, apaguei a pasta inteira — junto com `actions.ts` e cinco componentes que
+o resto do produto ainda usa. O `tsc` acusou em segundos e o `git checkout`
+devolveu tudo. A lição não é "usar git" (óbvio): é que substituir UM arquivo
+apagando o diretório dele é desproporcional, e desproporção é o que transforma
+um erro pequeno em um estrago grande.

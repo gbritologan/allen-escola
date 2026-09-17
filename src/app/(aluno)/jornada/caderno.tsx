@@ -107,7 +107,7 @@ export function Caderno({
                   {/* O minuto vem primeiro e é o link: ele é o caminho de
                       volta, e o resto é só contexto para reconhecer. */}
                   <Link
-                    href={n.atSeconds !== null ? `${n.caminho}?t=${n.atSeconds}` : n.caminho}
+                    href={n.atSeconds !== null ? `${n.caminho}&t=${n.atSeconds}` : n.caminho}
                     className="text-blue-light hover:underline"
                   >
                     {n.atSeconds !== null ? (

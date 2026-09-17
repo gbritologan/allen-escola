@@ -124,7 +124,7 @@ async function Resultados({ termo }: { termo: string }) {
       {
         titulo: a.title as string,
         caminho: slugDoCurso.has(a.course_id as string)
-          ? `/curso/${slugDoCurso.get(a.course_id as string)}/${a.slug}`
+          ? `/curso/${slugDoCurso.get(a.course_id as string)}?aula=${a.slug}`
           : null,
       },
     ]),
@@ -208,7 +208,7 @@ async function Resultados({ termo }: { termo: string }) {
               const aula = aulaDaNota.get(n.lesson_id as string)
               if (!aula?.caminho) return null
               const destino =
-                n.at_seconds !== null ? `${aula.caminho}?t=${n.at_seconds}` : aula.caminho
+                n.at_seconds !== null ? `${aula.caminho}&t=${n.at_seconds}` : aula.caminho
               return (
                 <Link
                   key={n.id as string}

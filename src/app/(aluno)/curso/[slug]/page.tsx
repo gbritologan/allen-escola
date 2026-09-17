@@ -2,13 +2,14 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { MiniaturaAula } from '@/components/domain/miniatura-aula'
+import { abrirAula } from './aula-actions'
+import { SalaDeAula, type AulaNaLista } from './sala-de-aula'
 import { OQueAprende } from '@/components/domain/o-que-aprende'
 import { Player } from '@/components/domain/player'
 import { Chip } from '@/components/primitives/chip'
 import { emBreve } from '@/core/catalog/types'
 import { porExtenso } from '@/core/identity/acesso'
-import { formatDuration, formatPosition } from '@/core/shared/format'
+import { formatDuration } from '@/core/shared/format'
 import { requireSession } from '@/lib/auth/session'
 import { createClient } from '@/lib/supabase/server'
 import { getVideoProvider, videoConfigurado } from '@/lib/video'
@@ -58,8 +59,18 @@ export async function generateMetadata({
  * contraste que o vidro precisa para parecer vidro (D-51). Vidro sobre preto
  * chapado é plástico fosco.
  */
-export default async function CursoPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function CursoPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>
+  /* `?aula=` é o endereço da aula dentro do curso. Ele existe para o caderno
+     poder voltar a um minuto, e para recarregar a página abrir onde parou —
+     mas trocar de aula NÃO navega: a sala reescreve a consulta sem carregar. */
+  searchParams: Promise<{ aula?: string }>
+}) {
   const { slug } = await params
+  const { aula: aulaPedida } = await searchParams
   const session = await requireSession()
   const supabase = await createClient()
 
@@ -144,6 +155,37 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
     }
   }
 
+  /*
+   * A AULA QUE ABRE.
+   *
+   * Pedida na consulta, se houver; senão a primeira não concluída — que serve
+   * tanto para quem nunca entrou (é a primeira) quanto para quem parou no
+   * meio (é onde parou).
+   */
+  const alvo = aulaPedida ? todas.find((l) => l.slug === aulaPedida) : undefined
+  const inicial = !aguardando && (alvo ?? proxima) ? await abrirAula((alvo ?? proxima)!.id) : null
+
+  const aulasDaSala: AulaNaLista[] = todas.map((l) => {
+    let poster: string | null = l.thumbnail_url ?? null
+    if (!poster && l.video_asset_id && podeVideo) {
+      try {
+        poster = getVideoProvider().posterUrl(l.video_asset_id)
+      } catch {
+        poster = null
+      }
+    }
+    return {
+      id: l.id,
+      slug: l.slug,
+      title: l.title,
+      durationSeconds: l.duration_seconds,
+      moduleId: l.module_id,
+      posterUrl: poster,
+      concluida: concluidas.has(l.id),
+      paraFazer: Boolean(l.para_fazer?.trim()),
+    }
+  })
+
   const arte = course.banner_url ?? course.cover_url
   const minutos = course.duration_seconds > 0 ? formatDuration(course.duration_seconds) : null
 
@@ -215,7 +257,7 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
               ) : (
                 <CapaComPlay
                   arte={course.cover_url ?? course.banner_url}
-                  destino={proxima && !aguardando ? `/curso/${course.slug}/${proxima.slug}` : null}
+                  destino={proxima && !aguardando ? '#sala' : null}
                   titulo={course.title}
                 />
               )}
@@ -269,13 +311,13 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
                   : 'Este curso ainda não abriu. Ele já está no seu catálogo, e as aulas aparecem aqui assim que a escola liberar.'}
               </p>
             ) : proxima ? (
-              <Link
-                href={`/curso/${course.slug}/${proxima.slug}`}
+              <a
+                href="#sala"
                 className="group flex h-14 items-center justify-center gap-3 rounded-[var(--radius-control)] bg-blue text-label font-strong text-off-white transition-all duration-200 hover:bg-blue-light hover:shadow-[0_0_40px_-12px_rgba(76,65,255,0.9)]"
               >
                 <SetaPlay />
                 {comecou ? 'Continuar de onde parou' : 'Começar o curso'}
-              </Link>
+              </a>
             ) : (
               <p className="rounded-[var(--radius-card)] border border-dashed border-line px-5 py-4 text-body text-ink-3">
                 As aulas deste curso estão sendo publicadas.
@@ -285,115 +327,23 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
         </div>
       </section>
 
-      {/* ═══ AS AULAS ══════════════════════════════════════════════════════ */}
+      {/* ═══ A SALA DE AULA ════════════════════════════════════════════════
+          A lista de aulas deixou de ser um índice que leva para fora: ela é a
+          navegação de dentro. Clicar troca o conteúdo, e o player, a lista e a
+          rolagem ficam onde estavam. */}
       {!aguardando && (modules ?? []).length > 0 && (
-        <section className="largura-catalogo relative flex flex-col gap-6 px-6">
+        <section id="sala" className="largura-catalogo relative flex flex-col gap-6 px-6 scroll-mt-6">
           <h2 className="text-title font-light">Conteúdo</h2>
-
-          <div className="flex flex-col gap-4">
-            {(modules ?? []).map((mod) => {
-              const aulas = todas.filter((l) => l.module_id === mod.id)
-              const feitas = aulas.filter((l) => concluidas.has(l.id)).length
-
-              return (
-                <div
-                  key={mod.id}
-                  className="glass-card overflow-hidden rounded-[var(--radius-card)]"
-                >
-                  <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-[rgba(255,255,255,0.08)] px-5 py-4">
-                    <div className="flex items-baseline gap-3">
-                      <span data-numeric className="text-caption text-ink-4">
-                        {formatPosition(mod.position)}
-                      </span>
-                      <div className="flex flex-col">
-                        <span className="text-lead font-light text-ink">{mod.title}</span>
-                        {mod.summary && (
-                          <span className="text-label text-ink-4">{mod.summary}</span>
-                        )}
-                      </div>
-                    </div>
-                    {aulas.length > 0 && (
-                      <span data-numeric className="text-caption text-ink-4">
-                        {feitas}/{aulas.length}
-                      </span>
-                    )}
-                  </div>
-
-                  <ol className="flex flex-col">
-                    {aulas.map((aula) => {
-                      const concluida = concluidas.has(aula.id)
-                      const ehProxima = proxima?.id === aula.id
-                      /* A miniatura enviada à mão vence a do provedor: ela só
-                         existe porque a automática falhou em algum caso real. */
-                      let poster: string | null = aula.thumbnail_url ?? null
-                      if (!poster && aula.video_asset_id && podeVideo) {
-                        try {
-                          poster = getVideoProvider().posterUrl(aula.video_asset_id)
-                        } catch {
-                          poster = null
-                        }
-                      }
-
-                      return (
-                        <li key={aula.id}>
-                          <Link
-                            href={`/curso/${course.slug}/${aula.slug}`}
-                            className={cn(
-                              'group flex items-center gap-4 border-t border-[rgba(255,255,255,0.05)] px-5 py-3 transition-colors duration-150',
-                              'hover:bg-[var(--color-realce-2)]',
-                              ehProxima && 'bg-[rgba(76,65,255,0.1)]',
-                            )}
-                          >
-                            {/* A miniatura faz a lista parecer catálogo em vez
-                                de sumário — e ela é gratuita: já existe no
-                                provedor. Quando falha, vira o número da aula
-                                em vez do ícone de imagem partida. */}
-                            <MiniaturaAula
-                              src={poster}
-                              posicao={formatPosition(aula.position)}
-                              concluida={concluida}
-                            />
-
-                            <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                              <span
-                                className={cn(
-                                  'truncate text-body transition-colors',
-                                  concluida ? 'text-ink-4' : 'text-ink-2 group-hover:text-ink',
-                                )}
-                              >
-                                {aula.title}
-                              </span>
-                              <span className="flex items-center gap-2 text-caption text-ink-4">
-                                <span data-numeric>{formatDuration(aula.duration_seconds)}</span>
-                                {aula.para_fazer?.trim() && (
-                                  <>
-                                    <span aria-hidden>·</span>
-                                    <span className="text-blue-light">Para fazer</span>
-                                  </>
-                                )}
-                              </span>
-                            </span>
-
-                            {concluida && <Visto />}
-                            {ehProxima && !concluida && (
-                              <span className="shrink-0 text-caption text-blue-light">
-                                continuar
-                              </span>
-                            )}
-                          </Link>
-                        </li>
-                      )
-                    })}
-                    {aulas.length === 0 && (
-                      <li className="border-t border-[rgba(255,255,255,0.05)] px-5 py-3 text-caption text-ink-4">
-                        Sem aulas publicadas.
-                      </li>
-                    )}
-                  </ol>
-                </div>
-              )
-            })}
-          </div>
+          <SalaDeAula
+            cursoSlug={course.slug}
+            modulos={(modules ?? []).map((m) => ({
+              id: m.id,
+              title: m.title,
+              position: m.position,
+            }))}
+            aulas={aulasDaSala}
+            inicial={inicial}
+          />
         </section>
       )}
 
@@ -463,12 +413,12 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
   )
 }
 
+
 /**
  * Sem teaser, a capa vira pôster com um play por cima.
  *
  * É melhor que um retângulo vazio e melhor que texto: a pessoa entende em um
- * olhar que ali se clica para assistir, mesmo que o clique leve à primeira
- * aula em vez de tocar um vídeo ali mesmo.
+ * olhar que ali se clica para assistir.
  */
 function CapaComPlay({
   arte,
@@ -526,24 +476,5 @@ function SetaPlay({ grande, pequena }: { grande?: boolean; pequena?: boolean }) 
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden className={cn(tamanho, 'translate-x-px')}>
       <path d="M8 5.5a1 1 0 0 1 1.52-.85l9 6.5a1 1 0 0 1 0 1.7l-9 6.5A1 1 0 0 1 8 18.5v-13Z" />
     </svg>
-  )
-}
-
-function Visto() {
-  return (
-    <span
-      aria-label="Aula concluída"
-      className="flex size-5 shrink-0 items-center justify-center rounded-full border border-[rgba(94,217,155,0.45)]"
-    >
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden className="size-3">
-        <path
-          d="M5 12.5l4.5 4.5L19 7.5"
-          stroke="#5ed99b"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </span>
   )
 }

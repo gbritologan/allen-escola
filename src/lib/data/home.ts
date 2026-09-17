@@ -292,7 +292,8 @@ export async function getCaderno(userId: string) {
           titulo: a.title as string,
           duracao: a.duration_seconds as number,
           cursoTitulo: curso?.title ?? '',
-          caminho: curso ? `/curso/${curso.slug}/${a.slug}` : '#',
+          // O endereço novo: a aula é consulta dentro do curso, não rota.
+          caminho: curso ? `/curso/${curso.slug}?aula=${a.slug}` : '#',
         },
       ]
     }),
