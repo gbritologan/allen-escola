@@ -82,15 +82,15 @@ export function Banner({ banner }: { banner: BannerHome }) {
           />
           <div className="relative flex h-full max-w-[34rem] flex-col justify-center gap-2 p-6 sm:p-9">
             {banner.eyebrow && (
-              <span className="text-caption uppercase tracking-[0.18em] text-ink-3">
+              <span className="text-caption uppercase tracking-[0.18em] text-[var(--color-sobre-veu-2)]">
                 {banner.eyebrow}
               </span>
             )}
             {banner.title && (
-              <h2 className="text-title font-light text-ink">{banner.title}</h2>
+              <h2 className="text-title font-light text-[var(--color-sobre-veu)]">{banner.title}</h2>
             )}
             {banner.subtitle && (
-              <p className="max-w-[42ch] text-body text-ink-2">{banner.subtitle}</p>
+              <p className="max-w-[42ch] text-body text-[var(--color-sobre-veu-2)]">{banner.subtitle}</p>
             )}
             {banner.ctaLabel && (
               <span className="pt-1 text-label text-blue-light">{banner.ctaLabel} →</span>

@@ -14,7 +14,7 @@ export function Skeleton({ className, style }: { className?: string; style?: CSS
       aria-hidden
       style={style}
       className={cn(
-        'relative overflow-hidden rounded-[var(--radius-control)] bg-[rgba(243,245,252,0.05)]',
+        'relative overflow-hidden rounded-[var(--radius-control)] bg-[var(--color-realce-2)]',
         'after:absolute after:inset-0 after:surface-sheen after:content-[""]',
         className,
       )}

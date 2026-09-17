@@ -57,7 +57,7 @@ export function Passos({
             key={i}
             className={cn(
               'h-0.5 flex-1 rounded-full transition-colors duration-300',
-              i <= passo ? 'bg-blue-light' : 'bg-[rgba(243,245,252,0.12)]',
+              i <= passo ? 'bg-blue-light' : 'bg-[var(--color-realce-4)]',
             )}
           />
         ))}

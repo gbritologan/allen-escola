@@ -22,7 +22,7 @@ const variants: Record<Variant, string> = {
     'hover:bg-blue-light hover:shadow-[0_14px_36px_-12px_rgba(76,65,255,1)]',
   secondary:
     'bg-navy-soft text-ink border border-line hover:border-line-strong hover:bg-navy-soft/70',
-  ghost: 'text-ink-2 hover:text-ink hover:bg-[rgba(243,245,252,0.06)]',
+  ghost: 'text-ink-2 hover:text-ink hover:bg-[var(--color-realce-2)]',
 }
 
 const sizes: Record<Size, string> = {

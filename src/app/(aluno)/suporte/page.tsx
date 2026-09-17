@@ -121,7 +121,7 @@ export default async function SuportePage({
               <Link
                 key={c.id}
                 href={`/suporte/${c.id}`}
-                className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 transition-colors hover:bg-[rgba(243,245,252,0.03)]"
+                className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 transition-colors hover:bg-[var(--color-realce-1)]"
               >
                 <span className="min-w-0 flex-1 truncate text-body text-ink-2">{c.subject}</span>
                 <div className="flex items-center gap-3">

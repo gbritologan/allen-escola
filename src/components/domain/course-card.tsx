@@ -81,7 +81,7 @@ export function CourseCard({
         ) : (
           <span
             aria-hidden
-            className="pointer-events-none absolute bottom-2 right-3 font-hair text-[9rem] leading-none text-[rgba(243,245,252,0.06)]"
+            className="pointer-events-none absolute bottom-2 right-3 font-hair text-[9rem] leading-none text-[var(--color-realce-2)]"
           >
             {course.title.charAt(0)}
           </span>

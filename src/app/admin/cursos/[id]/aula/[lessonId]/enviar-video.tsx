@@ -199,7 +199,7 @@ export function EnviarVideo({
               {etapa.progresso}%
             </span>
           </div>
-          <div className="h-1 overflow-hidden rounded-full bg-[rgba(243,245,252,0.08)]">
+          <div className="h-1 overflow-hidden rounded-full bg-[var(--color-realce-3)]">
             <div
               className="settle-transition h-full rounded-full bg-blue-light"
               style={{ width: `${etapa.progresso}%` }}
@@ -256,7 +256,7 @@ export function EnviarVideo({
 function Estado({ texto }: { texto: string }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="surface-sheen h-1 w-24 rounded-full bg-[rgba(243,245,252,0.08)]" />
+      <span className="surface-sheen h-1 w-24 rounded-full bg-[var(--color-realce-3)]" />
       <span className="text-label text-ink-3">{texto}</span>
     </div>
   )

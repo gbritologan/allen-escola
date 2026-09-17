@@ -65,7 +65,7 @@ export default async function ContaPage() {
        */}
       {perfil?.pioneer && (
         <Surface className="flex items-center gap-5 p-6">
-          <span className="flex size-20 shrink-0 items-center justify-center rounded-full bg-[rgba(243,245,252,0.94)] p-2.5">
+          <span className="flex size-20 shrink-0 items-center justify-center rounded-full bg-[var(--color-realce-4)] p-2.5">
             <Image
               src="/brand/selo-pioneiro.png"
               alt="Selo de Pioneiro"

@@ -63,7 +63,7 @@ function Fila({
             <Link
               key={t.id}
               href={`/admin/suporte/${t.id}`}
-              className="flex flex-wrap items-center gap-x-4 gap-y-1 px-5 py-3.5 transition-colors hover:bg-[rgba(243,245,252,0.03)]"
+              className="flex flex-wrap items-center gap-x-4 gap-y-1 px-5 py-3.5 transition-colors hover:bg-[var(--color-realce-1)]"
             >
               <span className="min-w-0 flex-1 truncate text-body text-ink">{t.subject}</span>
               <span className="text-caption text-ink-3">{quem.get(t.user_id)}</span>

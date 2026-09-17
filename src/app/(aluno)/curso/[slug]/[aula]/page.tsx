@@ -298,7 +298,7 @@ export default async function AulaPage({
         {proxima && (
           <Link
             href={`/curso/${course.slug}/${proxima.slug}`}
-            className="group flex items-center justify-between gap-4 rounded-[var(--radius-card)] border border-line px-5 py-4 transition-colors hover:border-line-strong hover:bg-[rgba(243,245,252,0.03)]"
+            className="group flex items-center justify-between gap-4 rounded-[var(--radius-card)] border border-line px-5 py-4 transition-colors hover:border-line-strong hover:bg-[var(--color-realce-1)]"
           >
             <div className="flex min-w-0 flex-col">
               <span className="text-caption text-ink-4">Próxima aula</span>

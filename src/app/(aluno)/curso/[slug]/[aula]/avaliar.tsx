@@ -41,7 +41,7 @@ export function Avaliar({
             >
               <svg
                 viewBox="0 0 24 24"
-                className={n <= atual ? 'size-5 fill-blue-light' : 'size-5 fill-[rgba(243,245,252,0.18)]'}
+                className={n <= atual ? 'size-5 fill-blue-light' : 'size-5 fill-[var(--color-realce-4)]'}
                 aria-hidden
               >
                 <path d="M12 2.6l2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95z" />

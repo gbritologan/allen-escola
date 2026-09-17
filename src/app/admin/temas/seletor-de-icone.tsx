@@ -59,7 +59,7 @@ export function SeletorDeIcone({ id, atual }: { id: string; atual: string }) {
                   title="Sem símbolo"
                   onClick={() => setAberto(false)}
                   className={`flex size-10 w-full items-center justify-center rounded-[var(--radius-control)] text-caption transition-colors duration-150 ${
-                    atual ? 'text-ink-4 hover:bg-[rgba(243,245,252,0.06)]' : 'bg-[rgba(76,65,255,0.16)] text-ink'
+                    atual ? 'text-ink-4 hover:bg-[var(--color-realce-2)]' : 'bg-[rgba(76,65,255,0.16)] text-ink'
                   }`}
                 >
                   —
@@ -77,7 +77,7 @@ export function SeletorDeIcone({ id, atual }: { id: string; atual: string }) {
                     className={`flex size-10 w-full items-center justify-center rounded-[var(--radius-control)] transition-colors duration-150 ${
                       chave === atual
                         ? 'bg-[rgba(76,65,255,0.16)] text-blue-light'
-                        : 'text-ink-3 hover:bg-[rgba(243,245,252,0.06)] hover:text-ink'
+                        : 'text-ink-3 hover:bg-[var(--color-realce-2)] hover:text-ink'
                     }`}
                   >
                     <svg viewBox="0 0 24 24" className="size-5 fill-current" aria-hidden>

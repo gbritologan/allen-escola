@@ -127,7 +127,7 @@ export function VideoIntro({
                   : `Enviando… ${etapa.progresso}%`}
               </span>
               {etapa.nome === 'enviando' && (
-                <span className="h-1 w-48 overflow-hidden rounded-full bg-[rgba(243,245,252,0.08)]">
+                <span className="h-1 w-48 overflow-hidden rounded-full bg-[var(--color-realce-3)]">
                   <span
                     className="block h-full rounded-full bg-blue-light transition-[width] duration-200"
                     style={{ width: `${etapa.progresso}%` }}

@@ -39,7 +39,7 @@ export default async function CursosPage() {
             <Link
               key={t.id}
               href={`/tema/${t.slug}`}
-              className="rounded-full border border-line px-4 py-2 text-label text-ink-2 transition-colors duration-150 hover:border-line-strong hover:bg-[rgba(243,245,252,0.05)] hover:text-ink"
+              className="rounded-full border border-line px-4 py-2 text-label text-ink-2 transition-colors duration-150 hover:border-line-strong hover:bg-[var(--color-realce-2)] hover:text-ink"
             >
               {t.name}
             </Link>

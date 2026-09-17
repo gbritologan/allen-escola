@@ -33,7 +33,7 @@ export function ThemeChip({ href, children }: { href: string; children: ReactNod
       className={cn(
         chipBase,
         'border-line text-ink-2 transition-colors duration-150 ease-[var(--ease-allen)]',
-        'hover:border-line-strong hover:text-ink hover:bg-[rgba(243,245,252,0.05)]',
+        'hover:border-line-strong hover:text-ink hover:bg-[var(--color-realce-2)]',
       )}
     >
       {children}

@@ -175,7 +175,7 @@ export function SoltarAulas({
                   {item.estado === 'erro' && 'falhou'}
                 </span>
               </div>
-              <div className="h-1 overflow-hidden rounded-full bg-[rgba(243,245,252,0.08)]">
+              <div className="h-1 overflow-hidden rounded-full bg-[var(--color-realce-3)]">
                 <div
                   className={cn(
                     'h-full rounded-full transition-[width] duration-200',

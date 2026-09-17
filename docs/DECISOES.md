@@ -2041,3 +2041,47 @@ preto chapado é plástico fosco (D-51), e era isso que estava acontecendo.
 eu tinha para mostrar, e não o momento em que a pessoa chega nela. Dá para
 ficar meses assim, porque tudo "funciona" — cada campo aparece, nada quebra. O
 teste que faltava era o que ele fez: abrir como aluno.
+
+## D-89 · O tema claro é acessibilidade, não preferência
+
+O Gabriel pediu claro/escuro e deu o motivo: aluno com astigmatismo. Texto
+claro sobre fundo escuro ESPALHA na retina de quem tem astigmatismo — o efeito
+chama halation, as letras ganham halo, e leitura longa vira cansaço. Numa
+escola isso é gente aprendendo menos por causa de uma escolha estética nossa.
+
+O escuro continua sendo o padrão da marca. Deixou de ser obrigatório.
+
+**A auditoria antes da promessa.** 239 cores cravadas no JSX pareciam um mês de
+trabalho. Contadas, viraram três famílias:
+
+- `rgba(243,245,252,α)` — tinta sobre superfície. **É a que quebrava tudo:**
+  branco a 5% sobre branco é invisível. Virou `--color-realce-1..4`, que
+  inverte para preto no claro. 42 trocas, 28 arquivos, mecânicas.
+- `rgba(5,7,20,α)` — véu sobre imagem. **Não muda**, e essa foi a descoberta
+  contraintuitiva: imagem não tem tema, então texto sobre véu precisa ser
+  claro nos dois. Daí `--color-sobre-veu`, a única cor da casa imune ao tema.
+  Sem ela, o título do banner viraria navy sobre véu preto no claro.
+- azul da marca — não muda. Marca não tem modo claro.
+
+**O claro não é o escuro invertido.** Branco puro com texto preto cansa tanto
+quanto o contrário. O fundo é off-white azulado da família do navy, e a tinta
+é o navy profundo. Verde e âmbar fecharam um tom: os do escuro brilham demais
+sobre claro.
+
+**Três defeitos que só apareceram olhando**, e nenhum deles quebrava o build:
+o vidro continuava escuro (mancha sobre fundo claro), o texto do banner sumia
+sobre o véu, e a marca off-white desaparecia. Os dois PNGs da marca agora são
+renderizados empilhados e o CSS escolhe — custa poucos KB e não custa um frame
+de logotipo errado depois da hidratação.
+
+**O tema é aplicado antes da primeira pintura**, por script síncrono no
+`<head>`. Sem ele, quem escolheu claro levaria um flash escuro a cada
+navegação — e quem pediu fundo claro por causa dos olhos é justamente quem
+menos deveria levar clarão na cara.
+
+Sem escolha salva, seguimos `prefers-color-scheme`. Quem já configurou o
+sistema para claro está dizendo algo, e o objetivo aqui era acessibilidade —
+não fazer a pessoa descobrir um botão para conseguir ler.
+
+**O Mapa fica escuro nos dois temas.** Ele pinta em canvas, não em CSS, e é um
+céu noturno: fundo claro ali não seria tema claro, seria outro produto.

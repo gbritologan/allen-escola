@@ -59,12 +59,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         voltar para o painel. Uma barra lateral de 224px não cabe em 375px, mas
         "não cabe" não é motivo para sumir; é motivo para virar outra coisa.
       */}
-      <nav className="sticky top-0 z-30 flex gap-1 overflow-x-auto border-b border-line bg-[rgba(8,11,30,0.9)] px-3 py-2 [backdrop-filter:blur(16px)] md:hidden">
+      <nav className="sticky top-0 z-30 flex gap-1 overflow-x-auto border-b border-line bg-[var(--casca-fundo)] px-3 py-2 [backdrop-filter:blur(16px)] md:hidden">
         {NAV.filter((item) => !item.requer || can(session.role, item.requer)).map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            className="shrink-0 rounded-[var(--radius-control)] px-3 py-1.5 text-caption text-ink-3 transition-colors hover:bg-[rgba(243,245,252,0.05)] hover:text-ink"
+            className="shrink-0 rounded-[var(--radius-control)] px-3 py-1.5 text-caption text-ink-3 transition-colors hover:bg-[var(--color-realce-2)] hover:text-ink"
           >
             {item.label}
           </Link>
@@ -82,7 +82,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-[var(--radius-control)] px-3 py-2 text-label text-ink-3 transition-colors duration-150 hover:bg-[rgba(243,245,252,0.05)] hover:text-ink"
+              className="rounded-[var(--radius-control)] px-3 py-2 text-label text-ink-3 transition-colors duration-150 hover:bg-[var(--color-realce-2)] hover:text-ink"
             >
               {item.label}
             </Link>

@@ -4,8 +4,29 @@
 /* ===========================================================================
    ALLEN ESCOLA — Design tokens
 
-   Tema único, escuro. Não é omissão: é o mundo visual da marca.
-   Toda cor é pintada explicitamente.
+   DOIS TEMAS, E O CLARO É ACESSIBILIDADE.
+
+   O escuro é o mundo visual da marca e continua sendo o padrão. Mas texto
+   claro sobre fundo escuro ESPALHA na retina de quem tem astigmatismo — o
+   efeito chama halation, e transforma leitura longa em cansaço. Numa escola,
+   isso não é preferência estética: é gente aprendendo menos.
+
+   COMO FUNCIONA. Toda cor sai de um token. O tema escuro define os tokens em
+   `:root`; o claro os redefine em `[data-tema="claro"]`. Componente nenhum
+   sabe qual tema está ativo — ele pede `var(--color-ink)` e recebe o certo.
+
+   AS TRÊS FAMÍLIAS que antes viviam cravadas no JSX:
+
+     --realce-N  tinta sobre a superfície (bordas, hover, divisores).
+                 No escuro é branco com pouca opacidade; no claro, preto.
+                 É a família que MAIS quebrava um tema claro, porque branco
+                 a 5% sobre branco é invisível.
+
+     --veu-N     véu por cima de imagem (legenda sobre foto, selo sobre capa).
+                 Escuro nos dois temas: ele existe para dar contraste a texto
+                 branco sobre imagem, e imagem não muda de tema.
+
+     azul        o azul da marca NÃO muda. Marca não tem modo claro.
    =========================================================================== */
 
 @theme {
@@ -29,6 +50,41 @@
   --color-positive: #48d6a8;
   --color-caution: #e8b14c;
   --color-critical: #ff6b6b;
+
+  /* --- As três famílias, como token ---------------------------------------
+     Elas existem para o JSX parar de cravar rgba(). Um `rgba(243,245,252,0.05)`
+     escrito à mão é invisível no tema claro, e não há como descobrir isso sem
+     abrir cada tela. */
+  --color-realce-1: rgba(243, 245, 252, 0.03);
+  --color-realce-2: rgba(243, 245, 252, 0.05);
+  --color-realce-3: rgba(243, 245, 252, 0.08);
+  --color-realce-4: rgba(243, 245, 252, 0.12);
+
+  /* Véu sobre imagem. Escuro nos dois temas, de propósito. */
+  --color-veu: rgba(5, 7, 20, 0.78);
+  --color-veu-forte: rgba(5, 7, 20, 0.92);
+
+  /* Superfícies opacas, com nome de papel e não de cor. */
+  --color-fundo: #050714;
+  --color-superficie: #0a0f2e;
+  --color-superficie-2: #12173d;
+
+  /* O vidro, por papel e não por cor. No escuro ele é um painel translúcido
+     mais claro que o fundo; no claro, mais BRANCO que o fundo — vidro escuro
+     sobre fundo claro não é vidro, é mancha. */
+  --vidro-fundo: rgba(12, 16, 40, 0.62);
+  --vidro-brilho: rgba(255, 255, 255, 0.055);
+  --vidro-borda: rgba(255, 255, 255, 0.075);
+  --vidro-sombra: rgba(0, 4, 30, 0.9);
+  --vidro-baixo: rgba(0, 0, 0, 0.5);
+  --casca-fundo: rgba(8, 11, 30, 0.72);
+
+  /* TINTA SOBRE VÉU — a exceção que o tema claro exige.
+     Texto por cima de imagem escurecida precisa ser CLARO nos dois temas. Usar
+     `--color-ink` ali faria o título do banner virar navy sobre um véu preto no
+     tema claro: ilegível, e só descoberto abrindo a tela. */
+  --color-sobre-veu: #f3f5fc;
+  --color-sobre-veu-2: #b9c0dc;
 
   /* =========================================================================
      TIPOGRAFIA — Elvon Grotesk, e só ela.
@@ -137,6 +193,73 @@
   --radius: 1rem;
 }
 
+/* ===========================================================================
+   O TEMA CLARO
+
+   Não é o escuro invertido. Um branco puro (#fff) com texto preto puro é tão
+   agressivo quanto o preto puro com texto branco — o contraste máximo cansa
+   nos dois sentidos. Então o fundo é um off-white levemente azulado, da mesma
+   família do navy, e a tinta é o navy profundo em vez de preto.
+
+   A marca sobrevive porque o azul não muda e a tipografia não muda. O que
+   muda é o chão.
+   =========================================================================== */
+:root[data-tema='claro'] {
+  --color-fundo: #f6f7fc;
+  --color-superficie: #ffffff;
+  --color-superficie-2: #eef0f8;
+
+  --color-navy-deep: #f6f7fc;
+  --color-navy: #ffffff;
+  --color-navy-soft: #eef0f8;
+
+  /* A tinta inverte: o navy profundo vira o texto. */
+  --color-ink: #0a0f2e;
+  --color-ink-2: #2b3357;
+  --color-ink-3: #5a6288;
+  --color-ink-4: #7e87ab;
+  --color-off-white: #0a0f2e;
+
+  --color-line: rgba(10, 15, 46, 0.12);
+  --color-line-strong: rgba(10, 15, 46, 0.24);
+
+  /* O realce vira PRETO com pouca opacidade. É a inversão que faz hover e
+     divisor continuarem existindo — branco a 5% sobre branco não existe. */
+  --color-realce-1: rgba(10, 15, 46, 0.03);
+  --color-realce-2: rgba(10, 15, 46, 0.05);
+  --color-realce-3: rgba(10, 15, 46, 0.08);
+  --color-realce-4: rgba(10, 15, 46, 0.12);
+
+  --vidro-fundo: rgba(255, 255, 255, 0.72);
+  --vidro-brilho: rgba(255, 255, 255, 0.9);
+  --vidro-borda: rgba(10, 15, 46, 0.1);
+  --vidro-sombra: rgba(10, 15, 46, 0.22);
+  --vidro-baixo: rgba(10, 15, 46, 0.06);
+  --casca-fundo: rgba(255, 255, 255, 0.82);
+  /* `--color-sobre-veu` NÃO é redefinido aqui: é a única cor que não muda com
+     o tema, porque o que está atrás dela é imagem, e imagem não tem tema. */
+
+  /* Estados ganham um tom mais fechado: os do escuro brilham demais no claro. */
+  --color-positive: #1f9d72;
+  --color-caution: #a8761c;
+  --color-critical: #d13b3b;
+}
+
+/* A marca tem dois arquivos empilhados; aqui o tema escolhe qual aparece.
+   `display` e não `opacity`: o arquivo escondido não deve ocupar espaço nem
+   ser lido por leitor de tela. */
+@layer base {
+  .marca-no-claro {
+    display: none;
+  }
+  :root[data-tema='claro'] .marca-no-escuro {
+    display: none;
+  }
+  :root[data-tema='claro'] .marca-no-claro {
+    display: block;
+  }
+}
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
@@ -203,20 +326,15 @@
 @utility liquid-glass {
   position: relative;
   background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.07),
-      rgba(255, 255, 255, 0.015) 42%,
-      rgba(255, 255, 255, 0.03)
-    ),
-    rgba(12, 16, 40, 0.55);
+    linear-gradient(180deg, var(--vidro-brilho), transparent 42%, var(--vidro-brilho)),
+    var(--vidro-fundo);
   backdrop-filter: blur(26px) saturate(165%);
   -webkit-backdrop-filter: blur(26px) saturate(165%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--vidro-borda);
   box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.16),
-    inset 0 -1px 0 0 rgba(0, 0, 0, 0.5),
-    0 24px 70px -24px rgba(0, 4, 30, 0.75),
+    inset 0 1px 0 0 var(--vidro-brilho),
+    inset 0 -1px 0 0 var(--vidro-baixo),
+    0 24px 70px -24px var(--vidro-sombra),
     0 0 60px -26px rgba(76, 65, 255, 0.55);
 }
 
@@ -280,23 +398,23 @@
 
 @utility glass-card {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.012) 55%),
-    rgba(12, 16, 40, 0.62);
+    linear-gradient(180deg, var(--vidro-brilho), transparent 55%),
+    var(--vidro-fundo);
   backdrop-filter: blur(12px) saturate(140%);
   -webkit-backdrop-filter: blur(12px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.075);
+  border: 1px solid var(--vidro-borda);
   box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
-    0 16px 40px -28px rgba(0, 4, 30, 0.9);
+    inset 0 1px 0 0 var(--vidro-brilho),
+    0 16px 40px -28px var(--vidro-sombra);
 }
 
 /* O realce do hover soma luz em vez de trocar a cor de fundo — trocar o fundo
    de um vidro apaga o que está atrás, que é justamente o ponto dele. */
 @utility glass-card-hover {
-  border-color: rgba(255, 255, 255, 0.16);
+  border-color: var(--color-line-strong);
   box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
-    0 22px 50px -26px rgba(0, 4, 30, 0.95),
+    inset 0 1px 0 0 var(--vidro-brilho),
+    0 22px 50px -26px var(--vidro-sombra),
     0 0 44px -30px rgba(76, 65, 255, 0.65);
 }
 

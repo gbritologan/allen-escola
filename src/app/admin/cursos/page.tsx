@@ -60,7 +60,7 @@ export default async function CursosPage() {
               <Link
                 key={course.id}
                 href={`/admin/cursos/${course.id}`}
-                className="flex items-center gap-4 px-4 py-4 transition-colors duration-150 hover:bg-[rgba(243,245,252,0.03)]"
+                className="flex items-center gap-4 px-4 py-4 transition-colors duration-150 hover:bg-[var(--color-realce-1)]"
               >
                 <div className="min-w-0 flex-1 flex flex-col gap-1">
                   <div className="flex flex-wrap items-center gap-2">

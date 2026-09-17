@@ -91,7 +91,7 @@ export function PainelLateral({
                       'flex items-center gap-3 px-3 py-2.5 transition-colors duration-150',
                       atual
                         ? 'bg-[rgba(76,65,255,0.14)]'
-                        : 'hover:bg-[rgba(243,245,252,0.04)]',
+                        : 'hover:bg-[var(--color-realce-2)]',
                     )}
                   >
                     {/* A miniatura vem do próprio provedor de vídeo — não há
@@ -160,7 +160,7 @@ export function PainelLateral({
                 href={m.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between gap-3 rounded-[var(--radius-control)] px-3 py-2.5 transition-colors hover:bg-[rgba(243,245,252,0.04)]"
+                className="flex items-center justify-between gap-3 rounded-[var(--radius-control)] px-3 py-2.5 transition-colors hover:bg-[var(--color-realce-2)]"
               >
                 <span className="min-w-0 truncate text-caption text-ink-2">{m.title}</span>
                 <span className="shrink-0 text-caption text-ink-4">

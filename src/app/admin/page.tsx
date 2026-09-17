@@ -104,7 +104,7 @@ export default async function AdminPage() {
               <Link
                 key={item.label}
                 href={item.href}
-                className="flex items-center gap-4 px-4 py-3.5 transition-colors duration-150 hover:bg-[rgba(243,245,252,0.03)]"
+                className="flex items-center gap-4 px-4 py-3.5 transition-colors duration-150 hover:bg-[var(--color-realce-1)]"
               >
                 <div className="min-w-0 flex-1">
                   <span className="text-body text-ink">{item.label}</span>

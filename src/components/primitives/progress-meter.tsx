@@ -29,7 +29,7 @@ export function ProgressMeter({
         aria-valuenow={percent}
         aria-valuemin={0}
         aria-valuemax={100}
-        className="h-1 flex-1 overflow-hidden rounded-full bg-[rgba(243,245,252,0.08)]"
+        className="h-1 flex-1 overflow-hidden rounded-full bg-[var(--color-realce-3)]"
       >
         <div
           className="settle-transition h-full rounded-full bg-blue-light"

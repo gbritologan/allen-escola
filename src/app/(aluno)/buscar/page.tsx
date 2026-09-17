@@ -150,7 +150,7 @@ async function Resultados({ termo }: { termo: string }) {
               <Link
                 key={app.id}
                 href={`/apps/${app.slug}`}
-                className="group flex flex-col gap-0.5 px-5 py-3.5 transition-colors hover:bg-[rgba(243,245,252,0.03)]"
+                className="group flex flex-col gap-0.5 px-5 py-3.5 transition-colors hover:bg-[var(--color-realce-1)]"
               >
                 <span className="text-body text-ink-2 group-hover:text-ink">{app.name}</span>
                 {app.tagline && (
@@ -172,7 +172,7 @@ async function Resultados({ termo }: { termo: string }) {
                 <Link
                   key={a.id}
                   href={curso ? `/curso/${curso.slug}` : '/cursos'}
-                  className="flex flex-col gap-0.5 px-5 py-3.5 transition-colors hover:bg-[rgba(243,245,252,0.03)]"
+                  className="flex flex-col gap-0.5 px-5 py-3.5 transition-colors hover:bg-[var(--color-realce-1)]"
                 >
                   <span className="text-body text-ink">{a.title}</span>
                   <span data-numeric className="text-caption text-ink-4">

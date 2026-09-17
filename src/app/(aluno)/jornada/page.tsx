@@ -108,7 +108,7 @@ export default async function JornadaPage() {
                   <Link
                     key={e.course_id}
                     href={`/curso/${curso.slug}`}
-                    className="flex flex-col gap-3 px-5 py-4 transition-colors hover:bg-[rgba(243,245,252,0.03)]"
+                    className="flex flex-col gap-3 px-5 py-4 transition-colors hover:bg-[var(--color-realce-1)]"
                   >
                     <div className="flex items-baseline justify-between gap-4">
                       <span className="text-body text-ink">{curso.title}</span>
@@ -135,7 +135,7 @@ export default async function JornadaPage() {
                   <Link
                     key={e.course_id}
                     href={`/curso/${curso.slug}`}
-                    className="flex items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-[rgba(243,245,252,0.03)]"
+                    className="flex items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-[var(--color-realce-1)]"
                   >
                     <span className="text-body text-ink-2">{curso.title}</span>
                     <span data-numeric className="text-caption text-positive">100%</span>

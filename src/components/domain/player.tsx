@@ -171,9 +171,9 @@ export function Player({
             const v = videoRef.current
             if (v) v.currentTime = Number(e.target.value)
           }}
-          className="h-1 flex-1 cursor-pointer appearance-none rounded-full bg-[rgba(243,245,252,0.16)] accent-[var(--color-blue-light)]"
+          className="h-1 flex-1 cursor-pointer appearance-none rounded-full bg-[var(--color-realce-4)] accent-[var(--color-blue-light)]"
           style={{
-            background: `linear-gradient(90deg, var(--color-blue-light) ${progresso}%, rgba(243,245,252,0.16) ${progresso}%)`,
+            background: `linear-gradient(90deg, var(--color-blue-light) ${progresso}%, var(--color-realce-4) ${progresso}%)`,
           }}
         />
 

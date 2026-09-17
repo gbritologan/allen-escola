@@ -68,7 +68,7 @@ export default async function AppPage({ params }: { params: Promise<{ slug: stri
         {/* A marca aparece aqui também: é o que liga esta página ao cartão de
             onde a pessoa veio. */}
         {app.logo_url && (
-          <div className="flex size-16 items-center justify-center overflow-hidden rounded-[var(--radius-control)] bg-[rgba(243,245,252,0.06)] p-2.5">
+          <div className="flex size-16 items-center justify-center overflow-hidden rounded-[var(--radius-control)] bg-[var(--color-realce-2)] p-2.5">
             <Image
               src={app.logo_url}
               alt=""

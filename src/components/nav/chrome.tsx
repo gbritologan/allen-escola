@@ -14,6 +14,7 @@ import {
   IconePainel,
   IconeSair,
 } from '@/components/icons'
+import { BotaoTema } from '@/components/nav/tema'
 import { BuscaRapida } from '@/components/nav/busca-rapida'
 import { cn } from '@/lib/utils'
 
@@ -134,7 +135,7 @@ function ItemDaSidebar({
         'relative flex items-center gap-3 rounded-[var(--radius-control)] px-3 py-2 text-label transition-colors duration-150',
         ativo
           ? 'bg-[rgba(76,65,255,0.14)] text-ink'
-          : 'text-ink-3 hover:bg-[rgba(243,245,252,0.05)] hover:text-ink-2 active:bg-[rgba(76,65,255,0.10)] active:text-ink',
+          : 'text-ink-3 hover:bg-[var(--color-realce-2)] hover:text-ink-2 active:bg-[rgba(76,65,255,0.10)] active:text-ink',
       )}
     >
       <MarcaDeEspera />
@@ -158,7 +159,7 @@ export function StudentChrome({
   return (
     <>
       {/* ---------- Sidebar (desktop) -------------------------------------- */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-[rgba(255,255,255,0.09)] bg-[rgba(8,11,30,0.72)] px-3 py-5 [backdrop-filter:blur(22px)_saturate(150%)] md:flex">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-line bg-[var(--casca-fundo)] px-3 py-5 [backdrop-filter:blur(22px)_saturate(150%)] md:flex">
         <Link href="/" aria-label="Allen Escola" className="px-3 pb-6">
           <Assinatura size={21} />
         </Link>
@@ -207,7 +208,7 @@ export function StudentChrome({
         <div className="flex flex-col gap-3 border-t border-line px-2 pt-4">
           <Link
             href="/conta"
-            className="flex items-center gap-2.5 rounded-[var(--radius-control)] px-1 py-1 transition-colors duration-150 hover:bg-[rgba(243,245,252,0.05)]"
+            className="flex items-center gap-2.5 rounded-[var(--radius-control)] px-1 py-1 transition-colors duration-150 hover:bg-[var(--color-realce-2)]"
           >
             <span
               aria-hidden
@@ -221,15 +222,20 @@ export function StudentChrome({
             </span>
           </Link>
 
-          <form action="/sair" method="post">
-            <button
-              type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-control)] border border-line px-3 py-2 text-caption text-ink-2 transition-colors duration-150 hover:border-line-strong hover:bg-[rgba(243,245,252,0.05)] hover:text-ink"
-            >
-              <IconeSair className="size-4 shrink-0" />
-              Sair
-            </button>
-          </form>
+          {/* Sair e trocar o tema dividem a linha: os dois são ações de
+              canto — necessárias, nunca o assunto da tela. */}
+          <div className="flex items-center gap-2">
+            <form action="/sair" method="post" className="flex-1">
+              <button
+                type="submit"
+                className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-control)] border border-line px-3 py-2 text-caption text-ink-2 transition-colors duration-150 hover:border-line-strong hover:bg-[var(--color-realce-2)] hover:text-ink"
+              >
+                <IconeSair className="size-4 shrink-0" />
+                Sair
+              </button>
+            </form>
+            <BotaoTema />
+          </div>
         </div>
       </aside>
 
@@ -257,7 +263,7 @@ export function StudentChrome({
       </nav>
 
       {/* ---------- Barra do celular ---------------------------------------- */}
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b border-[rgba(255,255,255,0.09)] bg-[rgba(8,11,30,0.7)] px-5 [backdrop-filter:blur(20px)_saturate(150%)] md:hidden">
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b border-line bg-[var(--casca-fundo)] px-5 [backdrop-filter:blur(20px)_saturate(150%)] md:hidden">
         <Link href="/" aria-label="Allen Escola">
           <Marca size={19} />
         </Link>
@@ -268,6 +274,7 @@ export function StudentChrome({
           <Link href="/suporte" className="text-caption text-ink-3">
             Suporte
           </Link>
+          <BotaoTema className="size-7" />
           <Link
             href="/conta"
             aria-label="Sua conta"

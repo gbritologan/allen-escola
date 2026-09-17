@@ -59,7 +59,7 @@ export default async function AppsPage() {
                  * quadrado tem fundo próprio porque logo com fundo
                  * transparente sobre vidro escuro some quando é escura.
                  */}
-                <div className="flex size-14 items-center justify-center overflow-hidden rounded-[var(--radius-control)] bg-[rgba(243,245,252,0.06)] p-2">
+                <div className="flex size-14 items-center justify-center overflow-hidden rounded-[var(--radius-control)] bg-[var(--color-realce-2)] p-2">
                   {app.logo_url ? (
                     <Image
                       src={app.logo_url}

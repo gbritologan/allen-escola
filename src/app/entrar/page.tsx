@@ -47,7 +47,7 @@ export default async function EntrarPage({
 
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-60 [background-image:radial-gradient(1px_1px_at_18%_24%,rgba(243,245,252,0.5),transparent),radial-gradient(1px_1px_at_72%_58%,rgba(243,245,252,0.35),transparent),radial-gradient(1px_1px_at_41%_81%,rgba(243,245,252,0.4),transparent),radial-gradient(1.5px_1.5px_at_86%_16%,rgba(243,245,252,0.3),transparent),radial-gradient(1px_1px_at_9%_62%,rgba(243,245,252,0.3),transparent)] [background-repeat:no-repeat]"
+        className="pointer-events-none absolute inset-0 opacity-60 [background-image:radial-gradient(1px_1px_at_18%_24%,var(--color-realce-4),transparent),radial-gradient(1px_1px_at_72%_58%,var(--color-realce-4),transparent),radial-gradient(1px_1px_at_41%_81%,var(--color-realce-4),transparent),radial-gradient(1.5px_1.5px_at_86%_16%,var(--color-realce-4),transparent),radial-gradient(1px_1px_at_9%_62%,var(--color-realce-4),transparent)] [background-repeat:no-repeat]"
       />
 
       <div

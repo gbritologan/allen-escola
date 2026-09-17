@@ -302,7 +302,7 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
                             href={`/curso/${course.slug}/${aula.slug}`}
                             className={cn(
                               'group flex items-center gap-4 border-t border-[rgba(255,255,255,0.05)] px-5 py-3 transition-colors duration-150',
-                              'hover:bg-[rgba(243,245,252,0.05)]',
+                              'hover:bg-[var(--color-realce-2)]',
                               ehProxima && 'bg-[rgba(76,65,255,0.1)]',
                             )}
                           >
@@ -447,7 +447,7 @@ function CapaComPlay({
       ) : (
         <span
           aria-hidden
-          className="absolute inset-0 flex items-center justify-center font-hair text-[9rem] leading-none text-[rgba(243,245,252,0.05)]"
+          className="absolute inset-0 flex items-center justify-center font-hair text-[9rem] leading-none text-[var(--color-realce-2)]"
         >
           {titulo.charAt(0)}
         </span>
