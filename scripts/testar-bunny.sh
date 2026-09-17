@@ -86,12 +86,46 @@ case "$STATUS" in
     echo "   BUNNY_STREAM_API_KEY na Vercel, sem copiar de novo."
     ;;
   401)
-    echo "❌ 401 — O BUNNY RECUSOU A CHAVE."
+    echo "❌ 401 na biblioteca $LIB."
     echo
-    echo "   O formato está certo, então não foi erro de colar."
-    echo "   Quase sempre é a chave da CONTA no lugar da chave da BIBLIOTECA:"
-    echo "   a certa fica em Stream → a biblioteca → aba API → \"API Key\"."
-    echo "   A de Account Settings não serve para este endpoint."
+    # O 401 do Bunny é ambíguo de propósito: ele responde a mesma coisa para
+    # chave errada e para biblioteca que a chave não alcança (testado — até um
+    # ID inventado devolve 401, nunca 404). Então perguntar "de quem é esta
+    # chave?" é o que desempata, e só o endpoint de CONTA responde isso.
+    echo "   Perguntando de quem é esta chave…"
+    echo
+    CONTA=$(mktemp)
+    ST2=$(curl -s -o "$CONTA" -w '%{http_code}' \
+      -H "AccessKey: $CHAVE" -H 'accept: application/json' \
+      "https://api.bunny.net/videolibrary?page=1&perPage=100")
+
+    if [ "$ST2" = "200" ]; then
+      echo "   ✅ ELA É VÁLIDA — mas é a chave da CONTA, não a da biblioteca."
+      echo
+      echo "   As bibliotecas que ela enxerga:"
+      python3 -c '
+import json, sys
+try:
+    d = json.load(open(sys.argv[1]))
+except Exception:
+    sys.exit(0)
+itens = d.get("Items", d if isinstance(d, list) else [])
+for b in itens:
+    print("     %s  ·  %s" % (b.get("Id"), b.get("Name")))
+' "$CONTA"
+      echo
+      echo "   Abra a que você usa, vá na aba API e copie a API Key DELA."
+      echo "   Se o Id acima não for $LIB, é esse o número que a gente precisa."
+    else
+      echo "   ❌ O endpoint de conta também recusou (HTTP $ST2)."
+      echo
+      echo "   Então sobrou uma hipótese: a chave é de OUTRA biblioteca."
+      echo "   Confira, na mesma página em que você copiou a chave, o campo"
+      echo "   \"Video Library ID\". Se não for $LIB, rode assim:"
+      echo
+      echo "     bash scripts/testar-bunny.sh <o número que aparece lá>"
+    fi
+    rm -f "$CONTA"
     ;;
   404)
     echo "❌ 404 — ESTE ID DE BIBLIOTECA NÃO EXISTE NESTA CONTA."
