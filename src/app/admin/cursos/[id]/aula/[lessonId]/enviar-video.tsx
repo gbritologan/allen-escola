@@ -1,6 +1,7 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/primitives/button'
 import { cn } from '@/lib/utils'
 import { IconeApagar } from '@/components/icons'
@@ -56,6 +57,36 @@ export function EnviarVideo({
   )
   const inputRef = useRef<HTMLInputElement>(null)
   const [arrastando, setArrastando] = useState(false)
+  const router = useRouter()
+
+  /**
+   * VÍDEO NO AR SEM DURAÇÃO: busca ela ao abrir a página.
+   *
+   * A duração sempre foi automática — mas só para quem FICAVA na tela
+   * esperando o Bunny terminar de processar. Quem saía antes, ou quem subia
+   * doze vídeos de uma vez pelo arraste, ficava com aulas de duração zero. E
+   * aí o campo "Duração" aparecia vazio no formulário, pedindo para ser
+   * preenchido à mão — exatamente o trabalho que ele existia para evitar.
+   *
+   * A condição é estreita de propósito: só roda quando HÁ vídeo e a duração é
+   * zero. Isso torna a busca autolimitada — na primeira vez que ela dá certo,
+   * a condição deixa de valer e nenhuma requisição acontece de novo.
+   */
+  useEffect(() => {
+    if (!assetIdAtual || duracaoAtual > 0) return
+    let vivo = true
+    void (async () => {
+      const r = await verificarProcessamento(lessonId, courseId)
+      if (!vivo) return
+      if (r.estado === 'ready' && r.duracao) {
+        setEtapa({ nome: 'pronto', duracao: r.duracao })
+        router.refresh()
+      }
+    })()
+    return () => {
+      vivo = false
+    }
+  }, [assetIdAtual, duracaoAtual, lessonId, courseId, router])
 
   async function aoEscolher(arquivo: File) {
     setEtapa({ nome: 'preparando' })

@@ -1965,3 +1965,39 @@ Duas lições, e a segunda é a que dói:
 A conferência agora só barra o que claramente não é chave — tamanho absurdo,
 caractere no meio. O julgamento de formato voltou para quem tem competência
 para fazê-lo.
+
+## D-87 · Quando tudo parece obrigatório, nada é claro
+
+O Gabriel disse que subir aula estava "confuso, difícil, não intuitivo, não
+didático". Fui olhar a tela com os olhos dele e o defeito não era falta de
+recurso — era falta de HIERARQUIA.
+
+A página da aula mostrava oito campos com o mesmo peso visual, três selos de
+aviso (`sem vídeo`, `sem Para Fazer`, `sem habilidade`) e um campo de duração
+vazio pedindo para ser preenchido. Nada dizia o que era obrigatório, então
+tudo parecia. Tela em que tudo parece obrigatório é tela em que não se sabe
+por onde começar.
+
+Agora são duas zonas, e a diferença entre elas é a única coisa a entender:
+
+- **O essencial** — título e vídeo. É o que faz a aula existir.
+- **Enriquecer a aula** — o resto, num `<details>` fechado por padrão.
+
+Os selos de aviso saíram. Sobrou um, e só quando é verdade: falta o vídeo
+para publicar. `sem Para Fazer` e `sem habilidade` acusavam ausência de coisas
+opcionais — um alarme que dispara para o estado normal treina a pessoa a
+ignorar alarmes.
+
+**A duração deixou de ser campo e virou informação.** Ela sempre veio do
+Bunny, mas só para quem FICAVA na tela esperando o processamento. Quem saía
+antes, ou subia doze vídeos pelo arraste, ficava com duração zero — e aí o
+campo vazio pedia para ser preenchido à mão, exatamente o trabalho que ele
+existia para evitar. Agora o componente busca a duração ao abrir a página,
+numa condição autolimitada (só quando há vídeo e a duração é zero). O campo
+manual foi para o fim da zona opcional, como correção.
+
+**No curso, o arraste virou o caminho único.** Antes o arraste e o "criar
+aula" ficavam lado a lado, com o mesmo peso: a pessoa escolhia entre dois
+jeitos de fazer a mesma coisa antes de fazer qualquer coisa. Escolha sem
+critério não é liberdade, é hesitação. Criar aula vazia virou o que sempre
+foi — a exceção, atrás de um "+".

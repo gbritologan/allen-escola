@@ -6,6 +6,7 @@ import { Button } from '@/components/primitives/button'
 import { Chip } from '@/components/primitives/chip'
 import { IconeApagar } from '@/components/icons'
 import { Field, Input } from '@/components/primitives/field'
+import { formatDuration } from '@/core/shared/format'
 import { Surface } from '@/components/surfaces/surface'
 import { createClient } from '@/lib/supabase/server'
 import { apagarAula, atualizarAula, publicarAula } from './actions'
@@ -67,11 +68,31 @@ export default async function EditorDeAulaPage({
 
   const published = lesson.status === 'published'
   const temVideo = Boolean(lesson.video_asset_id)
-  const temParaFazer = Boolean(lesson.para_fazer?.trim())
-  const semHabilidade = habilidadesMapeadas.size === 0
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8 px-6 py-10 lg:px-10">
+      {/*
+        ─── POR QUE ESTA PÁGINA FOI REDESENHADA ─────────────────────────────
+
+        O Gabriel disse que subir aula estava "confuso, difícil, não
+        intuitivo, não didático". Estava, e o defeito era de hierarquia: a
+        tela mostrava oito campos com o mesmo peso visual, três selos de
+        aviso ("sem vídeo", "sem Para Fazer", "sem habilidade") e um campo de
+        duração vazio pedindo para ser preenchido.
+
+        Nada dizia o que era obrigatório. Então TUDO parecia obrigatório — e
+        uma tela em que tudo parece obrigatório é uma tela em que não se sabe
+        por onde começar.
+
+        Agora são duas zonas, e a diferença entre elas é a única coisa que a
+        pessoa precisa entender:
+
+          O ESSENCIAL — título e vídeo. É o que faz a aula existir.
+          OPCIONAL    — o resto, fechado por padrão, aberto quando der vontade.
+
+        Os selos de aviso saíram. Sobrou um aviso, e só quando ele é
+        verdadeiro: falta o vídeo para publicar.
+      */}
       <header className="flex flex-col gap-4">
         <Link href={`/admin/cursos/${courseId}`} className="text-caption text-ink-3 hover:text-ink">
           ← {course?.title ?? 'Curso'}
@@ -81,14 +102,9 @@ export default async function EditorDeAulaPage({
           <div className="flex flex-col gap-2">
             <span className="text-caption text-ink-4">{mod?.title}</span>
             <h1 className="text-title font-light">{lesson.title}</h1>
-            <div className="flex flex-wrap gap-1.5">
-              <Chip tone={published ? 'positive' : 'neutral'}>
-                {published ? 'No ar' : 'Rascunho'}
-              </Chip>
-              {!temVideo && <Chip tone="caution">sem vídeo</Chip>}
-              {!temParaFazer && <Chip>sem Para Fazer</Chip>}
-              {semHabilidade && <Chip tone="caution">sem habilidade</Chip>}
-            </div>
+            <Chip tone={published ? 'positive' : 'neutral'}>
+              {published ? 'No ar' : 'Rascunho'}
+            </Chip>
           </div>
 
           <form action={publicarAula}>
@@ -103,138 +119,178 @@ export default async function EditorDeAulaPage({
 
         {!temVideo && (
           <p className="text-caption text-caution">
-            Sem vídeo, publicar deixaria o aluno numa tela preta. O botão volta quando o vídeo
-            estiver pronto.
+            Falta o vídeo. Assim que ele terminar de processar, o botão de publicar libera.
           </p>
         )}
       </header>
 
-      {/* ------------------------------------------------------------------ */}
-      <Surface className="flex flex-col gap-4 p-5">
-        <form action={atualizarAula} className="flex flex-col gap-4">
-          <input type="hidden" name="id" value={lesson.id} />
-          <input type="hidden" name="course_id" value={courseId} />
+      {/* ═══ O ESSENCIAL ═══════════════════════════════════════════════════ */}
+      <section className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-title font-light">O essencial</h2>
+          <p className="text-caption text-ink-4">
+            Um título e um vídeo. Com esses dois, a aula pode ir ao ar.
+          </p>
+        </div>
 
-          <Field label="Título da aula" htmlFor="title">
-            <Input id="title" name="title" defaultValue={lesson.title} required />
-          </Field>
-
-          <Field
-            label="Duração"
-            htmlFor="duration_minutes"
-            hint="Preenchida sozinha quando o vídeo termina de processar. Edite só se precisar corrigir."
-          >
-            <Input
-              id="duration_minutes"
+        <Surface className="flex flex-col gap-5 p-5">
+          <form action={atualizarAula} className="flex items-end gap-3">
+            <input type="hidden" name="id" value={lesson.id} />
+            <input type="hidden" name="course_id" value={courseId} />
+            {/* A duração viaja escondida: o formulário de título não pode
+                zerá-la sem querer, já que ela vem do Bunny e não daqui. */}
+            <input
+              type="hidden"
               name="duration_minutes"
-              type="number"
-              min={0}
-              step={1}
-              defaultValue={lesson.duration_seconds ? Math.round(lesson.duration_seconds / 60) : ''}
-              className="max-w-32"
+              value={lesson.duration_seconds ? Math.round(lesson.duration_seconds / 60) : 0}
             />
-          </Field>
-
-          <div className="self-start">
+            <div className="flex-1">
+              <Field label="Título da aula" htmlFor="title">
+                <Input id="title" name="title" defaultValue={lesson.title} required />
+              </Field>
+            </div>
             <BotaoSalvar />
+          </form>
+
+          <div className="flex flex-col gap-2 border-t border-line pt-5">
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="text-label font-medium text-ink-2">Vídeo</span>
+              {/* A duração é INFORMAÇÃO, não campo. Ela vem do Bunny quando o
+                  processamento acaba — pedir para alguém cronometrar a
+                  própria aula era trabalho que a máquina já fazia. */}
+              {lesson.duration_seconds > 0 && (
+                <span data-numeric className="text-caption text-ink-4">
+                  {formatDuration(lesson.duration_seconds)} · medido pelo vídeo
+                </span>
+              )}
+            </div>
+            {videoConfigurado() ? (
+              <EnviarVideo
+                lessonId={lesson.id}
+                courseId={courseId}
+                tituloAula={lesson.title}
+                assetIdAtual={lesson.video_asset_id}
+                duracaoAtual={lesson.duration_seconds}
+              />
+            ) : (
+              <p className="text-caption text-caution">
+                O provedor de vídeo não está configurado neste ambiente. Faltam as variáveis
+                BUNNY_STREAM_* — em produção elas precisam ser adicionadas na Vercel.
+              </p>
+            )}
           </div>
-        </form>
-      </Surface>
-
-      {/* --- Vídeo --------------------------------------------------------- */}
-      <Surface className="flex flex-col gap-4 p-5">
-        <span className="text-label font-medium text-ink-2">Vídeo</span>
-        {videoConfigurado() ? (
-          <EnviarVideo
-            lessonId={lesson.id}
-            courseId={courseId}
-            tituloAula={lesson.title}
-            assetIdAtual={lesson.video_asset_id}
-            duracaoAtual={lesson.duration_seconds}
-          />
-        ) : (
-          <p className="text-caption text-caution">
-            O provedor de vídeo não está configurado neste ambiente. Faltam as variáveis
-            BUNNY_STREAM_* — em produção elas precisam ser adicionadas na Vercel.
-          </p>
-        )}
-      </Surface>
-
-      {/* --- O par que define a Allen -------------------------------------- */}
-      <section className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-title font-light">A aula</h2>
-          <p className="text-caption text-ink-4">
-            Estes dois campos salvam sozinhos ao sair do campo.
-          </p>
-        </div>
-
-        <CampoLongo
-          lessonId={lesson.id}
-          field="description"
-          label="Descrição"
-          hint="Uma ou duas linhas sobre o que a aula resolve."
-          defaultValue={lesson.description ?? ''}
-          rows={3}
-        />
-
-        <CampoLongo
-          lessonId={lesson.id}
-          field="para_saber"
-          label="Para saber"
-          hint="O conhecimento essencial. O que a pessoa precisa entender antes de agir."
-          defaultValue={lesson.para_saber ?? ''}
-        />
-
-        <CampoLongo
-          lessonId={lesson.id}
-          field="para_fazer"
-          label="Para fazer"
-          hint="A ação concreta que o aluno executa na própria rotina. Sem isto, a aula é videoaula."
-          defaultValue={lesson.para_fazer ?? ''}
-          accent
-        />
+        </Surface>
       </section>
 
-      {/* --- Habilidades ---------------------------------------------------
-          Mapear aqui é o que faz `skill_signals` gravar alguma coisa. Sem
-          isto, a aula conclui e o gatilho insere zero linhas. */}
-      <section className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-title font-light">Habilidades</h2>
-          <p className="text-caption text-ink-4">
-            O que esta aula desenvolve. É daqui que sai o histórico do aluno — aula sem habilidade
-            marcada não registra nada.
-          </p>
-          <Link
-            href="/admin/habilidades"
-            className="self-start text-caption text-blue-light hover:underline"
+      {/* ═══ OPCIONAL ══════════════════════════════════════════════════════
+          Fechado por padrão. Quem está subindo doze aulas numa tarde não
+          quer rolar por cinco blocos que não vai preencher hoje — e quem
+          quer enriquecer uma aula acha tudo num clique. */}
+      <details className="group rounded-[var(--radius-card)] border border-line">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4">
+          <span className="flex flex-col gap-0.5">
+            <span className="text-lead font-light text-ink">Enriquecer a aula</span>
+            <span className="text-caption text-ink-4">
+              Tudo daqui para baixo é opcional — dá para voltar depois, com a aula já no ar.
+            </span>
+          </span>
+          <span
+            aria-hidden
+            className="shrink-0 text-caption text-ink-4 transition-transform duration-150 group-open:rotate-90"
           >
-            Criar ou renomear habilidades →
-          </Link>
-        </div>
-        <Surface className="p-5">
-          <Habilidades
-            lessonId={lesson.id}
-            courseId={courseId}
-            skills={skills ?? []}
-            mapeadas={habilidadesMapeadas}
-          />
-        </Surface>
-      </section>
+            ▸
+          </span>
+        </summary>
 
-      {/* --- Materiais ----------------------------------------------------- */}
-      <section className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-title font-light">Materiais</h2>
-          <p className="text-caption text-ink-4">
-            O que o aluno leva da aula. Aparece embaixo do Para Fazer.
-          </p>
+        <div className="flex flex-col gap-8 border-t border-line px-5 py-6">
+          <div className="flex flex-col gap-4">
+            <CampoLongo
+              lessonId={lesson.id}
+              field="description"
+              label="Descrição"
+              hint="Uma ou duas linhas sobre o que a aula resolve."
+              defaultValue={lesson.description ?? ''}
+              rows={3}
+            />
+
+            <CampoLongo
+              lessonId={lesson.id}
+              field="para_saber"
+              label="Para saber"
+              hint="O conhecimento essencial. O que a pessoa precisa entender antes de agir."
+              defaultValue={lesson.para_saber ?? ''}
+            />
+
+            <CampoLongo
+              lessonId={lesson.id}
+              field="para_fazer"
+              label="Para fazer"
+              hint="A ação concreta que o aluno executa na própria rotina. É o que separa a Allen de uma videoteca — mas não trava nada: a aula publica sem ele."
+              defaultValue={lesson.para_fazer ?? ''}
+              accent
+            />
+
+            <p className="text-caption text-ink-4">
+              Estes três salvam sozinhos ao sair do campo.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3 border-t border-line pt-6">
+            <div className="flex flex-col gap-1">
+              <span className="text-label font-medium text-ink-2">Habilidades</span>
+              <p className="text-caption text-ink-4">
+                O que esta aula desenvolve. Alimenta o histórico do aluno e o Mapa.{' '}
+                <Link href="/admin/habilidades" className="text-blue-light hover:underline">
+                  Criar ou renomear →
+                </Link>
+              </p>
+            </div>
+            <Habilidades
+              lessonId={lesson.id}
+              courseId={courseId}
+              skills={skills ?? []}
+              mapeadas={habilidadesMapeadas}
+            />
+          </div>
+
+          <div className="flex flex-col gap-3 border-t border-line pt-6">
+            <div className="flex flex-col gap-1">
+              <span className="text-label font-medium text-ink-2">Materiais</span>
+              <p className="text-caption text-ink-4">
+                Arquivos que o aluno baixa. Aparecem embaixo do Para Fazer.
+              </p>
+            </div>
+            <Materiais lessonId={lesson.id} courseId={courseId} materiais={materiais ?? []} />
+          </div>
+
+          <div className="flex flex-col gap-3 border-t border-line pt-6">
+            <Field
+              label="Corrigir a duração"
+              htmlFor="duration_minutes_manual"
+              hint="Normalmente não precisa: ela vem do vídeo sozinha. Use só se o número estiver errado, ou numa aula sem vídeo."
+            >
+              <form action={atualizarAula} className="flex items-center gap-3">
+                <input type="hidden" name="id" value={lesson.id} />
+                <input type="hidden" name="course_id" value={courseId} />
+                <input type="hidden" name="title" value={lesson.title} />
+                <Input
+                  id="duration_minutes_manual"
+                  name="duration_minutes"
+                  type="number"
+                  min={0}
+                  step={1}
+                  defaultValue={
+                    lesson.duration_seconds ? Math.round(lesson.duration_seconds / 60) : ''
+                  }
+                  className="max-w-28"
+                />
+                <span className="text-caption text-ink-4">minutos</span>
+                <BotaoSalvar />
+              </form>
+            </Field>
+          </div>
         </div>
-        <Surface className="p-5">
-          <Materiais lessonId={lesson.id} courseId={courseId} materiais={materiais ?? []} />
-        </Surface>
-      </section>
+      </details>
 
       <form action={apagarAula} className="border-t border-line pt-6">
         <input type="hidden" name="id" value={lesson.id} />

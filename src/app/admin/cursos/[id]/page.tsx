@@ -406,18 +406,34 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
                   />
                 ))}
 
-                {/* Vários de uma vez primeiro: é o gesto do trabalho real —
-                    quem sobe um curso tem uma pasta, não um arquivo. */}
+                {/*
+                  UM CAMINHO PRINCIPAL, NÃO DOIS.
+
+                  Antes o arraste e o "criar aula" ficavam lado a lado, com o
+                  mesmo peso, e a pessoa tinha que escolher entre dois jeitos
+                  de fazer a mesma coisa antes de fazer qualquer coisa. Escolha
+                  sem critério não é liberdade, é hesitação.
+
+                  O trabalho real de quem sobe um curso é uma PASTA de vídeos.
+                  Então o arraste é o caminho, e criar aula vazia virou o que
+                  ele sempre foi: a exceção, para quando existe uma aula sem
+                  vídeo.
+                */}
                 <SoltarAulas courseId={course.id} moduleId={mod.id} />
 
-                <form action={criarAula} className="flex items-center gap-2 border-t border-line px-4 py-3">
-                  <input type="hidden" name="course_id" value={course.id} />
-                  <input type="hidden" name="module_id" value={mod.id} />
-                  <Input name="title" placeholder="Título da nova aula" className="h-9" required />
-                  <Button type="submit" size="sm" variant="secondary">
-                    Criar aula
-                  </Button>
-                </form>
+                <details className="border-t border-line">
+                  <summary className="cursor-pointer list-none px-4 py-2.5 text-caption text-ink-4 transition-colors hover:text-ink-2">
+                    + Criar uma aula sem vídeo
+                  </summary>
+                  <form action={criarAula} className="flex items-center gap-2 px-4 pb-3">
+                    <input type="hidden" name="course_id" value={course.id} />
+                    <input type="hidden" name="module_id" value={mod.id} />
+                    <Input name="title" placeholder="Título da aula" className="h-9" required />
+                    <Button type="submit" size="sm" variant="secondary">
+                      Criar
+                    </Button>
+                  </form>
+                </details>
               </div>
             </Surface>
           ))}

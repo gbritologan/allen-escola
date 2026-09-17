@@ -146,8 +146,8 @@ export function SoltarAulas({
             arrastando ? 'border-[rgba(76,65,255,0.7)] bg-[rgba(76,65,255,0.08)]' : 'border-line',
           )}
         >
-          <span className="text-caption text-ink-2">
-            {arrastando ? 'Solte os vídeos' : 'Arraste vários vídeos para criar as aulas'}
+          <span className="text-body text-ink-2">
+            {arrastando ? 'Solte aqui' : 'Arraste os vídeos das aulas para cá'}
           </span>
           <button
             type="button"
@@ -157,7 +157,8 @@ export function SoltarAulas({
             ou escolher do computador
           </button>
           <span className="text-caption text-ink-4">
-            Um arquivo, uma aula. O nome do arquivo vira o título.
+            Cada vídeo vira uma aula, na ordem dos nomes dos arquivos. O título e a duração
+            saem prontos — é só conferir depois.
           </span>
         </div>
       ) : (
