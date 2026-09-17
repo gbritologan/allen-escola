@@ -37,16 +37,34 @@ fi
 echo "Biblioteca $LIB"
 echo "Na área de transferência: ${#CHAVE} caracteres"
 
-# A chave do Bunny é um UUID — 36 caracteres. Conferir o FORMATO antes de
-# perguntar ao Bunny é o que separa "você colou a coisa errada" de "o Bunny
-# recusou", que são problemas diferentes com soluções diferentes.
-if [ "${#CHAVE}" -lt 30 ] || [ "${#CHAVE}" -gt 60 ]; then
+# A chave do Bunny é um UUID: 8-4-4-4-12 em hexadecimal, 36 caracteres, QUATRO
+# hifens. Conferir o FORMATO antes de perguntar ao Bunny é o que separa "você
+# colou a coisa errada" de "o Bunny recusou" — problemas diferentes, com
+# soluções diferentes. Um 401 que na verdade era erro de cópia manda a pessoa
+# procurar chave nova quando a chave nunca saiu do painel.
+if printf '%s' "$CHAVE" | grep -Eqi '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'; then
+  : # formato certo, segue
+elif [ "$(printf '%s' "$CHAVE" | tr -cd - | wc -c)" -eq 5 ]; then
+  # 5 hifens com o bloco longo no MEIO é a versão mascarada que o painel
+  # mostra antes de você clicar no olho. Aconteceu três vezes seguidas aqui.
+  echo
+  echo "❌ ISSO É A CHAVE MASCARADA, NÃO A CHAVE."
+  echo "   ${#CHAVE} caracteres e 5 hifens. Uma chave de verdade tem 36 e QUATRO."
+  echo
+  echo "   O painel do Bunny esconde o valor até você revelar."
+  echo "   Clique no ícone do OLHO (👁) na linha API Key, confirme que o"
+  echo "   bloco longo passou para o FIM, e só então copie."
+  echo
+  echo "   mascarada: xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxx-xxxx"
+  echo "   de verdade: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  exit 1
+else
   echo
   echo "❌ ISSO NÃO TEM CARA DE CHAVE."
-  echo "   Uma API Key do Bunny tem ~36 caracteres. Esta tem ${#CHAVE}."
+  echo "   Uma API Key do Bunny tem 36 caracteres e 4 hifens. Esta tem ${#CHAVE}."
   echo
   echo "   O que costuma estar na área de transferência nesse caso:"
-  echo "   um pedaço da página, ou a chave colada duas vezes."
+  echo "   um pedaço da página, a saída do terminal, ou a chave colada duas vezes."
   echo "   Copie de novo, só o campo API Key, e rode outra vez."
   exit 1
 fi
