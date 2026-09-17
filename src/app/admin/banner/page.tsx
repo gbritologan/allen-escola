@@ -20,9 +20,13 @@ export const metadata: Metadata = { title: 'Banner' }
 /**
  * O BANNER DA HOME.
  *
- * A medida (1440×360) está escrita em três lugares — aqui, no componente e na
- * migration — porque é a única arte do produto feita FORA do produto. Medida
- * que mora só na cabeça de quem programou volta errada do designer.
+ * A medida (3200×640, 5:1) está escrita aqui e no componente porque é a única
+ * arte do produto feita FORA do produto. Medida que mora só na cabeça de quem
+ * programou volta errada do designer.
+ *
+ * A largura é o DOBRO da moldura de propósito — ver o componente para o
+ * porquê. Resumo: tela de densidade 2× pede dois pixels por ponto, e arte
+ * menor que isso o navegador estica.
  *
  * Um banner por vez no ar: publicar arquiva os outros. Dois publicados fariam
  * o segundo sumir sem explicação.
@@ -43,9 +47,9 @@ export default async function AdminBannerPage() {
         <h1 className="text-display font-light">Banner da Home</h1>
         <p className="max-w-[64ch] text-body text-ink-3">
           A faixa do topo da Home.{' '}
-          <strong className="font-medium text-ink-2">1920×480 (4:1)</strong> — 1440×360 ainda
-          funciona, mas em monitor grande a moldura passa de 1500px e a arte menor precisa ser
-          ampliada. JPG, PNG, WebP ou
+          <strong className="font-medium text-ink-2">3200×640 (5:1)</strong>. A largura é o
+          dobro da moldura de propósito: tela de Mac tem densidade 2×, e arte menor que isso o
+          navegador estica — é o que serrilha. JPG, PNG, WebP ou
           AVIF, até 8MB. Sem arte enviada o banner não aparece para o aluno — a Home fecha em
           volta como se ele não existisse.
         </p>
@@ -106,8 +110,8 @@ export default async function AdminBannerPage() {
               nomeBase={b.id}
               acaoSalvar={enviarArte}
               ocultos={{ id: b.id }}
-              moldura="aspect-[4/1] w-full"
-              rotuloVazio="1920 × 480"
+              moldura="aspect-[5/1] w-full"
+              rotuloVazio="3200 × 640"
               tamanhos="42rem"
             />
 

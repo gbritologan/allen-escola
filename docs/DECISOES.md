@@ -1849,3 +1849,33 @@ tetos das massas subiram para 1700/1400/1050px.
 monitor grande; continuar pedindo 1440 seria pedir arte que já nasce
 ampliada. Arte de 1440 que já está no ar continua servindo — a diferença é de
 8%.
+
+## D-83 · Densidade de tela: a metade que eu não tinha olhado
+
+Em D-82 eu consertei o `sizes` do banner e declarei a nitidez resolvida. Ela
+não estava, e o Gabriel voltou dizendo a mesma coisa.
+
+O que faltava: **tela de Mac tem densidade 2×.** Cada ponto de layout são dois
+pixels físicos. A moldura de 1552 pontos pede **3104 pixels** de arte. Com o
+`sizes` corrigido, o navegador passou a PEDIR a versão grande — e o Next não
+tinha o que entregar, porque `next/image` nunca amplia além do arquivo de
+origem. Arte de 1920 não vira 3104.
+
+Ou seja: o gargalo mudou de lugar e eu não segui atrás dele. Corrigi o `sizes`,
+vi a causa que eu conhecia desaparecer, e chamei de resolvido — sem olhar para
+a origem do arquivo, que passou a ser o limite no instante em que o `sizes`
+parou de ser. **Consertar a causa que eu encontrei não é o mesmo que consertar
+o problema.**
+
+Medido no navegador, não estimado: `devicePixelRatio: 2`, moldura
+`1552 × 310`, razão `5.00`, necessidade `3104px`.
+
+A medida pedida passou a ser **3200×640** — 5:1 exato, com folga sobre os 3104.
+
+E a proporção foi de 4:1 para 5:1 a pedido dele. A 4:1 o banner tinha 388px de
+altura numa moldura de 1552: quase um terço da dobra para um elemento que é
+apresentação, não conteúdo. A 5:1 ficam 310px, e os 78px voltam para onde mora
+o que a pessoa veio fazer.
+
+O banner do curso acompanhou (2000×400): página mais estreita, mesma lição de
+densidade.

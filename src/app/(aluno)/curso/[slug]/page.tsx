@@ -87,7 +87,7 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
        * arte" — sinaliza "quebrou".
        */}
       {course.banner_url && (
-        <div className="relative -mt-2 aspect-[4/1] w-full overflow-hidden rounded-[var(--radius-card)] border border-line bg-navy">
+        <div className="relative -mt-2 aspect-[5/1] w-full overflow-hidden rounded-[var(--radius-card)] border border-line bg-navy">
           <Image
             src={course.banner_url}
             alt=""

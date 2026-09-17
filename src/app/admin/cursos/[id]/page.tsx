@@ -275,8 +275,9 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
         <div className="flex flex-col gap-1">
           <h2 className="text-title font-light">Banner da página</h2>
           <p className="text-caption text-ink-4">
-            4:1 deitado — 1920×480, a mesma proporção do banner da Home. Aparece no topo da
-            página do curso, acima do título. Opcional: sem ele, a página abre pelo título.
+            5:1 deitado — 2000×400. A página do curso é mais estreita que a Home, e a largura
+            já é o dobro da moldura: em tela de densidade 2×, arte menor entra esticada.
+            Aparece acima do título. Opcional: sem ele, a página abre pelo título.
           </p>
         </div>
 
@@ -287,8 +288,8 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
           acaoSalvar={enviarBannerCurso}
           acaoRemover={removerBannerCurso}
           ocultos={{ id: course.id }}
-          moldura="aspect-[4/1] w-full max-w-2xl"
-          rotuloVazio="1920 × 480"
+          moldura="aspect-[5/1] w-full max-w-2xl"
+          rotuloVazio="2000 × 400"
           tamanhos="42rem"
         />
       </section>

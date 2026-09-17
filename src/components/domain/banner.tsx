@@ -14,13 +14,31 @@ export interface BannerHome {
 /**
  * O BANNER DA HOME.
  *
- * 4:1 — 1920×480. A medida está escrita aqui e no Studio porque é a única
+ * 5:1 — 3200×640. A medida está escrita aqui e no Studio porque é a única
  * imagem do produto cuja arte é feita FORA. Medida que só existe na cabeça de
  * quem programou volta errada.
  *
- * Era 1440×360 e subiu quando o catálogo ficou wide: a moldura passa de
- * 1500px em monitor grande, e arte de 1440 entra ampliada. Arte já no ar em
- * 1440 continua servindo — a diferença é de 8%, não de qualidade percebida.
+ * ─── POR QUE 3200 DE LARGURA PARA UMA MOLDURA DE 1552 ────────────────────
+ *
+ * Porque tela de Mac tem densidade 2×. Cada ponto da moldura são DOIS pixels
+ * físicos, então 1552 pontos pedem 3104 pixels de arte. Abaixo disso o
+ * navegador estica, e esticar é o que serrilha.
+ *
+ * Isto foi o que me escapou antes: eu tinha corrigido o `sizes` (D-82) e
+ * concluído que a nitidez estava resolvida. Estava, para tela comum. Numa
+ * Retina, o navegador PEDIA a versão grande e o Next não tinha o que entregar
+ * — arte de 1920 não vira 3104. O gargalo deixou de ser o `sizes` e passou a
+ * ser o arquivo de origem, e eu afirmei "resolvido" sem ter olhado para essa
+ * metade.
+ *
+ * 3200 (e não 3104) para fechar em 5:1 exato com número redondo.
+ *
+ * ─── POR QUE 5:1 E NÃO 4:1 ───────────────────────────────────────────────
+ *
+ * A 4:1, numa moldura de 1552, o banner tinha 388px de altura — quase um
+ * terço da dobra, para um elemento que é apresentação e não conteúdo. A 5:1
+ * ele fica em 310px: continua tendo presença e devolve 78px à Home, que é
+ * onde mora o que a pessoa veio fazer.
  *
  * SEM IMAGEM ele não aparece. Um retângulo vazio com "banner aqui" no lugar
  * mais nobre da Home é pior do que não ter banner — o aluno não sabe que é um
@@ -84,7 +102,7 @@ export function Banner({ banner }: { banner: BannerHome }) {
   )
 
   const classe =
-    'relative block aspect-[4/1] w-full overflow-hidden rounded-[var(--radius-card)] border border-line'
+    'relative block aspect-[5/1] w-full overflow-hidden rounded-[var(--radius-card)] border border-line'
 
   // Sem destino, não é link. Um <a> que não vai a lugar nenhum quebra teclado
   // e leitor de tela para ganhar nada.
