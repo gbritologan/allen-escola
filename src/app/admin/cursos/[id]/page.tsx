@@ -20,6 +20,7 @@ import {
   publicarCurso,
   removerBannerCurso,
 } from './actions'
+import { ApagarCurso } from './apagar-curso'
 import { AulaExpansivel } from './aula-expansivel'
 import { CampoImagem } from '@/components/domain/campo-imagem'
 import { videoConfigurado } from '@/lib/video'
@@ -48,7 +49,7 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
   const { id } = await params
   const supabase = await createClient()
 
-  const [{ data: course }, { data: themes }, { data: modules }] =
+  const [{ data: course }, { data: themes }, { data: modules }, { count: progressos }] =
     await Promise.all([
       supabase
         .from('courses')
@@ -59,9 +60,29 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
         .maybeSingle(),
       supabase.from('themes').select('id, name, status').order('position'),
       supabase.from('modules').select('id, title, position, status').eq('course_id', id).order('position'),
+      /*
+       * QUANTOS ALUNOS PERDEM ALGO SE ESTE CURSO FOR APAGADO.
+       *
+       * A zona de exclusão precisa dizer a consequência em número, não em
+       * "esta ação é irreversível" — aviso genérico ninguém lê, porque está
+       * em toda parte. "O progresso de 14 alunos" alguém lê.
+       *
+       * `head: true` traz só a contagem: a página não precisa das linhas.
+       */
+      supabase
+        .from('lesson_progress')
+        .select('user_id', { count: 'exact', head: true })
+        .in(
+          'lesson_id',
+          (
+            await supabase.from('lessons').select('id').eq('course_id', id)
+          ).data?.map((l) => l.id) ?? [],
+        ),
     ])
 
   if (!course) notFound()
+
+  const alunosComProgresso = progressos ?? 0
 
   const { data: links } = await supabase
     .from('course_themes')
@@ -474,6 +495,15 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
           </form>
         </Surface>
       </section>
+
+      {/* A zona de apagar fica no fim, fechada, longe de tudo que se usa
+          todo dia. Perto do que se usa, ela vira risco de clique. */}
+      <ApagarCurso
+        id={course.id}
+        titulo={course.title}
+        aulas={course.lesson_count ?? 0}
+        alunosComProgresso={alunosComProgresso}
+      />
     </div>
   )
 }

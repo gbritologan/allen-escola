@@ -2187,3 +2187,35 @@ aluno.
 O padrão vale além deste caso. Quando alguém reporta como defeito um
 comportamento correto, quase sempre o sistema está aplicando uma regra que a
 pessoa não tem como enxergar — e a correção não é mudar a regra, é mostrá-la.
+
+## D-94 · Apagar curso não é um botão
+
+O `on delete cascade` de `courses` é generoso: somem os módulos, as aulas, os
+materiais, as habilidades mapeadas — e também o **progresso, as anotações e as
+aulas salvas de todo aluno que passou por ali**. A anotação que alguém
+escreveu há seis meses vai junto. Não há desfazer.
+
+Um clique é gesto barato demais para isso. A ação exige que o **título do
+curso seja digitado**.
+
+A diferença entre isso e um "tem certeza?" não é rigor, é atenção. Diálogo de
+confirmação treina a pessoa a clicar duas vezes sem ler — todo mundo já
+clicou "OK" em algo que não leu. Digitar o nome obriga a olhar QUAL curso está
+na tela. É a diferença entre confirmar e conferir.
+
+E a consequência aparece em NÚMERO, não em adjetivo: "o progresso, as
+anotações e as aulas salvas de 14 alunos". "Esta ação é irreversível" ninguém
+lê, porque está em toda parte; "14 alunos" alguém lê.
+
+A tela também oferece a saída mais provável: se a ideia é só tirar da vista,
+"Voltar para rascunho" faz isso sem perder nada. Boa parte dos pedidos de
+apagar é, na verdade, um pedido de esconder.
+
+**Os vídeos saem do provedor ANTES do banco.** Se o banco apagar primeiro, os
+ids se perdem e os vídeos ficam no Bunny para sempre, cobrados, apontados por
+ninguém. Mas falhar ao apagar um vídeo não trava a exclusão: órfão custa
+centavos, e um curso apagado pela metade custa muito mais.
+
+`orders` é RESTRICT no schema, então curso vendido não apaga de jeito nenhum.
+Essa trava é do banco, não desta função — aqui a mensagem só traduz o erro do
+Postgres para português.

@@ -6,6 +6,7 @@ import { type EstadoImagem, IMAGEM_PARADA } from '@/core/shared/imagem'
 import { redirect } from 'next/navigation'
 import { slugify } from '@/core/shared/slug'
 import { apagarImagem, recusaDaUrl } from '@/lib/imagens'
+import { getVideoProvider } from '@/lib/video'
 import { can } from '@/core/identity/permissions'
 import { getSession } from '@/lib/auth/session'
 import { createClient } from '@/lib/supabase/server'
@@ -450,4 +451,84 @@ export async function criarAulaParaUpload(
     .single()
 
   return lesson ? { id: lesson.id as string, title: lesson.title as string } : null
+}
+
+export interface EstadoExclusao {
+  erro: string | null
+}
+
+/**
+ * APAGAR O CURSO — e por que isto não é um botão.
+ *
+ * O `on delete cascade` do banco é generoso: some o curso, os módulos, as
+ * aulas, os materiais, as habilidades mapeadas — e também o PROGRESSO, as
+ * ANOTAÇÕES e as AULAS SALVAS de todo aluno que passou por ali. A anotação que
+ * alguém escreveu há seis meses vai junto, e não há desfazer.
+ *
+ * Um clique é gesto barato demais para uma consequência desse tamanho. Por
+ * isso a ação exige que o título do curso seja DIGITADO. Não é burocracia: é
+ * o único jeito de garantir que a pessoa leu qual curso está apagando. Quem
+ * digita "Branding - Marca Inconfundível" inteiro não está apagando por
+ * engano.
+ *
+ * `orders` é RESTRICT no banco, então curso vendido não apaga de jeito nenhum
+ * — e isso é decisão do schema, não desta função. Aqui a mensagem só traduz o
+ * erro do Postgres para português.
+ *
+ * OS VÍDEOS SAEM DO PROVEDOR ANTES. Se o banco apagar primeiro, os ids se
+ * perdem e os vídeos ficam no Bunny para sempre, cobrados, apontados por
+ * ninguém. Falhar ao apagar um vídeo não impede o resto: órfão custa centavos,
+ * e travar a exclusão por causa dele deixaria o curso pela metade.
+ */
+export async function apagarCurso(
+  _prev: EstadoExclusao,
+  formData: FormData,
+): Promise<EstadoExclusao> {
+  const id = String(formData.get('id') ?? '')
+  const tituloDigitado = String(formData.get('confirmacao') ?? '').trim()
+  if (!id) return { erro: 'Curso não identificado.' }
+
+  const supabase = await createClient()
+  const { data: curso } = await supabase
+    .from('courses')
+    .select('title, intro_video_asset_id')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (!curso) return { erro: 'Curso não encontrado, ou você não tem permissão.' }
+
+  if (tituloDigitado !== curso.title) {
+    return { erro: 'O título não confere. Digite exatamente como está escrito acima.' }
+  }
+
+  const { data: aulas } = await supabase
+    .from('lessons')
+    .select('video_asset_id')
+    .eq('course_id', id)
+
+  const assets = [
+    ...(aulas ?? []).map((a) => a.video_asset_id),
+    curso.intro_video_asset_id,
+  ].filter((v): v is string => Boolean(v))
+
+  for (const asset of assets) {
+    try {
+      await getVideoProvider().deleteAsset(asset)
+    } catch {
+      // Ver o comentário acima: órfão no provedor não trava a exclusão.
+    }
+  }
+
+  const { error } = await supabase.from('courses').delete().eq('id', id)
+
+  if (error) {
+    return {
+      erro: error.message.includes('orders')
+        ? 'Este curso tem venda registrada e não pode ser apagado. Tire do ar em vez de apagar.'
+        : 'Não consegui apagar o curso.',
+    }
+  }
+
+  revalidar(id)
+  redirect('/admin/cursos')
 }
