@@ -67,6 +67,7 @@ async function Resultados({ termo }: { termo: string }) {
     supabase
       .from('courses')
       .select('id, slug, title, summary, cover_url, format, status, duration_seconds, lesson_count, available_at, coming_soon')
+      .eq('status', 'published')
       .textSearch('search_doc', consulta, { type: 'websearch', config: 'portuguese' })
       .limit(12),
     supabase
@@ -173,7 +174,6 @@ async function Resultados({ termo }: { termo: string }) {
                   summary: c.summary,
                   coverUrl: c.cover_url,
                   availableAt: c.available_at ?? null,
-                  rascunho: c.status !== 'published',
                   comingSoon: Boolean(c.coming_soon),
                   format: c.format,
                   durationSeconds: c.duration_seconds,

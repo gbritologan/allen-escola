@@ -69,6 +69,19 @@ export const listCourses = cache(async (filters: CourseFilters = {}): Promise<Co
     .select(
       'id, slug, title, summary, cover_url, format, status, duration_seconds, lesson_count, instructor_id, published_at, available_at, coming_soon',
     )
+    /*
+     * RASCUNHO NÃO APARECE PARA NINGUÉM AQUI — nem para a equipe.
+     *
+     * A RLS deixa `is_staff()` ler curso não publicado, e isso é certo: o
+     * Studio precisa. Mas estas funções servem a ÁREA DO ALUNO, e ali a
+     * equipe precisa ver exatamente o que o aluno vê — senão não há como
+     * conferir o próprio trabalho.
+     *
+     * O filtro aqui não afrouxa nada: ele é mais restritivo que a RLS, nunca
+     * menos. Quem precisa ver rascunho abre o Studio, que é onde rascunho
+     * mora.
+     */
+    .eq('status', 'published')
     .order('published_at', { ascending: false, nullsFirst: false })
 
   if (filters.format) query = query.eq('format', filters.format)
@@ -106,7 +119,6 @@ export const listCourses = cache(async (filters: CourseFilters = {}): Promise<Co
     summary: c.summary,
     coverUrl: c.cover_url,
     availableAt: c.available_at ?? null,
-    rascunho: c.status !== 'published',
     comingSoon: Boolean(c.coming_soon),
     format: c.format,
     durationSeconds: c.duration_seconds,

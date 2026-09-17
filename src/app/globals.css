@@ -456,3 +456,121 @@
   max-width: 100rem;
   margin-inline: auto;
 }
+
+/* ---------------------------------------------------------------------------
+   O VIDRO REDONDO
+
+   `liquid-glass` foi desenhado para painel: um degradê LINEAR de cima para
+   baixo, que num retângulo lê como luz vinda de cima. Aplicado a um círculo,
+   o mesmo degradê vira uma faixa horizontal — e o disco parece achatado,
+   porque a luz não acompanha a curva.
+
+   A diferença é geométrica, não de gosto: superfície curva reflete a luz num
+   PONTO, não numa linha. Daí o realce ser uma elipse pequena no alto, e não
+   uma faixa que atravessa.
+
+   Três camadas, e cada uma faz um trabalho:
+
+     · o realce especular — a elipse no alto, onde a luz bate
+     · o brilho de borda inferior — a luz que contorna a esfera e volta
+     · o fundo de vidro — o que estava ali antes, e continua
+
+   Sem a segunda, o disco parece um botão com um reflexo colado em cima. É ela
+   que fecha a forma como volume.
+--------------------------------------------------------------------------- */
+@utility glass-orb {
+  position: relative;
+  background:
+    radial-gradient(
+      68% 48% at 50% 4%,
+      color-mix(in srgb, var(--vidro-brilho) 100%, transparent) 0%,
+      transparent 72%
+    ),
+    radial-gradient(
+      120% 90% at 50% 118%,
+      color-mix(in srgb, var(--vidro-brilho) 55%, transparent) 0%,
+      transparent 58%
+    ),
+    var(--vidro-fundo);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  border: 1px solid var(--vidro-borda);
+  box-shadow:
+    inset 0 1px 0 0 var(--vidro-brilho),
+    inset 0 -6px 12px -8px var(--vidro-baixo),
+    0 18px 40px -22px var(--vidro-sombra);
+}
+
+/* O reflexo que atravessa no hover.
+
+   Uma faixa clara e inclinada que cruza o disco uma vez. Ela não gira nem
+   pulsa: atravessa e sai, como luz passando por um objeto que se moveu. Efeito
+   que fica repetindo vira ruído na periferia da visão — e numa grade de oito,
+   oito ruídos.
+
+   `transform` e `opacity` só: as duas propriedades que o navegador anima sem
+   recalcular layout. Numa grade inteira reagindo ao mouse, isso é a diferença
+   entre suave e travado. */
+@utility reflexo {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+@utility reflexo-faixa {
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  width: 45%;
+  left: -60%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    color-mix(in srgb, white 34%, transparent) 45%,
+    color-mix(in srgb, white 44%, transparent) 55%,
+    transparent 100%
+  );
+  transform: skewX(-18deg);
+  opacity: 0;
+}
+
+.group:hover .reflexo-faixa,
+.group:focus-visible .reflexo-faixa {
+  animation: atravessar 900ms var(--ease-allen) forwards;
+}
+
+@keyframes atravessar {
+  0% {
+    left: -60%;
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    left: 115%;
+    opacity: 0;
+  }
+}
+
+/* Quem pediu menos movimento não recebe o reflexo. O disco continua
+   respondendo ao mouse pela cor e pela escala — o retorno não se perde. */
+@media (prefers-reduced-motion: reduce) {
+  .group:hover .reflexo-faixa,
+  .group:focus-visible .reflexo-faixa {
+    animation: none;
+  }
+}
+
+/* O véu da cor sobe no hover: 14% em repouso, 26% quando o mouse chega.
+   É a variável que o inline style do selo lê — sem ela, a cor "mais viva" que
+   o Gabriel pediu exigiria estado em JavaScript para algo que o CSS resolve. */
+.group:hover .glass-orb,
+.group:focus-visible .glass-orb {
+  --veu-do-tema: 26%;
+}

@@ -2320,3 +2320,41 @@ cadeado.
 O cadeado vem antes do texto de propósito: símbolo de "fechado" não precisa de
 tradução, e funciona na miniatura pequena da busca do mesmo jeito que no
 cartão grande.
+
+## D-100 · "Ver como aluno" só funciona se for o que o aluno vê
+
+Eu tinha resolvido o "curso em rascunho continua aparecendo" mostrando um selo
+— *Rascunho · só a equipe vê* (D-93). Tornar a regra visível foi metade da
+resposta; o Gabriel deu a outra: *"eu quero ver como aluno mesmo, pra saber
+exatamente como o aluno está vendo"*.
+
+Ele está certo, e a diferença é de propósito da tela. A área do aluno não é um
+lugar onde a equipe tem privilégios: é onde a equipe **confere o próprio
+trabalho**. Um selo explicando por que algo extra aparece ainda deixa a equipe
+sem saber o que o aluno vê.
+
+Agora `listCourses` e a busca filtram `status = 'published'` no código, para
+todo mundo. O filtro é mais restritivo que a RLS, nunca menos — quem precisa
+ver rascunho abre o Studio, que é onde rascunho mora.
+
+## D-101 · Vidro de painel não serve para vidro redondo
+
+O `liquid-glass` tem um degradê LINEAR de cima para baixo. Num painel isso lê
+como luz vinda de cima. Num círculo, vira uma faixa horizontal — e o disco
+parece achatado, que foi a palavra que o Gabriel usou.
+
+A diferença é geométrica, não de gosto: **superfície curva reflete a luz num
+ponto, não numa linha.** Daí `glass-orb`, com o realce numa elipse pequena no
+alto e um segundo brilho contornando a base. É o de baixo que fecha a forma
+como volume; sem ele, o disco vira um botão com um reflexo colado em cima.
+
+**O reflexo do hover atravessa uma vez e sai**, em vez de ficar em laço. Efeito
+que se repete vira ruído na periferia da visão, e numa grade de oito seriam
+oito ruídos competindo pela atenção que deveria ir para o nome do tema.
+
+A animação mexe só em `transform` e `opacity` — as duas propriedades que o
+navegador anima sem recalcular layout. Numa grade inteira reagindo ao mouse,
+isso é a diferença entre suave e travado.
+
+E a cor "mais viva" saiu por variável CSS (`--veu-do-tema`: 14% → 26%), não por
+estado em JavaScript. Hover é pergunta que o CSS já sabe responder.
