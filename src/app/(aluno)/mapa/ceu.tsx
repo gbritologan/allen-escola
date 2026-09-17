@@ -569,7 +569,28 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
            * encaixe continuar legível.
            */
           ctx!.font = `300 ${Math.max(15, 26 * Math.min(1.8, c.z + 0.55))}px var(--font-elvon), Archivo, sans-serif`
-          ctx!.fillStyle = ativo ? COR.rotuloForte : COR.rotulo
+
+          /*
+           * O NOME CARREGA A COR DO TEMA.
+           *
+           * Antes era cinza para todos. O nome é o segundo elemento mais forte
+           * da tela, e deixá-lo neutro fazia a cor morrer no disco — a peça
+           * que mais se lê era a única que não dizia de quem é.
+           *
+           * A luz é mais alta que a do disco (88 contra 80): texto fino
+           * precisa de mais contraste que uma mancha cheia para a mesma
+           * legibilidade. Mesmo matiz, peso ótico diferente — que é o que
+           * mantém os dois como a mesma cor aos olhos.
+           *
+           * Quando a constelação está ativa, o branco volta: ali o nome deixa
+           * de identificar e passa a dizer "é este que você está olhando", e
+           * para isso o contraste máximo serve melhor que a cor.
+           */
+          ctx!.fillStyle = ativo
+            ? COR.rotuloForte
+            : `hsl(${a.hue} ${
+                a.estado === 'aceso' ? 70 : a.estado === 'visto' ? 58 : 48
+              }% 88% / 0.92)`
           ctx!.textAlign = 'center'
           ctx!.letterSpacing = '0.3em'
           ctx!.globalAlpha = 0.92
