@@ -2387,3 +2387,26 @@ durante a navegação.
 a pergunta errada: ali o tema é ponto de entrada, não verbete. Oito nomes mais
 oito frases num campo estrelado viram texto flutuando. A descrição continua na
 Home e na página do tema, onde há espaço para ler.
+
+## D-103 · Identidade vale mais que estado
+
+No Mapa, a saturação ia de 8% (constelação apagada) a 74% (acesa). Enquanto a
+cor era só decoração — um matiz calculado pela POSIÇÃO do tema no círculo —,
+isso funcionava: 8% lia como "ainda não fiz nada aqui".
+
+Depois de 0031 a cor virou **identidade**. Vendas é dourado, Liderança é
+vermelho, e o aluno aprende isso na Home. A 8% de saturação os oito viravam
+oito discos brancos, e a identidade que a Home acabou de construir não
+atravessava a ponte.
+
+O piso subiu para 52%, e a faixa ficou mais estreita (52 → 78). A diferença
+entre apagado e aceso encolheu; em troca, o tema é reconhecível pela cor em
+qualquer estado.
+
+É a troca certa, e o critério é a duração: **estado é informação de uma
+sessão; identidade é o que a pessoa carrega entre as telas.** Quando os dois
+disputam o mesmo canal — aqui, a saturação —, quem cede é o que dura menos.
+
+O erro de origem foi não revisar o desenho quando a premissa mudou. A regra de
+8% foi escrita quando a cor não significava nada; ela continuou valendo por
+duas migrações depois de a cor passar a significar tudo.

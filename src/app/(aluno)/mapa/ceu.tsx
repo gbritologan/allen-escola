@@ -486,13 +486,27 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
            * isso: um borrão roxo sem ícone.
            *
            * Agora a luz varia pouco (78–92), o bastante para o ícone sempre
-           * ler, e o estado migra para a SATURAÇÃO: apagada é quase cinza,
-           * acesa é o tom cheio. A tese de D-37 continua de pé — a constelação
-           * ganha COR ao ser feita — e some o efeito colateral de ela ganhar
-           * também legibilidade.
+           * ler, e o estado migra para a SATURAÇÃO.
+           *
+           * ─── E A SATURAÇÃO TINHA UM PISO BAIXO DEMAIS ─────────────────
+           *
+           * Ela ia de 8% (apagada) a 74% (acesa). Enquanto a cor era só
+           * decoração — um matiz calculado pela posição do tema —, isso
+           * funcionava: 8% lia como "ainda não fiz nada aqui".
+           *
+           * Depois de 0031, a cor virou IDENTIDADE: Vendas é dourado, Zeus é
+           * vermelho, e o aluno aprende isso na Home. A 8% de saturação, os
+           * oito temas viram oito discos brancos no Mapa — e a identidade que
+           * a Home construiu não atravessa a ponte.
+           *
+           * O piso subiu para 52%. O estado continua sendo dito, agora numa
+           * faixa mais estreita (52 → 78): a diferença entre apagado e aceso
+           * fica menor, e em troca o tema é reconhecível pela cor em qualquer
+           * estado. É a troca certa — estado é informação de uma sessão,
+           * identidade é o que a pessoa carrega entre as telas.
            */
-          const luz = aceso ? 92 : a.estado === 'visto' ? 84 : 78
-          const sat = aceso ? 74 : a.estado === 'visto' ? 26 : 8
+          const luz = aceso ? 92 : a.estado === 'visto' ? 86 : 80
+          const sat = aceso ? 78 : a.estado === 'visto' ? 64 : 52
 
           // O halo externo é o que cola o disco no céu. Sem ele o nó parece
           // um adesivo colado por cima do fundo.
