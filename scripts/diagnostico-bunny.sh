@@ -19,6 +19,20 @@ LIB="${1:-735837}"
 
 echo "════════ ÁREA DE TRANSFERÊNCIA ════════"
 BRUTO=$(pbpaste)
+
+# Sem isto, área vazia vira uma chamada com chave vazia, o Bunny devolve 401, e
+# o relatório inteiro sai parecendo diagnóstico quando não mediu nada. Erro que
+# se disfarça de resultado é pior que erro nenhum — foi o que aconteceu aqui.
+if [ -z "$(printf '%s' "$BRUTO" | tr -d '[:space:]')" ]; then
+  echo
+  echo "❌ A ÁREA DE TRANSFERÊNCIA ESTÁ VAZIA. Não testei nada."
+  echo
+  echo "   Vá ao painel do Bunny, na linha API Key:"
+  echo "     1. clique no olho para revelar"
+  echo "     2. clique no ícone de copiar"
+  echo "   Depois rode este comando de novo."
+  exit 1
+fi
 printf '%s' "$BRUTO" | python3 -c '
 import sys, re
 b = sys.stdin.buffer.read()
