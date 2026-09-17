@@ -20,6 +20,8 @@ import {
   criarBanner,
   enviarArte,
   salvarBanner,
+  enviarArteClara,
+  removerArteClara,
 } from './actions'
 
 export const metadata: Metadata = { title: 'Banner' }
@@ -42,7 +44,7 @@ export default async function AdminBannerPage() {
   const supabase = await createClient()
   const { data: banners } = await supabase
     .from('home_banners')
-    .select('id, eyebrow, title, subtitle, cta_label, cta_href, image_url, status, position')
+    .select('id, eyebrow, title, subtitle, cta_label, cta_href, image_url, image_url_light, status, position')
     .order('position')
 
   const { data: intro } = await supabase
@@ -167,16 +169,45 @@ export default async function AdminBannerPage() {
 
             {/* A prévia tem a proporção real. Julgar 4:1 num quadrado é como
                 aprovar capa olhando miniatura. */}
-            <CampoImagem
-              atual={b.image_url}
-              pasta="banners"
-              nomeBase={b.id}
-              acaoSalvar={enviarArte}
-              ocultos={{ id: b.id }}
-              moldura="aspect-[5/1] w-full"
-              rotuloVazio="3200 × 640"
-              tamanhos="42rem"
-            />
+            {/* DUAS ARTES, UMA POR TEMA.
+                Token resolve cor; não resolve fotografia. Uma arte feita para
+                fundo escuro fica suja sobre fundo claro, e a única saída é
+                outra arte. A do claro é opcional: sem ela, o tema claro
+                reaproveita a do escuro. */}
+            <div className="grid gap-5 lg:grid-cols-2">
+              <div className="flex flex-col gap-2">
+                <span className="text-caption uppercase tracking-[0.14em] text-ink-3">
+                  Tema escuro · o padrão
+                </span>
+                <CampoImagem
+                  atual={b.image_url}
+                  pasta="banners"
+                  nomeBase={b.id}
+                  acaoSalvar={enviarArte}
+                  ocultos={{ id: b.id }}
+                  moldura="aspect-[5/1] w-full"
+                  rotuloVazio="3200 × 640"
+                  tamanhos="42rem"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <span className="text-caption uppercase tracking-[0.14em] text-ink-3">
+                  Tema claro · opcional
+                </span>
+                <CampoImagem
+                  atual={b.image_url_light}
+                  pasta="banners"
+                  nomeBase={`${b.id}-claro`}
+                  acaoSalvar={enviarArteClara}
+                  acaoRemover={removerArteClara}
+                  ocultos={{ id: b.id }}
+                  moldura="aspect-[5/1] w-full"
+                  rotuloVazio="usa a do escuro"
+                  tamanhos="42rem"
+                />
+              </div>
+            </div>
 
             <form action={salvarBanner} className="flex flex-col gap-4">
               <input type="hidden" name="id" value={b.id} />

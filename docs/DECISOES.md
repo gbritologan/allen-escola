@@ -2542,3 +2542,25 @@ E o Studio passou a listar **na mesma ordem que o aluno vê**. Antes era
 `updated_at desc`, a ordem de quem edita: você subiria um curso e ele não
 subiria no lugar onde importa. Arrumar uma lista ordenada por outro critério é
 arrumar no escuro.
+
+## D-109 · Token resolve cor; não resolve fotografia
+
+Todo o tema claro até aqui saiu de token: a cor muda, o desenho não. Com o
+banner isso não funciona, e a razão é categórica — **ele é fotografia**. Uma
+arte pensada para fundo escuro fica suja sobre fundo claro, e não existe
+variável que conserte uma imagem.
+
+Então são dois arquivos, e a escolha é do CSS: as duas ficam no HTML e o tema
+mostra a certa, com `display` e não `opacity`, para a escondida não ser lida
+por leitor de tela. É o mesmo caminho da marca (D-89) — sem JavaScript, sem
+piscar a arte errada depois da hidratação.
+
+**A do claro é opcional, e o padrão importa.** Sem ela, as duas tags apontam
+para o mesmo arquivo: o navegador baixa uma vez e o resultado é o de antes.
+Quem não fizer a segunda arte não perde nada — e a alternativa (obrigar duas)
+travaria o banner por causa de uma tela que a maioria não usa.
+
+O custo honesto: quem fizer as duas artes carrega as duas. Num elemento com
+`priority` na dobra da Home isso não é grátis. Aceitei porque a alternativa é
+decidir no cliente, e decidir no cliente significa mostrar a arte errada por
+um frame — no lugar mais visto do produto.

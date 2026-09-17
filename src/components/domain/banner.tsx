@@ -9,6 +9,8 @@ export interface BannerHome {
   ctaLabel: string | null
   ctaHref: string | null
   imageUrl: string | null
+  /** A arte do tema claro. Nula = o claro reaproveita a do escuro. */
+  imageUrlLight: string | null
 }
 
 /**
@@ -54,9 +56,21 @@ export function Banner({ banner }: { banner: BannerHome }) {
   const temTexto = banner.eyebrow || banner.title || banner.subtitle
   const conteudo = (
     <>
+      {/*
+        DUAS ARTES, O CSS ESCOLHE.
+
+        Banner é fotografia, e token não conserta imagem: uma arte pensada para
+        fundo escuro fica suja sobre fundo claro. Então as duas ficam no HTML e
+        o tema mostra a certa — `display`, não `opacity`, para a escondida não
+        ser lida por leitor de tela nem baixada duas vezes à toa.
+
+        Sem `imageUrlLight`, as duas apontam para o mesmo arquivo: o navegador
+        baixa uma vez e o resultado é o de antes. Opcional de verdade.
+      */}
       <Image
         src={banner.imageUrl}
         alt={banner.title ?? ''}
+        className="marca-no-escuro object-cover"
         fill
         /*
          * ISTO É O QUE DECIDE A NITIDEZ, e é fácil de esquecer ao mexer no
@@ -71,7 +85,15 @@ export function Banner({ banner }: { banner: BannerHome }) {
          */
         sizes="(min-width: 1840px) 1552px, (min-width: 768px) calc(100vw - 288px), calc(100vw - 48px)"
         priority
-        className="object-cover"
+      />
+      <Image
+        src={banner.imageUrlLight ?? banner.imageUrl}
+        alt=""
+        aria-hidden
+        className="marca-no-claro object-cover"
+        fill
+        sizes="(min-width: 1840px) 1552px, (min-width: 768px) calc(100vw - 288px), calc(100vw - 48px)"
+        priority
       />
 
       {temTexto && (

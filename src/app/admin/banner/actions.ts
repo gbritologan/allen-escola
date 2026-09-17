@@ -124,3 +124,59 @@ export async function apagarBanner(formData: FormData) {
 
   revalidar()
 }
+
+/**
+ * A ARTE DO TEMA CLARO.
+ *
+ * Mesma mecânica de `enviarArte`, coluna diferente. Existe separada porque
+ * banner é FOTOGRAFIA: token não conserta imagem, e uma arte feita para fundo
+ * escuro fica suja sobre fundo claro.
+ *
+ * É opcional de verdade — sem ela, o tema claro reaproveita a arte do escuro.
+ * Pior que ter as duas, melhor que não ter banner.
+ */
+export async function enviarArteClara(
+  _prev: EstadoImagem,
+  formData: FormData,
+): Promise<EstadoImagem> {
+  const id = String(formData.get('id') ?? '')
+  const url = String(formData.get('url') ?? '')
+  if (!id) return { erro: 'Banner não identificado.', url: null }
+
+  const recusa = recusaDaUrl(url, 'banners')
+  if (recusa) return { erro: recusa, url: null }
+
+  const supabase = await createClient()
+  const { data: antes } = await supabase
+    .from('home_banners')
+    .select('image_url_light')
+    .eq('id', id)
+    .maybeSingle()
+
+  await supabase.from('home_banners').update({ image_url_light: url }).eq('id', id)
+  await apagarImagem(antes?.image_url_light)
+
+  revalidar()
+  return { erro: null, url }
+}
+
+export async function removerArteClara(
+  _prev: EstadoImagem,
+  formData: FormData,
+): Promise<EstadoImagem> {
+  const id = String(formData.get('id') ?? '')
+  if (!id) return { erro: 'Banner não identificado.', url: null }
+
+  const supabase = await createClient()
+  const { data: antes } = await supabase
+    .from('home_banners')
+    .select('image_url_light')
+    .eq('id', id)
+    .maybeSingle()
+
+  await supabase.from('home_banners').update({ image_url_light: null }).eq('id', id)
+  await apagarImagem(antes?.image_url_light)
+
+  revalidar()
+  return { erro: null, url: null }
+}

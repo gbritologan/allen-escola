@@ -133,7 +133,7 @@ export async function getBanner() {
   const supabase = await createClient()
   const { data } = await supabase
     .from('home_banners')
-    .select('id, eyebrow, title, subtitle, cta_label, cta_href, image_url')
+    .select('id, eyebrow, title, subtitle, cta_label, cta_href, image_url, image_url_light')
     .eq('status', 'published')
     .order('position')
     .limit(1)
@@ -148,6 +148,7 @@ export async function getBanner() {
     subtitle: data.subtitle as string | null,
     ctaLabel: data.cta_label as string | null,
     ctaHref: data.cta_href as string | null,
+    imageUrlLight: data.image_url_light ?? null,
     imageUrl: data.image_url as string | null,
   }
 }

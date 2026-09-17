@@ -99,6 +99,7 @@ export default async function InicioExemploPage() {
             // Sem arte de verdade ainda: a prévia usa a Athena da marca só
             // para o bloco existir e dar para julgar proporção.
             imageUrl: '/brand/athena.webp',
+    imageUrlLight: null,
           }}
           blocks={blocks}
           emBreve={[
