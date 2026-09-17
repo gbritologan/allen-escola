@@ -2085,3 +2085,28 @@ não fazer a pessoa descobrir um botão para conseguir ler.
 
 **O Mapa fica escuro nos dois temas.** Ele pinta em canvas, não em CSS, e é um
 céu noturno: fundo claro ali não seria tema claro, seria outro produto.
+
+## D-90 · Nome de PAPEL inverte com o tema; nome de COR, não
+
+O Gabriel abriu o Studio no tema claro e o botão "Publicar curso" estava azul
+com texto preto. Ilegível.
+
+A causa é uma linha que eu escrevi em D-89: redefini `--color-off-white` para
+navy no tema claro. O nome já dizia que era errado.
+
+A regra que faltava, e que agora está escrita:
+
+- **`ink`, `ink-2`, `line`, `realce`, `fundo` são PAPÉIS** — "o texto da
+  página", "o traço que separa". Papel muda de cor com o tema, porque o que
+  está atrás dele muda.
+- **`off-white`, `blue`, `blue-light` são CORES** — valores literais. Cor
+  literal não inverte, porque o que ela pinta não mudou de lugar.
+
+`off-white` existe para o que fica **sobre o azul da marca**, e o azul não tem
+modo claro. Invertê-lo trocou "claro sobre azul" por "navy sobre azul" em
+todos os botões primários do produto de uma vez.
+
+É o mesmo erro do texto do banner sobre o véu (D-89), reaparecendo num lugar
+que eu não tinha olhado — e as duas vezes o sintoma foi o mesmo: texto que
+some. Quando a exceção aparece duas vezes, ela não é exceção; é regra que eu
+ainda não tinha nomeado.

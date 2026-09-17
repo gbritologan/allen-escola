@@ -94,7 +94,7 @@ export function CourseCard({
       </div>
 
       <div className="flex flex-1 flex-col gap-1.5 p-4">
-        <h3 className="text-lead font-light text-ink transition-colors group-hover:text-off-white">
+        <h3 className="text-lead font-light text-ink-2 transition-colors group-hover:text-ink">
           {course.title}
         </h3>
         {course.summary && (

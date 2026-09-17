@@ -218,7 +218,13 @@
   --color-ink-2: #2b3357;
   --color-ink-3: #5a6288;
   --color-ink-4: #7e87ab;
-  --color-off-white: #0a0f2e;
+
+  /* `--color-off-white` NÃO é redefinido aqui, e a ausência é a correção de um
+     erro meu: eu o tinha invertido para navy, e todo botão azul ficou com
+     texto navy sobre azul — ilegível. O nome já dizia o problema. `ink` é um
+     PAPEL (o texto da página) e vira o oposto com o tema; `off-white` é uma
+     COR, e cor literal não inverte. Ela existe para o que fica sobre o azul da
+     marca, e o azul não tem modo claro. */
 
   --color-line: rgba(10, 15, 46, 0.12);
   --color-line-strong: rgba(10, 15, 46, 0.24);
