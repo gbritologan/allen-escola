@@ -3,6 +3,7 @@ import type { ContinueTarget } from '@/core/progress/types'
 import { resolveHome, type HomeBlock } from '@/core/home/resolve-home'
 import { createClient } from '@/lib/supabase/server'
 import { listCourses, listThemes } from './catalog'
+import { getVideoProvider, videoConfigurado } from '@/lib/video'
 
 /**
  * Monta a Home.
@@ -185,4 +186,52 @@ export async function getEmBreve() {
     // Esta consulta já filtra por publicado logo acima; rascunho não chega aqui.
     rascunho: false,
   }))
+}
+
+export interface BoasVindas {
+  url: string
+  poster: string | null
+  eyebrow: string | null
+  title: string | null
+  subtitle: string | null
+}
+
+/**
+ * O VÍDEO DE BOAS-VINDAS DA HOME.
+ *
+ * Devolve nulo quando não há vídeo, e a Home some com o bloco inteiro. Não é
+ * o mesmo que devolver um objeto vazio: um bloco que aparece sem conteúdo é
+ * defeito na tela mais vista do produto.
+ *
+ * O ticket é assinado a cada visita e expira. Vale a mesma regra de sempre
+ * (D-17): id de asset não abre nada sozinho, e link copiado do inspetor morre
+ * em pouco tempo.
+ */
+export async function getBoasVindas(viewerId: string): Promise<BoasVindas | null> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('home_intro')
+    .select('video_asset_id, eyebrow, title, subtitle')
+    .eq('id', 1)
+    .maybeSingle()
+
+  if (!data?.video_asset_id || !videoConfigurado()) return null
+
+  try {
+    const ticket = await getVideoProvider().createPlaybackTicket({
+      assetId: data.video_asset_id,
+      viewerId,
+    })
+    return {
+      url: ticket.url,
+      poster: ticket.posterUrl,
+      eyebrow: data.eyebrow,
+      title: data.title,
+      subtitle: data.subtitle,
+    }
+  } catch {
+    // Provedor fora do ar não pode derrubar a Home inteira. Sem vídeo, a
+    // página continua sendo a página.
+    return null
+  }
 }

@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { Banner, type BannerHome } from '@/components/domain/banner'
 import { ContinueCard } from '@/components/domain/continue-card'
 import { CourseCard } from '@/components/domain/course-card'
+import { Player } from '@/components/domain/player'
+import type { BoasVindas } from '@/lib/data/home'
 import { SeloDoTema } from '@/components/domain/selo-do-tema'
 import type { CourseSummary } from '@/core/catalog/types'
 import type { HomeBlock } from '@/core/home/resolve-home'
@@ -22,11 +24,13 @@ import { cn } from '@/lib/utils'
 export function BlocosDaHome({
   saudacao,
   banner,
+  boasVindas,
   blocks,
   emBreve,
 }: {
   saudacao: string
   banner: BannerHome | null
+  boasVindas?: BoasVindas | null
   blocks: HomeBlock[]
   emBreve: CourseSummary[]
 }) {
@@ -42,6 +46,45 @@ export function BlocosDaHome({
       {/* O destaque. Sem arte publicada ele não ocupa espaço nenhum — a Home
           fecha em volta como se ele não existisse. */}
       {banner && <Banner banner={banner} />}
+
+      {/*
+        AS BOAS-VINDAS.
+
+        Vem depois do banner e ANTES de tudo o mais — cursos, temas, o que for.
+        É a voz da escola falando uma vez com quem entrou, e voz que aparece
+        depois do catálogo já perdeu a vez.
+
+        Some inteiro quando não há vídeo. Bloco vazio no lugar mais visto do
+        produto não comunica "falta conteúdo": comunica "quebrou".
+      */}
+      {boasVindas && (
+        <section className="flex flex-col gap-4">
+          <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+            <div className="glass-card overflow-hidden rounded-[var(--radius-card)]">
+              <Player
+                src={boasVindas.url}
+                poster={boasVindas.poster}
+                lessonId={null}
+                posicaoInicial={0}
+              />
+            </div>
+
+            <div className="flex flex-col gap-3 lg:pt-4">
+              {boasVindas.eyebrow && (
+                <span className="text-caption font-medium uppercase tracking-[0.16em] text-blue-light">
+                  {boasVindas.eyebrow}
+                </span>
+              )}
+              {boasVindas.title && (
+                <h2 className="text-title font-light text-ink">{boasVindas.title}</h2>
+              )}
+              {boasVindas.subtitle && (
+                <p className="max-w-[44ch] text-body text-ink-3">{boasVindas.subtitle}</p>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {blocks.map((block) => {
         switch (block.kind) {

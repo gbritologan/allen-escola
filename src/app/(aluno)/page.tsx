@@ -1,7 +1,7 @@
 import { BlocosDaHome } from '@/components/domain/blocos-da-home'
 import { saudacao } from '@/core/home/saudacao'
 import { requireSession } from '@/lib/auth/session'
-import { getBanner, getEmBreve, getHomeBlocks } from '@/lib/data/home'
+import { getBanner, getBoasVindas, getEmBreve, getHomeBlocks } from '@/lib/data/home'
 
 /**
  * A HOME DA JORNADA.
@@ -17,16 +17,18 @@ import { getBanner, getEmBreve, getHomeBlocks } from '@/lib/data/home'
 export default async function HomePage() {
   const session = await requireSession()
 
-  const [blocks, banner, emBreve] = await Promise.all([
+  const [blocks, banner, emBreve, boasVindas] = await Promise.all([
     getHomeBlocks(session.userId),
     getBanner(),
     getEmBreve(),
+    getBoasVindas(session.userId),
   ])
 
   return (
     <BlocosDaHome
       saudacao={saudacao(session.profile?.fullName ?? session.email)}
       banner={banner}
+      boasVindas={boasVindas}
       blocks={blocks}
       emBreve={emBreve}
     />

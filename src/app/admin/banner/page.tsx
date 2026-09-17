@@ -1,5 +1,12 @@
 import type { Metadata } from 'next'
 import { CampoImagem } from '@/components/domain/campo-imagem'
+import { EnviarVideoSolto } from '@/components/domain/enviar-video-solto'
+import { videoConfigurado } from '@/lib/video'
+import {
+  prepararBoasVindas,
+  removerBoasVindas,
+  salvarTextoBoasVindas,
+} from './intro-actions'
 import { BotaoSalvar } from '@/components/primitives/botao-salvar'
 import { Button } from '@/components/primitives/button'
 import { Chip } from '@/components/primitives/chip'
@@ -38,6 +45,12 @@ export default async function AdminBannerPage() {
     .select('id, eyebrow, title, subtitle, cta_label, cta_href, image_url, status, position')
     .order('position')
 
+  const { data: intro } = await supabase
+    .from('home_intro')
+    .select('video_asset_id, eyebrow, title, subtitle')
+    .eq('id', 1)
+    .maybeSingle()
+
   const lista = banners ?? []
 
   return (
@@ -54,6 +67,56 @@ export default async function AdminBannerPage() {
           volta como se ele não existisse.
         </p>
       </header>
+
+      {/* ═══ BOAS-VINDAS ══════════════════════════════════════════════════
+          Vem antes do banner nesta tela porque vem antes na Home. Ordem de
+          edição que espelha a ordem de leitura poupa quem edita de traduzir
+          uma na outra toda vez. */}
+      <section className="flex flex-col gap-4 border-b border-line pb-10">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-title font-light">Vídeo de boas-vindas</h2>
+          <p className="max-w-[64ch] text-caption text-ink-4">
+            Todo aluno vê este vídeo ao entrar, no topo da Home, antes dos cursos e dos temas.
+            É a voz da escola falando uma vez com todo mundo. Opcional — sem vídeo, o bloco não
+            aparece e a Home fecha em volta.
+          </p>
+        </div>
+
+        {videoConfigurado() ? (
+          <EnviarVideoSolto
+            titulo="Boas-vindas · Allen Escola"
+            temVideo={Boolean(intro?.video_asset_id)}
+            preparar={prepararBoasVindas}
+            remover={removerBoasVindas}
+            ajuda="Escolher já envia. Um vídeo curto, de quem fala pela escola."
+          />
+        ) : (
+          <p className="text-caption text-caution">
+            O provedor de vídeo não está configurado neste ambiente.
+          </p>
+        )}
+
+        <form action={salvarTextoBoasVindas} className="flex flex-col gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Chapéu" htmlFor="intro_eyebrow" hint="Opcional. Ex.: Bem-vindo.">
+              <Input id="intro_eyebrow" name="eyebrow" defaultValue={intro?.eyebrow ?? ''} />
+            </Field>
+            <Field label="Título" htmlFor="intro_title" hint="Opcional.">
+              <Input id="intro_title" name="title" defaultValue={intro?.title ?? ''} />
+            </Field>
+          </div>
+          <Field
+            label="Subtítulo"
+            htmlFor="intro_subtitle"
+            hint="Opcional. Uma linha ao lado do vídeo — um vídeo também pode falar sozinho."
+          >
+            <Input id="intro_subtitle" name="subtitle" defaultValue={intro?.subtitle ?? ''} />
+          </Field>
+          <div className="self-start">
+            <BotaoSalvar />
+          </div>
+        </form>
+      </section>
 
       <form action={criarBanner} className="flex items-end gap-3">
         <div className="flex-1">
