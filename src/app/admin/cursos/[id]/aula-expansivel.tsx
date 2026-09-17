@@ -2,9 +2,13 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { IconeApagar } from '@/components/icons'
+import { Button } from '@/components/primitives/button'
 import { Chip } from '@/components/primitives/chip'
+import { Input } from '@/components/primitives/field'
 import { formatDuration } from '@/core/shared/format'
 import { cn } from '@/lib/utils'
+import { apagarAulaDoCurso, renomearAula } from './actions'
 import { EnviarVideo } from './aula/[lessonId]/enviar-video'
 import { Materiais, type Material } from './aula/[lessonId]/materiais'
 
@@ -116,6 +120,43 @@ export function AulaExpansivel({
           />
 
           <Materiais lessonId={aula.id} courseId={courseId} materiais={aula.materiais} />
+
+          {/*
+            RENOMEAR E APAGAR, AQUI MESMO.
+
+            Antes, trocar o título de uma aula exigia abrir a página dela,
+            editar, salvar e voltar — quatro passos para corrigir um typo que
+            se vê na lista. Quem sobe doze vídeos de uma vez corrige doze
+            títulos, e o nome vem do nome do arquivo: errar é o caso comum,
+            não a exceção.
+
+            O campo salva no Enter ou ao sair, como todo campo de nome deve.
+          */}
+          <div className="flex flex-wrap items-end gap-3 border-t border-line pt-5">
+            <form action={renomearAula} className="flex flex-1 items-end gap-2">
+              <input type="hidden" name="id" value={aula.id} />
+              <input type="hidden" name="course_id" value={courseId} />
+              <label className="flex flex-1 flex-col gap-1.5">
+                <span className="text-caption text-ink-4">Título da aula</span>
+                <Input name="title" defaultValue={aula.title} className="h-9" required />
+              </label>
+              <Button type="submit" size="sm" variant="secondary">
+                Renomear
+              </Button>
+            </form>
+
+            <form action={apagarAulaDoCurso}>
+              <input type="hidden" name="id" value={aula.id} />
+              <input type="hidden" name="course_id" value={courseId} />
+              <button
+                type="submit"
+                className="flex h-9 items-center gap-1.5 rounded-[var(--radius-control)] border border-line px-3 text-caption text-ink-4 transition-colors hover:border-[rgba(255,107,107,0.45)] hover:text-critical"
+              >
+                <IconeApagar className="size-3.5" />
+                Apagar aula
+              </button>
+            </form>
+          </div>
 
           {/* O texto da aula continua na página dela: Para Saber, Para Fazer e
               habilidades são trabalho de escrita, não de upload. */}

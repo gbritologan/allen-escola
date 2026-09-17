@@ -2439,3 +2439,43 @@ clareavam ali, e eu os deixei claros aqui também. Sobre branco, `ink-4` dava
 O erro conceitual: no escuro, tom baixo é o que se afasta do fundo **por
 cima**; no claro, **por baixo**. Hierarquia se preserva pela distância ao
 fundo, não pelo número. Fechei os dois, mantendo a distância entre eles.
+
+## D-105 · Refinamento é aritmética, não gosto
+
+"As coisas estão muito rentes uma da outra." No painel lateral da aula, a aba
+"MATERIAIS" estava literalmente cortada na borda.
+
+A causa dá para calcular: três rótulos em CAIXA ALTA — que já é larga — com
+`0.12em` de entreletra, repartindo o painel em `flex-1`, e ainda gastando 8px
+de respiro lateral cada. O rótulo mais longo não cabia na terça parte.
+
+A entreletra caiu para `0.06em` e o respiro lateral foi a zero — `flex-1` já
+reparte o espaço, e o padding só roubava o que o texto precisava. O respiro
+vertical subiu, e os blocos internos passaram de `px-3 py-2.5` para
+`px-5 py-3`.
+
+O que parecia "falta de capricho" era uma conta que não fechava. Aperto raramente
+é descuido de quem escolheu o valor; é um valor que era certo antes de o
+conteúdo crescer.
+
+## D-106 · O caso comum não pode custar quatro passos
+
+Renomear uma aula exigia abrir a página dela, editar, salvar e voltar. Quatro
+passos para corrigir um typo que se vê na lista.
+
+E errar o título é o **caso comum**, não a exceção: o arraste de vários vídeos
+tira o nome do arquivo, e nome de arquivo raramente é nome de aula. Quem sobe
+doze vídeos corrige doze títulos.
+
+Agora renomear e apagar estão na própria linha da aula, abertos junto com o
+envio do vídeo — onde o erro aparece.
+
+**Apagar aula não pede o nome digitado**, e a diferença para apagar curso
+(D-94) é de proporção: uma aula é uma peça, some da lista na hora, e quem
+apagou vê o efeito imediatamente. Um curso leva doze aulas e o progresso de
+todo mundo. Trava desproporcional ensina a pessoa a ignorar travas.
+
+`renomearAula` só toca o título, em vez de reaproveitar `atualizarAula`, que
+exige a duração no mesmo envio. Reaproveitar faria a lista do curso precisar
+conhecer a duração para não zerá-la — uma tela dependendo de um detalhe de
+outra. Menos poder, menos acoplamento.

@@ -77,7 +77,7 @@ export function PainelLateral({
 
       {aba === 'aulas' && (
         <div className="flex flex-col">
-          <span className="px-4 pb-2 pt-4 text-caption uppercase tracking-[0.14em] text-ink-4">
+          <span className="px-5 pb-3 pt-5 text-caption uppercase tracking-[0.1em] text-ink-4">
             A seguir · {moduloTitulo}
           </span>
           <ul className="flex max-h-[32rem] flex-col overflow-y-auto">
@@ -89,7 +89,7 @@ export function PainelLateral({
                     href={`/curso/${cursoSlug}/${a.slug}`}
                     aria-current={atual ? 'true' : undefined}
                     className={cn(
-                      'flex items-center gap-3 px-3 py-2.5 transition-colors duration-150',
+                      'flex items-center gap-3 px-5 py-3 transition-colors duration-150',
                       atual
                         ? 'bg-[rgba(76,65,255,0.14)]'
                         : 'hover:bg-[var(--color-realce-2)]',
@@ -125,7 +125,7 @@ export function PainelLateral({
       )}
 
       {aba === 'anotacoes' && (
-        <div className="flex flex-col gap-4 p-4">
+        <div className="flex flex-col gap-5 p-5">
           <FormAnotacao aulaId={aulaAtualId} caminho={caminho} />
 
           {anotacoes.length > 0 && (
@@ -133,7 +133,7 @@ export function PainelLateral({
               {anotacoes.map((n) => (
                 <li
                   key={n.id}
-                  className="group flex flex-col gap-1 rounded-[var(--radius-control)] border border-line px-3 py-2.5"
+                  className="group flex flex-col gap-1.5 rounded-[var(--radius-control)] border border-line px-4 py-3"
                 >
                   <div className="flex items-baseline justify-between gap-2">
                     {/* O minuto é o valor da nota: ele é o caminho de volta.
@@ -176,7 +176,7 @@ export function PainelLateral({
       {aba === 'materiais' && (
         <div className="flex flex-col p-1">
           {materiais.length === 0 ? (
-            <p className="px-3 py-6 text-caption text-ink-4">
+            <p className="px-5 py-7 text-caption text-ink-4">
               Esta aula não tem material para baixar.
             </p>
           ) : (
@@ -186,7 +186,7 @@ export function PainelLateral({
                 href={m.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between gap-3 rounded-[var(--radius-control)] px-3 py-2.5 transition-colors hover:bg-[var(--color-realce-2)]"
+                className="flex items-center justify-between gap-3 rounded-[var(--radius-control)] px-4 py-3 transition-colors hover:bg-[var(--color-realce-2)]"
               >
                 <span className="min-w-0 truncate text-caption text-ink-2">{m.title}</span>
                 <span className="shrink-0 text-caption text-ink-4">
@@ -216,7 +216,21 @@ function Botao({
       onClick={onClick}
       aria-pressed={ativa}
       className={cn(
-        'flex-1 border-b-2 px-2 py-3 text-caption uppercase tracking-[0.12em] transition-colors duration-150',
+        /*
+         * O ESPAÇAMENTO DAS ABAS.
+         *
+         * Eram três rótulos em caixa alta com 0.12em de entreletra, dividindo
+         * o painel em `flex-1` e com 8px de respiro lateral. Caixa alta já é
+         * larga; entreletra larga a mais; e três nomes de tamanhos diferentes
+         * ("Aulas" tem metade de "Anotações") faziam o terceiro encostar na
+         * borda e cortar.
+         *
+         * A entreletra caiu para 0.06em, o respiro vertical subiu, e o
+         * horizontal virou 0: `flex-1` já reparte o espaço, e o padding lateral
+         * só roubava o que o texto precisava. Refinamento aqui é aritmética,
+         * não gosto — o rótulo mais longo tem que caber na terça parte.
+         */
+        'flex-1 border-b-2 px-0 py-3.5 text-caption uppercase tracking-[0.06em] transition-colors duration-150',
         ativa
           ? 'border-b-blue-light text-ink'
           : 'border-b-transparent text-ink-4 hover:text-ink-2',

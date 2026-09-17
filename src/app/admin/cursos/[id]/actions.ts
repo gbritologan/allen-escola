@@ -539,3 +539,61 @@ export async function apagarCurso(
   revalidar(id)
   redirect('/admin/cursos')
 }
+
+/**
+ * RENOMEAR A AULA, DE DENTRO DO CURSO.
+ *
+ * `atualizarAula` (na página da aula) também renomeia, mas exige a duração no
+ * mesmo envio — o formulário de lá carrega os dois. Chamá-la daqui obrigaria a
+ * lista do curso a conhecer a duração para não zerá-la, e uma tela passaria a
+ * depender de um detalhe de outra.
+ *
+ * Esta só toca o título. Menos poder, menos acoplamento.
+ */
+export async function renomearAula(formData: FormData) {
+  const id = String(formData.get('id') ?? '')
+  const courseId = String(formData.get('course_id') ?? '')
+  const titulo = String(formData.get('title') ?? '').trim()
+  if (!id || titulo.length < 2) return
+
+  const supabase = await createClient()
+  await supabase.from('lessons').update({ title: titulo }).eq('id', id)
+
+  revalidar(courseId)
+}
+
+/**
+ * APAGAR A AULA, com o vídeo junto.
+ *
+ * Diferente de apagar curso (D-94), aqui não peço o nome digitado. A
+ * proporção é outra: uma aula é uma peça, some da lista na hora, e quem
+ * apagou vê o efeito imediatamente — enquanto um curso leva doze aulas e o
+ * progresso de todo mundo.
+ *
+ * O vídeo sai do provedor ANTES do banco, pelo mesmo motivo de sempre: depois
+ * do delete o id se perde e o arquivo fica cobrado para sempre, apontado por
+ * ninguém.
+ */
+export async function apagarAulaDoCurso(formData: FormData) {
+  const id = String(formData.get('id') ?? '')
+  const courseId = String(formData.get('course_id') ?? '')
+  if (!id) return
+
+  const supabase = await createClient()
+  const { data: aula } = await supabase
+    .from('lessons')
+    .select('video_asset_id')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (aula?.video_asset_id) {
+    try {
+      await getVideoProvider().deleteAsset(aula.video_asset_id)
+    } catch {
+      // Órfão no provedor custa centavos; travar a exclusão custa mais.
+    }
+  }
+
+  await supabase.from('lessons').delete().eq('id', id)
+  revalidar(courseId)
+}
