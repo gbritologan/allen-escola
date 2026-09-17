@@ -1909,3 +1909,29 @@ quebrou exatamente quando começou a ser usado.
 
 A lição não é "testar mais". É que componente com renderização condicional tem
 mais de um estado, e o estado que importa é aquele em que ele aparece.
+
+## D-85 · Campo cego faz a pessoa colar duas vezes
+
+O verificador de chave do Bunny pedia a chave num campo sem eco — o padrão de
+`read -rs`, escolhido para a chave não aparecer na tela nem no histórico.
+
+O Gabriel colou, não viu nada acontecer, colou de novo. Chegaram **208
+caracteres** onde cabiam 36. O Bunny respondeu 401, e a minha mensagem de erro
+culpou "chave da conta no lugar da chave da biblioteca" — um diagnóstico
+errado, dito com confiança, sobre um problema que era do meu próprio campo.
+
+Duas correções, e a segunda é a que importa:
+
+1. **A chave vem da área de transferência (`pbpaste`), não do teclado.** Colar
+   não repete; digitar às cegas, sim. E some o passo em que não há retorno.
+
+2. **O formato é conferido ANTES de perguntar ao Bunny.** 208 caracteres não
+   é "chave recusada", é "você colou outra coisa" — problemas diferentes, com
+   soluções diferentes. Um erro que acusa a causa errada é pior que nenhum
+   erro: ele manda a pessoa consertar o que não está quebrado.
+
+**O custo real disso:** a chave acabou digitada no prompt do shell depois que
+o script terminou (`zsh: command not found: <a chave>`), e de lá foi parar no
+histórico e num print. Duas exposições que existiram porque o campo não dava
+sinal de vida. Segurança que atrapalha o uso não é segurança — ela empurra a
+pessoa para o caminho inseguro.

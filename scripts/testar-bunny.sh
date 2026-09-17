@@ -1,32 +1,56 @@
 #!/usr/bin/env bash
 #
-# TESTAR A CHAVE DO BUNNY SEM ELA VAZAR PARA LUGAR NENHUM.
+# TESTAR A CHAVE DO BUNNY SEM DIGITAR NADA.
 #
-# A chave é digitada escondida (`read -rs`) e vive só dentro deste processo:
-# não entra no histórico do shell, não vai para arquivo, não aparece na tela.
+# A chave vem da ÁREA DE TRANSFERÊNCIA (pbpaste), não do teclado. Isso não é
+# conveniência: a primeira versão pedia a chave num campo cego, e campo cego
+# não dá retorno — o Gabriel colou mais de uma vez achando que não tinha
+# pegado, e chegaram 208 caracteres onde cabiam 36. O Bunny recusou, e a
+# mensagem de erro culpou a chave errada em vez do campo.
 #
-# Por que existe: descobrir que a chave está errada DEPOIS de salvá-la na
-# Vercel custa um redeploy e mais uma rodada de "não funcionou". Aqui a
-# resposta vem em dois segundos, antes de qualquer coisa ser salva.
+# Colar não repete. Digitar às cegas, sim.
 #
-#   bash scripts/testar-bunny.sh
+# A chave vive só dentro deste processo: não vai para arquivo, não aparece na
+# tela, não entra no histórico do shell.
+#
+#   1. copie a API Key no painel do Bunny
+#   2. bash scripts/testar-bunny.sh
 #
 set -uo pipefail
 
-printf 'ID da biblioteca [735837]: '
-read -r LIB
-LIB="${LIB:-735837}"
+LIB="${1:-735837}"
 
-printf 'API Key da biblioteca (não aparece enquanto você digita): '
-read -rs CHAVE
-printf '\n\n'
-
-if [ -z "$CHAVE" ]; then
-  echo "Nenhuma chave digitada. Rode de novo."
+if ! command -v pbpaste >/dev/null 2>&1; then
+  echo "Este script usa a área de transferência do macOS (pbpaste) e não achei ela."
   exit 1
 fi
 
-echo "Biblioteca $LIB · chave de ${#CHAVE} caracteres"
+# Tira espaço, quebra de linha e aspas que vêm junto de um copiar desatento.
+CHAVE=$(pbpaste | tr -d '[:space:]"'"'"'')
+
+if [ -z "$CHAVE" ]; then
+  echo "A área de transferência está vazia."
+  echo "Copie a API Key no painel do Bunny e rode de novo."
+  exit 1
+fi
+
+echo "Biblioteca $LIB"
+echo "Na área de transferência: ${#CHAVE} caracteres"
+
+# A chave do Bunny é um UUID — 36 caracteres. Conferir o FORMATO antes de
+# perguntar ao Bunny é o que separa "você colou a coisa errada" de "o Bunny
+# recusou", que são problemas diferentes com soluções diferentes.
+if [ "${#CHAVE}" -lt 30 ] || [ "${#CHAVE}" -gt 60 ]; then
+  echo
+  echo "❌ ISSO NÃO TEM CARA DE CHAVE."
+  echo "   Uma API Key do Bunny tem ~36 caracteres. Esta tem ${#CHAVE}."
+  echo
+  echo "   O que costuma estar na área de transferência nesse caso:"
+  echo "   um pedaço da página, ou a chave colada duas vezes."
+  echo "   Copie de novo, só o campo API Key, e rode outra vez."
+  exit 1
+fi
+
 echo "Perguntando ao Bunny…"
 echo
 
@@ -40,14 +64,16 @@ case "$STATUS" in
     echo "✅ A CHAVE FUNCIONA."
     echo "   O Bunny respondeu 200 e listou a biblioteca."
     echo
-    echo "   Pode salvar esta chave em BUNNY_STREAM_API_KEY na Vercel."
+    echo "   Ela continua na sua área de transferência — pode colar direto em"
+    echo "   BUNNY_STREAM_API_KEY na Vercel, sem copiar de novo."
     ;;
   401)
     echo "❌ 401 — O BUNNY RECUSOU A CHAVE."
     echo
-    echo "   Quase sempre é a chave da CONTA no lugar da chave da BIBLIOTECA."
-    echo "   A certa fica em: Stream → a biblioteca → aba API → \"API Key\"."
-    echo "   A de Account Settings NÃO serve para este endpoint."
+    echo "   O formato está certo, então não foi erro de colar."
+    echo "   Quase sempre é a chave da CONTA no lugar da chave da BIBLIOTECA:"
+    echo "   a certa fica em Stream → a biblioteca → aba API → \"API Key\"."
+    echo "   A de Account Settings não serve para este endpoint."
     ;;
   404)
     echo "❌ 404 — ESTE ID DE BIBLIOTECA NÃO EXISTE NESTA CONTA."
