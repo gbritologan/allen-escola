@@ -82,6 +82,9 @@ export const listCourses = cache(async (filters: CourseFilters = {}): Promise<Co
      * mora.
      */
     .eq('status', 'published')
+    /* A ordem é a que o Studio definiu. A data continua como desempate, para
+       cursos nunca reordenados aparecerem como sempre apareceram. */
+    .order('position')
     .order('published_at', { ascending: false, nullsFirst: false })
 
   if (filters.format) query = query.eq('format', filters.format)

@@ -2518,3 +2518,27 @@ o resto do produto ainda usa. O `tsc` acusou em segundos e o `git checkout`
 devolveu tudo. A lição não é "usar git" (óbvio): é que substituir UM arquivo
 apagando o diretório dele é desproporcional, e desproporção é o que transforma
 um erro pequeno em um estrago grande.
+
+## D-108 · A ordem do catálogo é decisão editorial, não cronológica
+
+O catálogo ordenava por `published_at desc`: o último publicado vinha
+primeiro. É razoável para blog e errado para escola — **a ordem em que se
+gravou não é a ordem em que se quer que se aprenda**, e ninguém deveria ter
+que republicar um curso para movê-lo na lista.
+
+`courses.position` dá a caneta a quem monta o catálogo. Nasce semeada com a
+ordem atual, para a primeira troca partir do que já está na tela em vez de
+embaralhar tudo — migração que reordena sozinha assusta mais do que ajuda.
+
+Duas decisões de interface:
+
+**Setas, não arrastar.** Arrastar é bonito e péssimo de teclado, e uma lista
+de oito itens não ganha nada com ele.
+
+**As setas ficam ANTES do título.** A ordem é uma propriedade da lista, não do
+curso — e o olho lê a posição antes do nome.
+
+E o Studio passou a listar **na mesma ordem que o aluno vê**. Antes era
+`updated_at desc`, a ordem de quem edita: você subiria um curso e ele não
+subiria no lugar onde importa. Arrumar uma lista ordenada por outro critério é
+arrumar no escuro.
