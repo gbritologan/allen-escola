@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ICONES_TEMA } from '@/components/icons/temas'
 import type { Astro, Mapa } from '@/core/mapa/layout'
 import { ruido } from '@/core/mapa/layout'
 
@@ -39,31 +38,67 @@ const COR = {
  * fica no tom cheio. A constelação GANHA cor ao ser feita.
  */
 /**
- * Um Path2D por chave de ícone, criado uma vez.
+ * OS EMBLEMAS NO CANVAS.
  *
- * `new Path2D(d)` a cada quadro, para cada tema, a 60fps, seria trabalho
- * jogado fora: os caminhos nunca mudam.
+ * Na Home, os emblemas são PNG usados como máscara de CSS — a forma vem do
+ * arquivo, a cor vem do tema. Canvas não tem máscara de CSS, então o mesmo
+ * truque é feito à mão: desenha-se o PNG numa tela fora da vista, pinta-se
+ * por cima com `source-in`, e o que sobra é a silhueta na cor certa.
+ *
+ * Fazer isso a cada quadro, para oito temas, a 60fps, seria absurdo. Então
+ * cada combinação de emblema+cor+tamanho é pintada UMA vez e guardada. O
+ * laço de desenho só copia o resultado.
+ *
+ * ─── POR QUE NÃO CONTINUAR COM VETOR ─────────────────────────────────────
+ *
+ * Havia um caminho mais simples: manter os desenhos em Path2D, como antes. Ele
+ * foi descartado porque exigiria DUAS versões de cada emblema — a arte real na
+ * Home e um vetor aproximado no Mapa. Duas versões divergem: alguém troca uma
+ * arte e esquece a outra, e o aluno vê símbolos diferentes para o mesmo tema
+ * em duas telas. A identidade que a cor e o ícone construíram morre aí.
  */
-const CAMINHOS = new Map<string, Path2D[]>()
+const PINTADOS = new Map<string, HTMLCanvasElement>()
+const CARREGADAS = new Map<string, HTMLImageElement>()
 
-function caminhosDoIcone(chave: string): Path2D[] | null {
-  const cache = CAMINHOS.get(chave)
-  if (cache) return cache
-  const icone = ICONES_TEMA[chave]
-  if (!icone) return null
-  const feito = icone.d.map((d) => new Path2D(d))
-  CAMINHOS.set(chave, feito)
-  return feito
+function imagemDoEmblema(chave: string): HTMLImageElement | null {
+  const pronta = CARREGADAS.get(chave)
+  if (pronta) return pronta.complete && pronta.naturalWidth > 0 ? pronta : null
+
+  const img = new Image()
+  img.src = `/temas/${chave}.png`
+  CARREGADAS.set(chave, img)
+  return null
 }
 
-/**
- * Desenha o símbolo do tema dentro do anel.
- *
- * Os caminhos vêm no viewBox 24×24, então a transformação leva o centro do
- * ícone (12,12) para o centro do astro e escala pelo lado desejado. `evenodd`
- * é o que faz os subcaminhos internos virarem furo — sem ele a máscara do
- * teatro vira uma mancha.
- */
+function emblemaPintado(chave: string, cor: string, lado: number): HTMLCanvasElement | null {
+  // O tamanho entra na chave arredondado: sem isso, cada fração de zoom
+  // geraria uma tela nova e o cache cresceria sem limite durante a navegação.
+  const passo = Math.max(12, Math.round(lado / 4) * 4)
+  const id = `${chave}|${cor}|${passo}`
+
+  const cache = PINTADOS.get(id)
+  if (cache) return cache
+
+  const img = imagemDoEmblema(chave)
+  if (!img) return null
+
+  const tela = document.createElement('canvas')
+  tela.width = passo
+  tela.height = passo
+  const ctx = tela.getContext('2d')
+  if (!ctx) return null
+
+  ctx.drawImage(img, 0, 0, passo, passo)
+  // `source-in` mantém só onde já havia desenho: a cor entra pela silhueta.
+  ctx.globalCompositeOperation = 'source-in'
+  ctx.fillStyle = cor
+  ctx.fillRect(0, 0, passo, passo)
+
+  PINTADOS.set(id, tela)
+  return tela
+}
+
+/** Desenha o emblema do tema dentro do anel. */
 function desenharIcone(
   ctx: CanvasRenderingContext2D,
   chave: string | null | undefined,
@@ -73,26 +108,15 @@ function desenharIcone(
   cor: string,
 ) {
   if (!chave || lado < 9) return
-  const caminhos = caminhosDoIcone(chave)
-  if (!caminhos) return
+  const pintado = emblemaPintado(chave, cor, lado)
+  if (!pintado) return
 
-  const escala = lado / 24
   ctx.save()
-  ctx.translate(cx - lado / 2, cy - lado / 2)
-  ctx.scale(escala, escala)
-  ctx.fillStyle = cor
   ctx.globalAlpha = 0.92
-  for (const caminho of caminhos) ctx.fill(caminho, 'evenodd')
+  ctx.drawImage(pintado, cx - lado / 2, cy - lado / 2, lado, lado)
   ctx.restore()
 }
 
-/** Corta sem cortar palavra no meio. */
-function cortar(texto: string, max: number) {
-  if (texto.length <= max) return texto
-  const corte = texto.slice(0, max)
-  const espaco = corte.lastIndexOf(' ')
-  return (espaco > max * 0.6 ? corte.slice(0, espaco) : corte).trimEnd() + '…'
-}
 
 function corDoAstro(hue: number, estado: string, realce = false): string {
   if (estado === 'aceso') return `hsl(${hue} 82% ${realce ? 74 : 64}%)`
@@ -540,12 +564,12 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
 
           // A segunda linha. Some no zoom baixo: a esta distância o nome é o
           // que orienta, e a descrição vira sujeira sob ele.
-          if (a.subtitulo && c.z > 0.42) {
-            ctx!.font = `400 ${Math.max(10, 13 * Math.min(1.4, c.z + 0.45))}px var(--font-elvon), Archivo, sans-serif`
-            ctx!.fillStyle = COR.rotulo
-            ctx!.globalAlpha = 0.62
-            ctx!.fillText(cortar(a.subtitulo, 46), sx, sy - raio - 20)
-          }
+          /* A DESCRIÇÃO SAIU DO CÉU.
+             Ela existia para explicar o tema, e no Mapa isso é a pergunta
+             errada: aqui o tema é ponto de entrada, não verbete. Oito nomes
+             mais oito frases num campo estrelado viram texto flutuando —
+             a descrição continua na Home e na página do tema, onde há
+             espaço para ler. */
           ctx!.globalAlpha = 1
         } else if (a.tipo === 'curso' && (c.z > 0.55 || ativo)) {
           ctx!.font = '400 12px var(--font-elvon), Archivo, sans-serif'
@@ -702,7 +726,7 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
       a.tipo === 'tema'
         ? a.icone
         : mapa.astros.find((x) => x.tipo === 'tema' && x.id === a.temaId)?.icone
-    return chave ? (ICONES_TEMA[chave] ?? null) : null
+    return chave ?? null
   }
 
   /**
@@ -882,11 +906,23 @@ export function Ceu({ mapa, temas }: { mapa: Mapa; temas: Astro[] }) {
                   }% ${selecionado.estado === 'aceso' ? 88 : 58}%)`,
                 }}
               >
-                <svg viewBox="0 0 24 24" className="size-6 fill-navy-deep">
-                  {simboloDoPainel(selecionado)!.d.map((d, i) => (
-                    <path key={i} d={d} fillRule="evenodd" />
-                  ))}
-                </svg>
+                {/* Máscara, como na Home: mesma arte, cor de quem chama.
+                    Duas versões do mesmo emblema divergiriam no dia em que
+                    alguém trocasse uma e esquecesse a outra. */}
+                <span
+                  aria-hidden
+                  className="size-6 bg-navy-deep"
+                  style={{
+                    maskImage: `url(/temas/${simboloDoPainel(selecionado)}.png)`,
+                    WebkitMaskImage: `url(/temas/${simboloDoPainel(selecionado)}.png)`,
+                    maskSize: 'contain',
+                    WebkitMaskSize: 'contain',
+                    maskRepeat: 'no-repeat',
+                    WebkitMaskRepeat: 'no-repeat',
+                    maskPosition: 'center',
+                    WebkitMaskPosition: 'center',
+                  }}
+                />
               </span>
             )}
             <div className="flex min-w-0 flex-col">

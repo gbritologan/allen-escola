@@ -20,10 +20,10 @@ export const metadata: Metadata = { title: 'O Mapa · exemplo' }
  */
 
 const TEMAS = [
-  { id: 't1', slug: 'negociacao', name: 'Negociação', icon: 'agora', description: 'Acordo, troca, o sim' },
-  { id: 't2', slug: 'vendas', name: 'Vendas', icon: 'podio', description: 'Prospecção, pipeline, fechamento' },
-  { id: 't3', slug: 'ia', name: 'Inteligência Artificial', icon: 'olho', description: 'IA aplicada ao que você já faz' },
-  { id: 't4', slug: 'comunicacao', name: 'Comunicação', icon: 'pergaminho', description: 'Falar, escrever, convencer' },
+  { id: 't1', slug: 'dados', name: 'Dados e Tecnologia', icon: 'atena', accent: '#3CAAFF', description: '' },
+  { id: 't2', slug: 'vendas', name: 'Vendas', icon: 'nike', accent: '#F2C14E', description: '' },
+  { id: 't3', slug: 'ia', name: 'Inteligência Artificial', icon: 'prometeu', accent: '#4C41FF', description: '' },
+  { id: 't4', slug: 'lideranca', name: 'Liderança e Gestão', icon: 'zeus', accent: '#FF6B5E', description: '' },
   { id: 't5', slug: 'lideranca', name: 'Liderança', icon: 'mestre', description: 'Time, decisão, delegação' },
   { id: 't6', slug: 'dados', name: 'Dados', icon: 'ampulheta', description: 'Medir para decidir' },
 ]

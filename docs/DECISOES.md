@@ -2358,3 +2358,32 @@ isso é a diferença entre suave e travado.
 
 E a cor "mais viva" saiu por variável CSS (`--veu-do-tema`: 14% → 26%), não por
 estado em JavaScript. Hover é pergunta que o CSS já sabe responder.
+
+## D-102 · A mesma arte nas duas telas, por caminhos diferentes
+
+O Mapa ficou sem ícone quando os temas passaram a apontar para os emblemas
+gregos (0035): ele desenhava a partir de `ICONES_TEMA`, o repertório antigo em
+Path2D, e as chaves novas não existiam ali.
+
+Havia um caminho mais simples: manter vetores no Mapa e PNG na Home. Descartado
+— exigiria **duas versões de cada emblema**, e duas versões divergem. Alguém
+troca uma arte e esquece a outra, e o aluno vê símbolos diferentes para o mesmo
+tema em duas telas. A identidade que a cor e o ícone acabaram de construir
+morre aí.
+
+Então é o mesmo arquivo nos dois lugares, por técnicas diferentes:
+
+- **Home** — o PNG como máscara de CSS.
+- **Mapa** — canvas não tem máscara de CSS, então o truque é feito à mão:
+  desenha o PNG numa tela fora da vista, pinta por cima com `source-in`, e o
+  que sobra é a silhueta na cor certa.
+
+Cada combinação de emblema+cor+tamanho é pintada **uma vez** e guardada; o laço
+de 60fps só copia. E o tamanho entra na chave do cache arredondado — sem isso,
+cada fração de zoom geraria uma tela nova e o cache cresceria sem limite
+durante a navegação.
+
+**A descrição saiu do céu.** Ela existia para explicar o tema, e no Mapa essa é
+a pergunta errada: ali o tema é ponto de entrada, não verbete. Oito nomes mais
+oito frases num campo estrelado viram texto flutuando. A descrição continua na
+Home e na página do tema, onde há espaço para ler.
