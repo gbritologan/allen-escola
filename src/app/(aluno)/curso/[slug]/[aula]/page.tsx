@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { formatDuration, formatPosition } from '@/core/shared/format'
 import { requireSession } from '@/lib/auth/session'
 import { createClient } from '@/lib/supabase/server'
-import { concluirAula, registrarAbertura } from './actions'
+import { alternarSalvo, concluirAula, registrarAbertura } from './actions'
 import Image from 'next/image'
 import { Aplicacao } from './aplicacao'
 import { Avaliar } from './avaliar'
@@ -53,10 +53,25 @@ export async function generateMetadata({
  */
 export default async function AulaPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string; aula: string }>
+  searchParams: Promise<{ t?: string }>
 }) {
   const { slug, aula } = await params
+
+  /*
+   * `?t=` — o ponto de partida vindo de uma anotação.
+   *
+   * Uma nota com marca de tempo só vale se o link REALMENTE levar ao momento.
+   * Sem isto, clicar na nota abriria a aula de onde a pessoa parou, e a marca
+   * de tempo viraria enfeite.
+   *
+   * Vence a posição salva de propósito: quem clicou num minuto específico
+   * pediu aquele minuto, e a intenção explícita ganha do histórico.
+   */
+  const { t } = await searchParams
+  const pedido = t !== undefined ? Math.max(0, Math.floor(Number(t) || 0)) : null
   const session = await requireSession()
   const supabase = await createClient()
 
@@ -129,17 +144,31 @@ export default async function AulaPage({
     ])
 
   // O que a coluna da direita precisa, em paralelo com o resto.
-  const [{ data: anotacao }, { data: nota }, { data: progressoDoCurso }, { data: aplicadasNoCurso }] =
+  const [
+    { data: anotacoes },
+    { data: nota },
+    { data: salvo },
+    { data: progressoDoCurso },
+    { data: aplicadasNoCurso },
+  ] =
     await Promise.all([
+      /* Várias por aula desde 0029: quem assiste anota em momentos diferentes,
+         e cada nota carrega o segundo em que foi feita. */
       supabase
         .from('lesson_notes')
-        .select('body')
+        .select('id, body, at_seconds, created_at')
+        .eq('user_id', session.userId)
+        .eq('lesson_id', lesson.id)
+        .order('at_seconds', { ascending: true, nullsFirst: false }),
+      supabase
+        .from('lesson_ratings')
+        .select('stars')
         .eq('user_id', session.userId)
         .eq('lesson_id', lesson.id)
         .maybeSingle(),
       supabase
-        .from('lesson_ratings')
-        .select('stars')
+        .from('saved_lessons')
+        .select('lesson_id')
         .eq('user_id', session.userId)
         .eq('lesson_id', lesson.id)
         .maybeSingle(),
@@ -241,7 +270,7 @@ export default async function AulaPage({
       src={video.url}
       poster={video.poster}
       lessonId={lesson.id}
-      posicaoInicial={progresso?.position_seconds ?? 0}
+      posicaoInicial={pedido ?? progresso?.position_seconds ?? 0}
     />
   ) : (
     semVideo
@@ -326,7 +355,7 @@ export default async function AulaPage({
       aulaAtualId={lesson.id}
       cursoSlug={course.slug}
       moduloTitulo={mod?.title ?? 'Este módulo'}
-      anotacao={anotacao?.body ?? ''}
+      anotacoes={anotacoes ?? []}
       caminho={caminho}
     />
   )
@@ -376,6 +405,33 @@ export default async function AulaPage({
   const acoes = (
     <div className="flex flex-col gap-5 border-y border-line py-5">
       <div className="flex flex-wrap items-center gap-3">
+        {/*
+          SALVAR NÃO É CONCLUIR.
+
+          Concluir é um fato que o sistema apura sozinho (92% do vídeo).
+          Salvar é intenção: "quero voltar aqui". Ficam lado a lado porque são
+          os dois gestos que a pessoa tem sobre a aula, e separados em ações
+          diferentes porque significam coisas diferentes — e porque limpar
+          progresso nunca pode apagar uma curadoria de meses.
+        */}
+        <form action={alternarSalvo}>
+          <input type="hidden" name="lesson_id" value={lesson.id} />
+          <input type="hidden" name="caminho" value={caminho} />
+          <button
+            type="submit"
+            aria-pressed={Boolean(salvo)}
+            className={cn(
+              'flex h-9 items-center gap-2 rounded-full border px-4 text-caption transition-colors',
+              salvo
+                ? 'border-[rgba(76,65,255,0.55)] bg-[rgba(76,65,255,0.12)] text-ink'
+                : 'border-line text-ink-2 hover:border-line-strong hover:text-ink',
+            )}
+          >
+            <Marcador cheio={Boolean(salvo)} />
+            {salvo ? 'Salva' : 'Salvar'}
+          </button>
+        </form>
+
         {!temParaFazer && (
           <form action={concluirAula}>
             <input type="hidden" name="lesson_id" value={lesson.id} />
@@ -532,5 +588,22 @@ export default async function AulaPage({
 
       {lateral}
     </main>
+  )
+}
+
+/** O marcador de livro: cheio quando salva, contornado quando não. */
+function Marcador({ cheio }: { cheio: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden
+      className="size-3.5"
+      fill={cheio ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinejoin="round"
+    >
+      <path d="M6.5 3.75h11a.75.75 0 0 1 .75.75v15.3a.5.5 0 0 1-.78.42L12 16.4l-5.47 3.82a.5.5 0 0 1-.78-.41V4.5a.75.75 0 0 1 .75-.75Z" />
+    </svg>
   )
 }

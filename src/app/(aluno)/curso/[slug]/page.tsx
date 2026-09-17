@@ -173,17 +173,50 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
         </Link>
 
         <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-          {/* O vídeo. É por isto que a pessoa veio. */}
-          <div className="glass-card overflow-hidden rounded-[var(--radius-card)]">
-            {teaser ? (
-              <Player src={teaser.url} poster={teaser.poster} lessonId={null} posicaoInicial={0} />
-            ) : (
-              <CapaComPlay
-                arte={course.cover_url ?? course.banner_url}
-                destino={proxima && !aguardando ? `/curso/${course.slug}/${proxima.slug}` : null}
-                titulo={course.title}
-              />
-            )}
+          {/*
+            O TEASER, COM NOME.
+
+            Ele já estava na dobra, e mesmo assim o Gabriel pediu "destaque".
+            O que faltava não era tamanho: era IDENTIDADE. Um vídeo solto no
+            topo de uma página lê como imagem de capa — a pessoa não sabe que
+            aquilo é uma peça que todo curso tem, com um papel definido.
+
+            O rótulo resolve isso por um custo de doze pixels. "Introdução ao
+            curso" transforma o mesmo retângulo de decoração em promessa: há
+            algo curto aqui que explica o resto.
+
+            E ele é PADRÃO — aparece igual em todos os cursos, com teaser ou
+            sem. Sem teaser, o rótulo diz a verdade ("Comece por aqui") em vez
+            de anunciar um vídeo que não existe.
+          */}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2.5">
+              <span className="flex size-6 items-center justify-center rounded-full bg-[rgba(76,65,255,0.16)]">
+                <SetaPlay pequena />
+              </span>
+              <span className="text-caption font-medium uppercase tracking-[0.16em] text-ink-3">
+                {teaser ? 'Introdução ao curso' : 'Comece por aqui'}
+              </span>
+            </div>
+
+            <div
+              className={cn(
+                'glass-card overflow-hidden rounded-[var(--radius-card)]',
+                // O halo azul só existe quando há teaser: é o que separa
+                // "assista a isto" de "esta é a capa".
+                teaser && 'shadow-[0_0_70px_-30px_rgba(76,65,255,0.85)]',
+              )}
+            >
+              {teaser ? (
+                <Player src={teaser.url} poster={teaser.poster} lessonId={null} posicaoInicial={0} />
+              ) : (
+                <CapaComPlay
+                  arte={course.cover_url ?? course.banner_url}
+                  destino={proxima && !aguardando ? `/curso/${course.slug}/${proxima.slug}` : null}
+                  titulo={course.title}
+                />
+              )}
+            </div>
           </div>
 
           {/* O texto, do lado, curto. */}

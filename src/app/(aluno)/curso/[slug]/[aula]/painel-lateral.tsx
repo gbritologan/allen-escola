@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { formatDuration } from '@/core/shared/format'
 import { cn } from '@/lib/utils'
-import { salvarAnotacao } from './actions'
+import { apagarAnotacao } from './actions'
+import { FormAnotacao, type Anotacao } from './form-anotacao'
 
 export interface AulaNaLista {
   id: string
@@ -47,7 +48,7 @@ export function PainelLateral({
   aulaAtualId,
   cursoSlug,
   moduloTitulo,
-  anotacao,
+  anotacoes,
   caminho,
 }: {
   aulas: AulaNaLista[]
@@ -55,7 +56,7 @@ export function PainelLateral({
   aulaAtualId: string
   cursoSlug: string
   moduloTitulo: string
-  anotacao: string
+  anotacoes: Anotacao[]
   caminho: string
 }) {
   const [aba, setAba] = useState<Aba>('aulas')
@@ -124,27 +125,52 @@ export function PainelLateral({
       )}
 
       {aba === 'anotacoes' && (
-        <form action={salvarAnotacao} className="flex flex-col gap-3 p-4">
-          <input type="hidden" name="lesson_id" value={aulaAtualId} />
-          <input type="hidden" name="caminho" value={caminho} />
-          <textarea
-            name="body"
-            defaultValue={anotacao}
-            rows={12}
-            placeholder="O que você não quer esquecer desta aula."
-            className="w-full resize-none rounded-[var(--radius-control)] border border-line bg-navy-deep p-3 text-body text-ink placeholder:text-ink-4 outline-none focus:border-[rgba(76,65,255,0.7)]"
-          />
-          <div className="flex items-center justify-between gap-3">
-            <button
-              type="submit"
-              className="rounded-[var(--radius-control)] border border-line px-3 py-1.5 text-caption text-ink-2 transition-colors hover:border-line-strong hover:text-ink"
-            >
-              Salvar
-            </button>
-            {/* A promessa, dita onde ela importa: na hora de escrever. */}
-            <span className="text-caption text-ink-4">Só você lê isto.</span>
-          </div>
-        </form>
+        <div className="flex flex-col gap-4 p-4">
+          <FormAnotacao aulaId={aulaAtualId} caminho={caminho} />
+
+          {anotacoes.length > 0 && (
+            <ul className="flex flex-col gap-2 border-t border-line pt-4">
+              {anotacoes.map((n) => (
+                <li
+                  key={n.id}
+                  className="group flex flex-col gap-1 rounded-[var(--radius-control)] border border-line px-3 py-2.5"
+                >
+                  <div className="flex items-baseline justify-between gap-2">
+                    {/* O minuto é o valor da nota: ele é o caminho de volta.
+                        Por isso vem primeiro, e em azul. */}
+                    {n.at_seconds !== null ? (
+                      <a
+                        href={`${caminho}?t=${n.at_seconds}`}
+                        data-numeric
+                        className="text-caption text-blue-light hover:underline"
+                      >
+                        {formatDuration(n.at_seconds)}
+                      </a>
+                    ) : (
+                      <span className="text-caption text-ink-4">a aula toda</span>
+                    )}
+                    <form action={apagarAnotacao}>
+                      <input type="hidden" name="note_id" value={n.id} />
+                      <input type="hidden" name="caminho" value={caminho} />
+                      <button
+                        type="submit"
+                        aria-label="Apagar anotação"
+                        className="text-caption text-ink-4 opacity-0 transition-opacity hover:text-critical focus-visible:opacity-100 group-hover:opacity-100"
+                      >
+                        apagar
+                      </button>
+                    </form>
+                  </div>
+                  <p className="whitespace-pre-line text-label text-ink-2">{n.body}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <span className="text-caption text-ink-4">
+            Só você lê isto. Elas ficam reunidas no seu caderno, na Jornada.
+          </span>
+        </div>
       )}
 
       {aba === 'materiais' && (

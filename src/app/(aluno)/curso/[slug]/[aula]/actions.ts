@@ -181,27 +181,48 @@ export async function salvarAnotacao(formData: FormData) {
   const lessonId = String(formData.get('lesson_id') ?? '')
   const caminho = String(formData.get('caminho') ?? '')
   const texto = String(formData.get('body') ?? '').trim()
-  if (!lessonId) return
+  if (!lessonId || !texto) return
+
+  /*
+   * A MARCA DE TEMPO.
+   *
+   * Vem do player, em segundos. É ela que transforma "achei minha nota" em
+   * "voltei ao momento exato" — uma frase solta vale pouco seis meses depois;
+   * a mesma frase com o minuto do vídeo vale o curso inteiro.
+   *
+   * Nula é um estado legítimo: quem anota sobre a aula toda, ou fora do
+   * player, não tem um segundo a registrar, e inventar um seria mentir sobre
+   * onde a pessoa estava.
+   */
+  const bruto = String(formData.get('at_seconds') ?? '').trim()
+  const segundos = bruto === '' ? null : Math.max(0, Math.floor(Number(bruto) || 0))
 
   const session = await requireSession()
   const supabase = await createClient()
 
-  if (!texto) {
-    await supabase
-      .from('lesson_notes')
-      .delete()
-      .eq('user_id', session.userId)
-      .eq('lesson_id', lessonId)
-  } else {
-    await supabase
-      .from('lesson_notes')
-      .upsert(
-        { user_id: session.userId, lesson_id: lessonId, body: texto },
-        { onConflict: 'user_id,lesson_id' },
-      )
-  }
+  await supabase.from('lesson_notes').insert({
+    user_id: session.userId,
+    lesson_id: lessonId,
+    body: texto,
+    at_seconds: segundos,
+  })
 
   if (caminho) revalidatePath(caminho)
+  revalidatePath('/jornada')
+}
+
+/** Apagar uma anotação. Escrita à mão, apagada à mão — nunca por efeito colateral. */
+export async function apagarAnotacao(formData: FormData) {
+  const id = String(formData.get('note_id') ?? '')
+  const caminho = String(formData.get('caminho') ?? '')
+  if (!id) return
+
+  const session = await requireSession()
+  const supabase = await createClient()
+  await supabase.from('lesson_notes').delete().eq('id', id).eq('user_id', session.userId)
+
+  if (caminho) revalidatePath(caminho)
+  revalidatePath('/jornada')
 }
 
 /**
@@ -237,4 +258,48 @@ export async function avaliarAula(formData: FormData) {
   }
 
   if (caminho) revalidatePath(caminho)
+}
+
+/**
+ * SALVAR A AULA — e por que isto não é o mesmo que concluir.
+ *
+ * Concluir é um FATO sobre o que a pessoa assistiu, e o sistema decide sozinho
+ * (92% do vídeo). Salvar é uma INTENÇÃO dela: "quero voltar aqui". As duas
+ * coisas vivem em tabelas diferentes de propósito — se salvar fosse uma coluna
+ * em `lesson_progress`, limpar progresso apagaria a lista de salvos, e a
+ * pessoa perderia uma curadoria que levou meses fazendo.
+ *
+ * Alternar e não "salvar": o botão é o mesmo nos dois estados, e um botão que
+ * só adiciona obriga a pessoa a procurar outro lugar para desfazer.
+ */
+export async function alternarSalvo(formData: FormData) {
+  const lessonId = String(formData.get('lesson_id') ?? '')
+  const caminho = String(formData.get('caminho') ?? '')
+  if (!lessonId) return
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return
+
+  const { data: existe } = await supabase
+    .from('saved_lessons')
+    .select('lesson_id')
+    .eq('user_id', user.id)
+    .eq('lesson_id', lessonId)
+    .maybeSingle()
+
+  if (existe) {
+    await supabase
+      .from('saved_lessons')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('lesson_id', lessonId)
+  } else {
+    await supabase.from('saved_lessons').insert({ user_id: user.id, lesson_id: lessonId })
+  }
+
+  if (caminho) revalidatePath(caminho)
+  revalidatePath('/jornada')
 }
