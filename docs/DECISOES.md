@@ -2219,3 +2219,42 @@ centavos, e um curso apagado pela metade custa muito mais.
 `orders` é RESTRICT no schema, então curso vendido não apaga de jeito nenhum.
 Essa trava é do banco, não desta função — aqui a mensagem só traduz o erro do
 Postgres para português.
+
+## D-95 · Ferramenta que exige ortografia exata inventa trabalho
+
+O preparador de ícones exigia que o arquivo começasse com a chave do
+personagem. Dos oito que o Gabriel salvou, dois ficaram de fora:
+`hefesos.jpeg` (uma letra a menos) e `prometheus.jpeg` (grafia em inglês).
+
+Nenhum dos dois é erro dele. Nome grego tem variante em toda língua, e
+"Prometheus" é como o nome aparece na maioria das fontes. O erro era meu, por
+tratar grafia de nome próprio como se fosse identificador de sistema.
+
+Agora o script reconhece apelidos conhecidos e, quando nenhum bate, cai numa
+comparação por similaridade com corte em 0.72 — alto o bastante para
+"hefesos" achar "hefesto", baixo o bastante para "zeus" não achar "nike". E um
+arquivo não pode servir a dois temas: sem essa trava, a similaridade daria o
+mesmo desenho para dois personagens e ninguém notaria.
+
+O princípio: quando a ferramenta e a pessoa discordam sobre como se escreve um
+nome próprio, quem cede é a ferramenta.
+
+## D-96 · Os emblemas, e o que sobreviveu ao meu erro
+
+A arte chegou (D-92 registra por que não podia vir de mim). Oito emblemas
+azuis no traço da marca, convertidos em ESTÊNCIL: luminância vira alpha, a
+forma fica, a cor sai.
+
+É isso que faz um arquivo servir para os dois temas e para qualquer cor
+futura. A alternativa — oito PNGs por cor — transformaria "mudar o tom de
+Vendas" em trabalho de edição de imagem, e o tema claro precisaria de um
+conjunto inteiro só dele.
+
+O disco é o mesmo `liquid-glass` do botão de tema. Foi o único vidro do
+produto que o Gabriel elogiou sem ser perguntado; repetir um acerto é mais
+honesto do que inventar variação para parecer novo. Por cima, um véu da cor a
+14% — chapar a cor mataria o vidro, e sem véu os oito discos seriam idênticos.
+
+E o recorte automático no conteúdo não é detalhe: sem ele, margens diferentes
+nos arquivos de origem virariam oito ícones de tamanhos diferentes na mesma
+grade, e a grade voltaria a parecer desleixada.

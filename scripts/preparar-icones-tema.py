@@ -20,6 +20,8 @@ Lê de "ICONES DOS TEMAS/" e escreve em "public/temas/".
 """
 from __future__ import annotations
 
+import unicodedata
+from difflib import SequenceMatcher
 from pathlib import Path
 from PIL import Image
 
@@ -27,18 +29,53 @@ RAIZ = Path(__file__).resolve().parent.parent
 ENTRADA = RAIZ / 'ICONES DOS TEMAS'
 SAIDA = RAIZ / 'public' / 'temas'
 
-# O nome do arquivo de entrada precisa começar com a chave. "atena.png",
-# "atena-v2.png" e "Atena final.jpeg" vão todos para atena.png.
-CHAVES = ['atena', 'hefesto', 'socrates', 'prometeu', 'zeus', 'hermes', 'apolo', 'nike']
+# AS CHAVES E COMO AS PESSOAS REALMENTE ESCREVEM.
+#
+# A primeira versão exigia que o arquivo começasse exatamente com a chave, e
+# duas das oito ficaram de fora: "hefesos.jpeg" (letra a menos) e
+# "prometheus.jpeg" (grafia em inglês). Nenhum dos dois é erro de quem nomeou
+# — é grafia de nome grego, que tem variante em toda língua.
+#
+# Ferramenta que exige ortografia exata de nome próprio inventa um trabalho
+# que não existia. Os apelidos abaixo cobrem as formas previsíveis, e a
+# similaridade cobre as que eu não previ.
+CHAVES = {
+    'atena': ['atena', 'athena', 'athene'],
+    'hefesto': ['hefesto', 'hefestos', 'hefesos', 'hefaisto', 'hephaestus', 'hephaistos'],
+    'socrates': ['socrates', 'sokrates'],
+    'prometeu': ['prometeu', 'prometheus', 'prometeus', 'prometheu'],
+    'zeus': ['zeus', 'jupiter'],
+    'hermes': ['hermes', 'mercurio'],
+    'apolo': ['apolo', 'apollo', 'apollon'],
+    'nike': ['nike', 'nice', 'vitoria'],
+}
 
 LADO = 512  # 2x do maior tamanho em tela, para Retina não esticar (D-83).
 
 
-def achar(chave: str):
-    for f in sorted(ENTRADA.iterdir()):
-        if f.is_file() and f.stem.lower().replace(' ', '-').startswith(chave):
+def normalizar(texto: str) -> str:
+    semacento = unicodedata.normalize('NFKD', texto.lower())
+    return ''.join(c for c in semacento if c.isalnum())
+
+
+def achar(chave: str, apelidos: list[str]):
+    arquivos = [f for f in sorted(ENTRADA.iterdir()) if f.is_file() and not f.name.startswith('.')]
+
+    # Primeiro o que bate com algum apelido conhecido.
+    for f in arquivos:
+        nome = normalizar(f.stem)
+        if any(nome.startswith(normalizar(a)) for a in apelidos):
             return f
-    return None
+
+    # Depois, o mais PARECIDO — cobre as grafias que eu não previ. O corte em
+    # 0.72 é alto o bastante para "hefesos" achar "hefesto" e baixo o
+    # suficiente para "zeus" não achar "nike".
+    melhor, nota = None, 0.0
+    for f in arquivos:
+        atual = SequenceMatcher(None, normalizar(f.stem), chave).ratio()
+        if atual > nota:
+            melhor, nota = f, atual
+    return melhor if nota >= 0.72 else None
 
 
 def virar_estencil(origem: Path, destino: Path) -> None:
@@ -76,8 +113,15 @@ def main() -> None:
     SAIDA.mkdir(parents=True, exist_ok=True)
 
     faltando = []
-    for chave in CHAVES:
-        origem = achar(chave)
+    usados: set = set()
+    for chave, apelidos in CHAVES.items():
+        origem = achar(chave, apelidos)
+        # Um arquivo não pode servir a dois temas: sem isto, a similaridade
+        # poderia dar o mesmo desenho para dois personagens e ninguém notaria.
+        if origem and origem in usados:
+            origem = None
+        if origem:
+            usados.add(origem)
         if not origem:
             faltando.append(chave)
             continue
