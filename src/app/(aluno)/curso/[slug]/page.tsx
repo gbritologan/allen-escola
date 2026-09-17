@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { MiniaturaAula } from '@/components/domain/miniatura-aula'
 import { Player } from '@/components/domain/player'
 import { Chip } from '@/components/primitives/chip'
 import { emBreve } from '@/core/catalog/types'
@@ -87,7 +88,7 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
         .order('position'),
       supabase
         .from('lessons')
-        .select('id, slug, title, position, duration_seconds, module_id, para_fazer, video_asset_id')
+        .select('id, slug, title, position, duration_seconds, module_id, para_fazer, video_asset_id, thumbnail_url')
         .eq('course_id', course.id)
         .order('position'),
       supabase.from('course_themes').select('theme_id').eq('course_id', course.id),
@@ -284,8 +285,10 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
                     {aulas.map((aula) => {
                       const concluida = concluidas.has(aula.id)
                       const ehProxima = proxima?.id === aula.id
-                      let poster: string | null = null
-                      if (aula.video_asset_id && podeVideo) {
+                      /* A miniatura enviada à mão vence a do provedor: ela só
+                         existe porque a automática falhou em algum caso real. */
+                      let poster: string | null = aula.thumbnail_url ?? null
+                      if (!poster && aula.video_asset_id && podeVideo) {
                         try {
                           poster = getVideoProvider().posterUrl(aula.video_asset_id)
                         } catch {
@@ -305,30 +308,13 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
                           >
                             {/* A miniatura faz a lista parecer catálogo em vez
                                 de sumário — e ela é gratuita: já existe no
-                                provedor. */}
-                            <span className="relative aspect-video w-24 shrink-0 overflow-hidden rounded-[var(--radius-control)] bg-navy-deep">
-                              {poster ? (
-                                <Image
-                                  src={poster}
-                                  alt=""
-                                  fill
-                                  sizes="96px"
-                                  className={cn(
-                                    'object-cover transition-transform duration-300 group-hover:scale-105',
-                                    concluida && 'opacity-45',
-                                  )}
-                                />
-                              ) : (
-                                <span className="flex h-full items-center justify-center text-caption text-ink-4">
-                                  {formatPosition(aula.position)}
-                                </span>
-                              )}
-                              <span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-                                <span className="flex size-7 items-center justify-center rounded-full bg-[rgba(5,7,20,0.72)]">
-                                  <SetaPlay pequena />
-                                </span>
-                              </span>
-                            </span>
+                                provedor. Quando falha, vira o número da aula
+                                em vez do ícone de imagem partida. */}
+                            <MiniaturaAula
+                              src={poster}
+                              posicao={formatPosition(aula.position)}
+                              concluida={concluida}
+                            />
 
                             <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                               <span

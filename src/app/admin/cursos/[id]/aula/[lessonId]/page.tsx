@@ -9,7 +9,8 @@ import { Field, Input } from '@/components/primitives/field'
 import { formatDuration } from '@/core/shared/format'
 import { Surface } from '@/components/surfaces/surface'
 import { createClient } from '@/lib/supabase/server'
-import { apagarAula, atualizarAula, publicarAula } from './actions'
+import { CampoImagem } from '@/components/domain/campo-imagem'
+import { apagarAula, atualizarAula, enviarThumb, publicarAula, removerThumb } from './actions'
 import { CampoLongo } from './campo-longo'
 import { EnviarVideo } from './enviar-video'
 import { Habilidades } from './habilidades'
@@ -41,7 +42,7 @@ export default async function EditorDeAulaPage({
     supabase
       .from('lessons')
       .select(
-        'id, title, description, position, status, duration_seconds, video_asset_id, para_saber, para_fazer, module_id',
+        'id, title, description, position, status, duration_seconds, video_asset_id, thumbnail_url, para_saber, para_fazer, module_id',
       )
       .eq('id', lessonId)
       .maybeSingle(),
@@ -178,6 +179,30 @@ export default async function EditorDeAulaPage({
                 BUNNY_STREAM_* — em produção elas precisam ser adicionadas na Vercel.
               </p>
             )}
+          </div>
+
+          {/* A MINIATURA, JUNTO DO VÍDEO E NÃO NO OPCIONAL.
+              O frame automático do Bunny falha de dois jeitos — vídeo ainda
+              processando, ou quadro preto — e quando falha o aluno vê imagem
+              quebrada no catálogo. Uma peça que conserta um defeito visível
+              pertence ao essencial. */}
+          <div className="flex flex-col gap-2 border-t border-line pt-5">
+            <span className="text-label font-medium text-ink-2">Miniatura</span>
+            <p className="text-caption text-ink-4">
+              16:9. Opcional: sem ela, usamos o frame que o vídeo gera sozinho. Envie uma quando
+              o frame automático cair num quadro ruim.
+            </p>
+            <CampoImagem
+              atual={lesson.thumbnail_url ?? null}
+              pasta="capas"
+              nomeBase={`aula-${lesson.id}`}
+              acaoSalvar={enviarThumb}
+              acaoRemover={removerThumb}
+              ocultos={{ id: lesson.id, course_id: courseId }}
+              moldura="aspect-video w-full max-w-[16rem]"
+              rotuloVazio="usando o frame do vídeo"
+              tamanhos="256px"
+            />
           </div>
         </Surface>
       </section>

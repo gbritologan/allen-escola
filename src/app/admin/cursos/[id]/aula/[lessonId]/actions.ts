@@ -2,6 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { type EstadoImagem, IMAGEM_PARADA } from '@/core/shared/imagem'
+import { apagarImagem, recusaDaUrl } from '@/lib/imagens'
 import { createClient } from '@/lib/supabase/server'
 
 /**
@@ -47,6 +49,71 @@ export async function atualizarAula(formData: FormData) {
 
   revalidatePath(`/admin/cursos/${courseId}/aula/${id}`)
   revalidatePath(`/admin/cursos/${courseId}`)
+}
+
+/**
+ * A MINIATURA DA AULA.
+ *
+ * O catálogo usa a thumbnail que o Bunny gera sozinho, e ela falha de dois
+ * jeitos: vídeo ainda processando (não existe imagem) ou frame automático num
+ * quadro preto. Nos dois casos o aluno vê ícone de imagem quebrada.
+ *
+ * Esta é a saída manual. Quando existe, vence a automática.
+ */
+export async function enviarThumb(
+  _prev: EstadoImagem,
+  formData: FormData,
+): Promise<EstadoImagem> {
+  const id = String(formData.get('id') ?? '')
+  const courseId = String(formData.get('course_id') ?? '')
+  const url = String(formData.get('url') ?? '')
+  if (!id) return { erro: 'Aula não identificada.', url: null }
+
+  const recusa = recusaDaUrl(url, 'capas')
+  if (recusa) return { erro: recusa, url: null }
+
+  const supabase = await createClient()
+  const { data: antes } = await supabase
+    .from('lessons')
+    .select('thumbnail_url')
+    .eq('id', id)
+    .maybeSingle()
+
+  const { error } = await supabase.from('lessons').update({ thumbnail_url: url }).eq('id', id)
+  if (error) {
+    await apagarImagem(url)
+    return { erro: 'A imagem subiu, mas não consegui gravá-la na aula.', url: null }
+  }
+
+  await apagarImagem(antes?.thumbnail_url)
+  revalidatePath(`/admin/cursos/${courseId}/aula/${id}`)
+  revalidatePath(`/admin/cursos/${courseId}`)
+  revalidatePath('/curso/[slug]', 'page')
+  return { erro: null, url }
+}
+
+export async function removerThumb(
+  _prev: EstadoImagem,
+  formData: FormData,
+): Promise<EstadoImagem> {
+  const id = String(formData.get('id') ?? '')
+  const courseId = String(formData.get('course_id') ?? '')
+  if (!id) return { erro: 'Aula não identificada.', url: null }
+
+  const supabase = await createClient()
+  const { data: antes } = await supabase
+    .from('lessons')
+    .select('thumbnail_url')
+    .eq('id', id)
+    .maybeSingle()
+
+  await supabase.from('lessons').update({ thumbnail_url: null }).eq('id', id)
+  await apagarImagem(antes?.thumbnail_url)
+
+  revalidatePath(`/admin/cursos/${courseId}/aula/${id}`)
+  revalidatePath(`/admin/cursos/${courseId}`)
+  revalidatePath('/curso/[slug]', 'page')
+  return IMAGEM_PARADA
 }
 
 export async function publicarAula(formData: FormData) {
