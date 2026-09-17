@@ -12,7 +12,7 @@ import { formatPosition, formatRemaining } from '@/core/shared/format'
  */
 export function ContinueCard({ target }: { target: ContinueTarget }) {
   return (
-    <article className="flex flex-col gap-5 rounded-[var(--radius-card)] border border-line bg-[linear-gradient(120deg,rgba(18,23,61,0.9),rgba(10,15,46,1)_58%)] p-6 sm:p-8">
+    <article className="flex flex-col gap-5 rounded-[var(--radius-card)] border border-line bg-[linear-gradient(120deg,var(--color-superficie-2),var(--color-superficie)_58%)] p-6 sm:p-8">
       <div className="flex flex-col gap-2">
         <span data-numeric className="text-caption uppercase tracking-[0.16em] text-ink-3">
           {target.courseTitle} · Módulo {formatPosition(target.modulePosition)} · Aula{' '}

@@ -61,7 +61,7 @@ export function BuscaRapida() {
           value={valor}
           onChange={(e) => setValor(e.target.value)}
           placeholder="Buscar"
-          className="h-9 w-full rounded-[var(--radius-control)] border border-line bg-[rgba(5,7,20,0.5)] pl-8 pr-10 text-caption text-ink placeholder:text-ink-4 outline-none transition-colors focus:border-[rgba(76,65,255,0.7)]"
+          className="h-9 w-full rounded-[var(--radius-control)] border border-line bg-[var(--color-fundo)] pl-8 pr-10 text-caption text-ink placeholder:text-ink-4 outline-none transition-colors focus:border-[rgba(76,65,255,0.7)]"
         />
         {/* O atalho fica escrito. Atalho que ninguém descobre é atalho que não
             existe — e escrever custa doze pixels. */}

@@ -35,12 +35,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           antes do primeiro frame. Daí o `suppressHydrationWarning` no <html>:
           o atributo muda antes do React olhar, e isso é intencional.
 
-          Sem escolha salva, seguimos o sistema. Quem configurou o computador
-          para claro está dizendo algo.
+          O PADRÃO É O ESCURO, e não o do sistema. Eu tinha feito seguir o
+          `prefers-color-scheme` por um argumento de acessibilidade, e o
+          Gabriel corrigiu com um argumento melhor: o escuro é o produto. Quem
+          precisa do claro precisa de UM clique — quem não precisa não deve
+          receber outra plataforma porque o sistema dele está em claro.
         */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('allen-tema');if(!t){t=window.matchMedia('(prefers-color-scheme: light)').matches?'claro':'escuro'}if(t==='claro'){document.documentElement.dataset.tema='claro'}}catch(e){}})()`,
+            __html: `(function(){try{var t=localStorage.getItem('allen-tema');if(t==='claro'){document.documentElement.dataset.tema='claro'}}catch(e){}})()`,
           }}
         />
       </head>

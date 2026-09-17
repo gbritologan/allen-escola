@@ -2110,3 +2110,34 @@ todos os botões primários do produto de uma vez.
 que eu não tinha olhado — e as duas vezes o sintoma foi o mesmo: texto que
 some. Quando a exceção aparece duas vezes, ela não é exceção; é regra que eu
 ainda não tinha nomeado.
+
+## D-91 · O escuro volta a ser o padrão, e o argumento dele é melhor que o meu
+
+Em D-89 eu fiz o tema seguir o `prefers-color-scheme` do sistema, com um
+argumento de acessibilidade: quem precisa de claro já teria claro, sem
+descobrir botão nenhum.
+
+O Gabriel discordou com um argumento melhor: **o escuro é o produto.** Quem
+precisa do claro precisa de UM clique. Quem não precisa não deveria receber
+outra plataforma porque o sistema dele está configurado em claro — e a maioria
+dos Macs está.
+
+Meu erro foi otimizar para a minoria ao custo de mudar o produto para todos.
+Acessibilidade é garantir que a opção EXISTA e seja fácil de achar, não impor
+a opção a quem não pediu.
+
+E três defeitos do tema claro, todos da mesma família: superfície escura
+cravada onde deveria haver token.
+
+- **"Continue de onde parou"** tinha um degradê navy literal. Virou
+  `--color-superficie-2` → `--color-superficie`.
+- **O campo de busca** tinha `rgba(5,7,20,0.5)` — cinza-chumbo sobre a sidebar
+  clara, texto ilegível. Virou `--color-fundo`.
+
+A varredura de D-89 pegou a família da TINTA (`rgba(243,245,252,α)`) porque
+ela tinha um padrão único e repetido. As superfícies escapa­ram porque cada uma
+usava um navy diferente — `18,23,61`, `10,15,46`, `5,7,20` — e eu procurei
+padrão em vez de procurar papel.
+
+A lição: numa migração de tema, o que se procura não é uma cor. É todo lugar
+onde alguém escreveu uma cor.
