@@ -5,6 +5,8 @@ import { ProgressMeter } from '@/components/primitives/progress-meter'
 import { Surface } from '@/components/surfaces/surface'
 import { resolverSkills, type SinalCru } from '@/core/skills/resolve-skills'
 import { createClient } from '@/lib/supabase/server'
+import { getCaderno } from '@/lib/data/home'
+import { Caderno } from './caderno'
 import { requireSession } from '@/lib/auth/session'
 import { Habilidades } from './habilidades'
 
@@ -23,6 +25,7 @@ export const metadata: Metadata = { title: 'Minha jornada' }
 export default async function JornadaPage() {
   const session = await requireSession()
   const supabase = await createClient()
+  const caderno = await getCaderno(session.userId)
 
   const [{ data: enrollments }, { count: aplicacoes }] = await Promise.all([
     supabase
@@ -89,6 +92,8 @@ export default async function JornadaPage() {
       </section>
 
       <Habilidades skills={habilidades} />
+
+      <Caderno notas={caderno.notas} salvas={caderno.salvas} />
 
       {lista.length === 0 ? (
         <section className="flex flex-col items-start gap-4">

@@ -63,7 +63,7 @@ async function Resultados({ termo }: { termo: string }) {
     .replace(/[\u0300-\u036f]/g, '')
     .trim()
 
-  const [{ data: cursos }, { data: aulas }, { data: apps }] = await Promise.all([
+  const [{ data: cursos }, { data: aulas }, { data: apps }, { data: notas }] = await Promise.all([
     supabase
       .from('courses')
       .select('id, slug, title, summary, cover_url, format, status, duration_seconds, lesson_count, available_at')
@@ -83,13 +83,58 @@ async function Resultados({ termo }: { termo: string }) {
       .eq('status', 'published')
       .textSearch('search_doc', consulta, { type: 'websearch', config: 'portuguese' })
       .limit(8),
+    /*
+     * AS ANOTAÇÕES DA PESSOA.
+     *
+     * Aqui NÃO usamos `textSearch`: `lesson_notes` não tem índice de busca, e
+     * criar um exigiria ler o que os alunos escrevem para montar o documento.
+     * `ilike` faz uma varredura simples, e sobre a própria lista de alguém —
+     * dezenas de linhas, não milhões — isso custa nada.
+     *
+     * A RLS garante que só as notas de quem está buscando aparecem. Não é
+     * confiança no filtro daqui: é o Postgres recusando o resto.
+     */
+    supabase
+      .from('lesson_notes')
+      .select('id, body, at_seconds, lesson_id')
+      .ilike('body', `%${consulta}%`)
+      .order('created_at', { ascending: false })
+      .limit(10),
   ])
 
   const encontrouCursos = cursos ?? []
   const encontrouAulas = aulas ?? []
   const encontrouApps = apps ?? []
+  const encontrouNotas = notas ?? []
 
-  if (encontrouCursos.length === 0 && encontrouAulas.length === 0 && encontrouApps.length === 0) {
+  /* O caminho de volta para cada anotação: título da aula e slug do curso. */
+  const idsDasNotas = [...new Set(encontrouNotas.map((n) => n.lesson_id as string))]
+  const { data: aulasDasNotas } = idsDasNotas.length
+    ? await supabase.from('lessons').select('id, slug, title, course_id').in('id', idsDasNotas)
+    : { data: [] as Array<{ id: string; slug: string; title: string; course_id: string }> }
+  const cursosDasNotas = [...new Set((aulasDasNotas ?? []).map((a) => a.course_id as string))]
+  const { data: cursosNota } = cursosDasNotas.length
+    ? await supabase.from('courses').select('id, slug').in('id', cursosDasNotas)
+    : { data: [] as Array<{ id: string; slug: string }> }
+  const slugDoCurso = new Map((cursosNota ?? []).map((c) => [c.id as string, c.slug as string]))
+  const aulaDaNota = new Map(
+    (aulasDasNotas ?? []).map((a) => [
+      a.id as string,
+      {
+        titulo: a.title as string,
+        caminho: slugDoCurso.has(a.course_id as string)
+          ? `/curso/${slugDoCurso.get(a.course_id as string)}/${a.slug}`
+          : null,
+      },
+    ]),
+  )
+
+  if (
+    encontrouCursos.length === 0 &&
+    encontrouAulas.length === 0 &&
+    encontrouApps.length === 0 &&
+    encontrouNotas.length === 0
+  ) {
     return (
       <section className="flex flex-col gap-2">
         <p className="text-lead font-light text-ink-2">Nada para “{termo}”.</p>
@@ -138,6 +183,55 @@ async function Resultados({ termo }: { termo: string }) {
               />
             ))}
           </div>
+        </section>
+      )}
+
+      {/*
+        SUAS ANOTAÇÕES VÊM PRIMEIRO.
+
+        Antes dos cursos, dos apps e das aulas — e a ordem é deliberada. Quem
+        busca uma palavra que ele mesmo escreveu está procurando a PRÓPRIA
+        nota, não um curso que por acaso usa a mesma palavra. Devolver o
+        catálogo primeiro seria responder outra pergunta.
+
+        É também o que fecha o pedido original: achar a aula pelo que você
+        anotou nela.
+      */}
+      {encontrouNotas.length > 0 && (
+        <section className="flex flex-col gap-4">
+          <h2 className="text-caption font-medium uppercase tracking-[0.16em] text-ink-3">
+            Nas suas anotações
+          </h2>
+          <Surface className="flex flex-col divide-y divide-[var(--color-line)]">
+            {encontrouNotas.map((n) => {
+              const aula = aulaDaNota.get(n.lesson_id as string)
+              if (!aula?.caminho) return null
+              const destino =
+                n.at_seconds !== null ? `${aula.caminho}?t=${n.at_seconds}` : aula.caminho
+              return (
+                <Link
+                  key={n.id as string}
+                  href={destino}
+                  className="group flex flex-col gap-1 px-5 py-4 transition-colors hover:bg-[var(--color-realce-2)]"
+                >
+                  <span className="line-clamp-2 text-body text-ink-2 transition-colors group-hover:text-ink">
+                    {n.body as string}
+                  </span>
+                  <span className="flex items-center gap-2 text-caption text-ink-4">
+                    {n.at_seconds !== null && (
+                      <>
+                        <span data-numeric className="text-blue-light">
+                          {formatDuration(n.at_seconds as number)}
+                        </span>
+                        <span aria-hidden>·</span>
+                      </>
+                    )}
+                    <span className="truncate">{aula.titulo}</span>
+                  </span>
+                </Link>
+              )
+            })}
+          </Surface>
         </section>
       )}
 

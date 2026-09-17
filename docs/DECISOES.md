@@ -2258,3 +2258,38 @@ honesto do que inventar variação para parecer novo. Por cima, um véu da cor a
 E o recorte automático no conteúdo não é detalhe: sem ele, margens diferentes
 nos arquivos de origem virariam oito ícones de tamanhos diferentes na mesma
 grade, e a grade voltaria a parecer desleixada.
+
+## D-97 · O caderno mora na Jornada, e o minuto é o produto
+
+O Gabriel imaginou uma sidebar própria para as anotações. A sidebar já tem
+sete destinos, e um oitavo cobraria atenção de todo mundo, todo dia, por algo
+que só passa a existir depois que a pessoa anotou alguma coisa.
+
+A Jornada já é onde mora o que é dela — progresso, habilidades, aplicações.
+Anotação e aula salva são da mesma família: rastro de quem passou.
+
+**O que faz o caderno valer é o minuto.** Cada anotação leva ao ponto exato do
+vídeo em que foi escrita. Seis meses depois, "reduzir a promessa antes de
+escolher o arquétipo" não diz nada sozinha — clicando, a aula abre em 4min12 e
+o contexto volta inteiro. Sem o `?t=`, seria uma lista de frases órfãs.
+
+**Vazio, não aparece.** Caderno com "você ainda não anotou" é cobrança. Quem
+não anotou não precisa saber que existe um lugar para as anotações que ele não
+fez — vai descobrir quando anotar.
+
+## D-98 · Buscar o que você escreveu vem antes de buscar o catálogo
+
+As anotações entraram na busca, e aparecem ANTES dos cursos, dos apps e das
+aulas.
+
+A ordem é o argumento inteiro: quem digita uma palavra que ele mesmo escreveu
+está procurando a própria nota, não um curso que por acaso usa a mesma
+palavra. Devolver o catálogo primeiro seria responder outra pergunta.
+
+**Não usa `textSearch`.** `lesson_notes` não tem índice de busca, e criar um
+exigiria montar um documento a partir do que os alunos escrevem — dado que a
+equipe não deve tocar. Um `ilike` sobre a lista de UMA pessoa percorre dezenas
+de linhas, não milhões, e custa nada.
+
+E quem garante que só as notas de quem busca aparecem não é o filtro daqui: é
+a RLS. O `ilike` poderia ser esquecido; o Postgres não esquece.

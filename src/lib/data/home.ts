@@ -235,3 +235,99 @@ export async function getBoasVindas(viewerId: string): Promise<BoasVindas | null
     return null
   }
 }
+
+/**
+ * O CADERNO: as anotações e as aulas salvas de uma pessoa.
+ *
+ * Três consultas em vez de um join: o Supabase não faz join arbitrário pelo
+ * cliente, e montar o caminho da aula (`/curso/<slug>/<aula>`) exige o slug do
+ * curso, que mora duas tabelas acima. Buscar em lotes e casar em memória é
+ * mais previsível que embed aninhado — e a RLS já filtrou tudo para a pessoa
+ * certa antes de qualquer linha chegar aqui.
+ */
+export async function getCaderno(userId: string) {
+  const supabase = await createClient()
+
+  const [{ data: notas }, { data: salvas }] = await Promise.all([
+    supabase
+      .from('lesson_notes')
+      .select('id, body, at_seconds, created_at, lesson_id')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(60),
+    supabase
+      .from('saved_lessons')
+      .select('lesson_id, saved_at')
+      .eq('user_id', userId)
+      .order('saved_at', { ascending: false })
+      .limit(40),
+  ])
+
+  const ids = [
+    ...new Set([
+      ...(notas ?? []).map((n) => n.lesson_id as string),
+      ...(salvas ?? []).map((s) => s.lesson_id as string),
+    ]),
+  ]
+
+  if (ids.length === 0) return { notas: [], salvas: [] }
+
+  const { data: aulas } = await supabase
+    .from('lessons')
+    .select('id, slug, title, duration_seconds, course_id')
+    .in('id', ids)
+
+  const cursoIds = [...new Set((aulas ?? []).map((a) => a.course_id as string))]
+  const { data: cursos } = cursoIds.length
+    ? await supabase.from('courses').select('id, slug, title').in('id', cursoIds)
+    : { data: [] as Array<{ id: string; slug: string; title: string }> }
+
+  const porCurso = new Map((cursos ?? []).map((c) => [c.id as string, c]))
+  const porAula = new Map(
+    (aulas ?? []).map((a) => {
+      const curso = porCurso.get(a.course_id as string)
+      return [
+        a.id as string,
+        {
+          titulo: a.title as string,
+          duracao: a.duration_seconds as number,
+          cursoTitulo: curso?.title ?? '',
+          caminho: curso ? `/curso/${curso.slug}/${a.slug}` : '#',
+        },
+      ]
+    }),
+  )
+
+  return {
+    notas: (notas ?? []).flatMap((n) => {
+      const aula = porAula.get(n.lesson_id as string)
+      // Aula apagada depois da anotação: a linha some por cascade, mas se
+      // chegar aqui sem par, some da lista em vez de virar item sem destino.
+      if (!aula) return []
+      return [
+        {
+          id: n.id as string,
+          body: n.body as string,
+          atSeconds: n.at_seconds as number | null,
+          createdAt: n.created_at as string,
+          aulaTitulo: aula.titulo,
+          cursoTitulo: aula.cursoTitulo,
+          caminho: aula.caminho,
+        },
+      ]
+    }),
+    salvas: (salvas ?? []).flatMap((s) => {
+      const aula = porAula.get(s.lesson_id as string)
+      if (!aula) return []
+      return [
+        {
+          id: s.lesson_id as string,
+          titulo: aula.titulo,
+          cursoTitulo: aula.cursoTitulo,
+          caminho: aula.caminho,
+          duracao: aula.duracao,
+        },
+      ]
+    }),
+  }
+}
