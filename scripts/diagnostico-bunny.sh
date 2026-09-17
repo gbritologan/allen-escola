@@ -24,14 +24,27 @@ BRUTO=$(pbpaste)
 # o relatório inteiro sai parecendo diagnóstico quando não mediu nada. Erro que
 # se disfarça de resultado é pior que erro nenhum — foi o que aconteceu aqui.
 if [ -z "$(printf '%s' "$BRUTO" | tr -d '[:space:]')" ]; then
+  # A área vazia aconteceu duas vezes: o botão de copiar do painel do Bunny
+  # não estava entregando nada. Em vez de mandar tentar de novo pela terceira
+  # vez, o script oferece o outro caminho aqui mesmo.
+  #
+  # O campo é VISÍVEL de propósito. A versão escondida parecia mais segura e
+  # era pior: sem eco, a pessoa cola duas vezes achando que não pegou — foi
+  # assim que chegaram 208 caracteres onde cabiam 36. Ver o que se colou é o
+  # que evita colar de novo, e o valor não entra no histórico do shell porque
+  # é entrada de programa, não comando.
   echo
-  echo "❌ A ÁREA DE TRANSFERÊNCIA ESTÁ VAZIA. Não testei nada."
+  echo "A área de transferência está vazia — o botão de copiar do Bunny"
+  echo "não entregou nada. Sem problema: selecione a chave na tela com o"
+  echo "mouse, copie com Cmd+C, e cole aqui embaixo."
   echo
-  echo "   Vá ao painel do Bunny, na linha API Key:"
-  echo "     1. clique no olho para revelar"
-  echo "     2. clique no ícone de copiar"
-  echo "   Depois rode este comando de novo."
-  exit 1
+  printf 'Cole a chave e tecle Enter (ela VAI aparecer, é de propósito): '
+  read -r BRUTO
+  echo
+  if [ -z "$(printf '%s' "$BRUTO" | tr -d '[:space:]')" ]; then
+    echo "❌ Nada foi colado. Não testei nada."
+    exit 1
+  fi
 fi
 printf '%s' "$BRUTO" | python3 -c '
 import sys, re
