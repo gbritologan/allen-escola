@@ -22,6 +22,8 @@ import {
 } from './actions'
 import { AulaExpansivel } from './aula-expansivel'
 import { CampoImagem } from '@/components/domain/campo-imagem'
+import { videoConfigurado } from '@/lib/video'
+import { VideoIntro } from './video-intro'
 import { textoDosPontos } from '@/core/catalog/aprendizado'
 import { Capa } from './capa'
 import { SoltarAulas } from './soltar-aulas'
@@ -51,7 +53,7 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
       supabase
         .from('courses')
         .select(
-          'id, title, slug, summary, description, format, status, instructor_id, lesson_count, duration_seconds, cover_url, banner_url, learning_points, available_at, release_after_days',
+          'id, title, slug, summary, description, format, status, instructor_id, lesson_count, duration_seconds, cover_url, banner_url, learning_points, available_at, release_after_days, intro_video_asset_id',
         )
         .eq('id', id)
         .maybeSingle(),
@@ -268,6 +270,29 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
 
       {/* ---------------------------------------------------------------- */}
       <Capa id={course.id} slug={course.slug} coverUrl={course.cover_url ?? null} />
+
+      {/* O teaser abre a página do aluno. É a primeira coisa que ele vê —
+          antes do título, antes do texto. */}
+      <section className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-title font-light">Vídeo de introdução</h2>
+          <p className="text-caption text-ink-4">
+            O teaser do curso: um ou dois minutos sobre o que a pessoa vai aprender. Toca no topo
+            da página do curso. Opcional — sem ele, a página abre com a capa e um botão de play.
+          </p>
+        </div>
+        {videoConfigurado() ? (
+          <VideoIntro
+            courseId={course.id}
+            titulo={course.title}
+            temIntro={Boolean(course.intro_video_asset_id)}
+          />
+        ) : (
+          <p className="text-caption text-caution">
+            O provedor de vídeo não está configurado neste ambiente.
+          </p>
+        )}
+      </section>
 
       {/* O banner é OUTRA peça, não outro tamanho da mesma: a capa vende o
           curso de fora, no catálogo; o banner recebe quem já entrou. */}

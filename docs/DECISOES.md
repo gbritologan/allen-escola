@@ -2001,3 +2001,43 @@ aula" ficavam lado a lado, com o mesmo peso: a pessoa escolhia entre dois
 jeitos de fazer a mesma coisa antes de fazer qualquer coisa. Escolha sem
 critério não é liberdade, é hesitação. Criar aula vazia virou o que sempre
 foi — a exceção, atrás de um "+".
+
+## D-88 · A página do curso respondia a pergunta errada
+
+O Gabriel abriu a página do curso como ALUNO — não como dono — e a palavra
+dele foi "decepção". Estava certo.
+
+A tela era uma parede de texto: título, resumo, dezesseis promessas em duas
+colunas, oito parágrafos de descrição, e só então a lista de aulas. Ela
+respondia **"sobre o que é isto?"** quando a pergunta de quem clica num curso
+é **"como isto é?"**.
+
+Refeita em quatro decisões:
+
+1. **O vídeo ocupa a dobra.** Com teaser, ele toca ali (0027 criou
+   `intro_video_asset_id`). Sem teaser, a capa vira pôster com um play enorme
+   que leva à primeira aula. Nos dois casos a primeira coisa na tela é algo
+   para assistir.
+
+2. **O texto foi para o lado, e encolheu.** Tema, título, uma linha, os
+   números, um botão. Nada mais disputa a dobra com o vídeo.
+
+3. **As aulas viraram catálogo.** Miniatura vinda do provedor (custa zero — já
+   existe lá), duração, marca de concluída, destaque na próxima. Lista com
+   imagem se varre; lista de títulos se lê, e ninguém lê sumário.
+
+4. **A leitura longa desceu para o fim.** "O que você vai aprender" e a
+   descrição continuam inteiras — só deixaram de ser pedágio.
+
+O botão diz **"Começar o curso"** ou **"Continuar de onde parou"** conforme o
+progresso, e nos dois casos leva à primeira aula não concluída. Uma regra só
+cobre as duas situações e nenhuma delas obriga a pessoa a procurar na lista.
+
+**Sobre o vidro:** o fundo é a arte do próprio curso, borrada e escurecida.
+Não é enfeite — é o que dá ao `glass-card` algo para filtrar. Vidro sobre
+preto chapado é plástico fosco (D-51), e era isso que estava acontecendo.
+
+**A lição de método:** eu construí essa tela olhando a estrutura de dados que
+eu tinha para mostrar, e não o momento em que a pessoa chega nela. Dá para
+ficar meses assim, porque tudo "funciona" — cada campo aparece, nada quebra. O
+teste que faltava era o que ele fez: abrir como aluno.
