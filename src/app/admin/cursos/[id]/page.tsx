@@ -54,7 +54,7 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
       supabase
         .from('courses')
         .select(
-          'id, title, slug, summary, description, format, status, instructor_id, lesson_count, duration_seconds, cover_url, banner_url, learning_points, available_at, release_after_days, intro_video_asset_id',
+          'id, title, slug, summary, description, format, status, instructor_id, lesson_count, duration_seconds, cover_url, banner_url, learning_points, available_at, coming_soon, release_after_days, intro_video_asset_id',
         )
         .eq('id', id)
         .maybeSingle(),
@@ -241,10 +241,36 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
               />
             </Field>
 
+            {/*
+              DOIS JEITOS DE DIZER "AINDA NÃO", E ELES NÃO SÃO REDUNDANTES.
+
+              O interruptor é "ainda não sei quando" e só sai quando alguém
+              desligar. A data é "a partir de tal dia" e se resolve sozinha.
+
+              Com só a data, quem não sabia o dia era obrigado a inventar um —
+              e data inventada chega: o curso abriria num dia que ninguém
+              escolheu.
+            */}
+            <label className="flex items-start gap-3 rounded-[var(--radius-control)] border border-line px-4 py-3">
+              <input
+                type="checkbox"
+                name="coming_soon"
+                defaultChecked={Boolean(course.coming_soon)}
+                className="mt-0.5 size-4 shrink-0 accent-[var(--color-blue-light)]"
+              />
+              <span className="flex flex-col gap-0.5">
+                <span className="text-body text-ink">Marcar como “Em breve”</span>
+                <span className="text-caption text-ink-4">
+                  O curso aparece no catálogo com a capa, um cadeado e o aviso — e não deixa
+                  entrar. Fica assim até você desmarcar.
+                </span>
+              </span>
+            </label>
+
             <Field
-              label="Disponível a partir de"
+              label="Ou abrir numa data"
               htmlFor="available_at"
-              hint="Em branco: disponível assim que publicado. Data no futuro: aparece como 'Em breve' e abre sozinho no dia."
+              hint="Em branco: abre assim que publicado. Data no futuro: também aparece como 'Em breve', mas abre sozinho no dia — sem ninguém precisar voltar aqui."
             >
               <Input
                 id="available_at"

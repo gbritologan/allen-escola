@@ -133,6 +133,8 @@ export interface CourseSummary {
    * sozinho no dia — status precisaria de alguém lembrando de voltar lá.
    */
   availableAt: string | null
+  /** Em breve sem prazo. Ver `emBreve()`. */
+  comingSoon: boolean
   /**
    * AINDA É RASCUNHO — e só a equipe está vendo isto.
    *
@@ -147,11 +149,22 @@ export interface CourseSummary {
   rascunho: boolean
 }
 
-/** Ainda não abriu. */
+/**
+ * Ainda não abriu — por interruptor ou por data.
+ *
+ * `comingSoon` é o "ainda não" sem prazo: só sai quando alguém desligar.
+ * `availableAt` é o "a partir de tal dia": sai sozinho quando o dia chega.
+ *
+ * Os dois existem porque respondem a perguntas diferentes, e se distinguem
+ * por QUEM desliga — o interruptor espera uma pessoa, a data espera o
+ * relógio. Ter só a data obrigava a inventar uma quando não se sabe o dia, e
+ * data inventada chega: o curso abriria num dia que ninguém escolheu.
+ */
 export function emBreve(
-  curso: { availableAt: string | null },
+  curso: { availableAt: string | null; comingSoon?: boolean },
   agora: Date = new Date(),
 ): boolean {
+  if (curso.comingSoon) return true
   return Boolean(curso.availableAt && new Date(curso.availableAt) > agora)
 }
 

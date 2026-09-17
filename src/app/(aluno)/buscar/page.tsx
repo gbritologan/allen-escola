@@ -66,7 +66,7 @@ async function Resultados({ termo }: { termo: string }) {
   const [{ data: cursos }, { data: aulas }, { data: apps }, { data: notas }] = await Promise.all([
     supabase
       .from('courses')
-      .select('id, slug, title, summary, cover_url, format, status, duration_seconds, lesson_count, available_at')
+      .select('id, slug, title, summary, cover_url, format, status, duration_seconds, lesson_count, available_at, coming_soon')
       .textSearch('search_doc', consulta, { type: 'websearch', config: 'portuguese' })
       .limit(12),
     supabase
@@ -174,6 +174,7 @@ async function Resultados({ termo }: { termo: string }) {
                   coverUrl: c.cover_url,
                   availableAt: c.available_at ?? null,
                   rascunho: c.status !== 'published',
+                  comingSoon: Boolean(c.coming_soon),
                   format: c.format,
                   durationSeconds: c.duration_seconds,
                   lessonCount: c.lesson_count,

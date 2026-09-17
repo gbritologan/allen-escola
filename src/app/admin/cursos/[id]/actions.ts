@@ -60,6 +60,12 @@ export async function atualizarCurso(formData: FormData) {
   const disponivelEm = String(formData.get('available_at') ?? '').trim()
 
   /*
+   * O interruptor do "em breve". Checkbox ausente no FormData significa
+   * desmarcado — por isso a leitura é por presença, não por valor.
+   */
+  const emBreveManual = formData.get('coming_soon') !== null
+
+  /*
    * A blindagem dos 7 dias. Vazio = abre junto com o acesso.
    *
    * É prazo POR ALUNO, contado da entrada dele — diferente de `available_at`,
@@ -88,6 +94,7 @@ export async function atualizarCurso(formData: FormData) {
       available_at: disponivelEm ? `${disponivelEm} 00:00:00-03` : null,
       release_after_days: liberarApos === '' ? null : Math.max(0, Number(liberarApos) || 0),
       learning_points: pontos,
+      coming_soon: emBreveManual,
     })
     .eq('id', id)
 

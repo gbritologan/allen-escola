@@ -87,12 +87,31 @@ export function CourseCard({
           </span>
         )}
 
+        {/*
+          EM BREVE É UM VÉU, NÃO UM SELO.
+
+          Era um chip de doze pixels num canto. Chip compete com os outros
+          chips e some na varredura — a pessoa clicava, chegava numa página que
+          não deixava entrar, e só aí entendia.
+
+          Agora a capa inteira diz. O cadeado é o que se lê antes do texto:
+          símbolo de "fechado" não precisa de tradução, e funciona na miniatura
+          pequena da busca do mesmo jeito que no cartão grande.
+        */}
+        {aguardando && (
+          <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[rgba(5,7,20,0.62)] backdrop-blur-[2px]">
+            <Cadeado />
+            <span className="text-caption font-medium uppercase tracking-[0.22em] text-[var(--color-sobre-veu)]">
+              Em breve
+            </span>
+          </span>
+        )}
+
         <div className="relative flex flex-wrap items-center gap-2">
           {/* Rascunho no catálogo do aluno só aparece para a equipe — a RLS
               cuida disso. O selo existe porque a regra, sem ele, é invisível:
               tirar um curso do ar e vê-lo continuar na tela parece defeito. */}
           {course.rascunho && <Chip tone="caution">Rascunho · só a equipe vê</Chip>}
-          {aguardando && <Chip tone="caution">Em breve</Chip>}
           {masterclass && <Chip tone="accent">Capacitação</Chip>}
         </div>
       </div>
@@ -111,5 +130,24 @@ export function CourseCard({
         </span>
       </div>
     </Link>
+  )
+}
+
+/** O cadeado do "em breve". Fechado, sólido, legível a 24px. */
+function Cadeado() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden
+      className="size-6 text-[var(--color-sobre-veu)]"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="4.5" y="10.5" width="15" height="10" rx="2.2" />
+      <path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7" />
+    </svg>
   )
 }

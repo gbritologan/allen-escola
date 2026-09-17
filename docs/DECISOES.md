@@ -2293,3 +2293,30 @@ de linhas, não milhões, e custa nada.
 
 E quem garante que só as notas de quem busca aparecem não é o filtro daqui: é
 a RLS. O `ilike` poderia ser esquecido; o Postgres não esquece.
+
+## D-99 · Dois jeitos de dizer "ainda não", e eles não competem
+
+"Em breve" era só `available_at`: uma data no futuro. Isso resolve o caso
+planejado — o curso abre sozinho no dia, sem ninguém lembrar de voltar — e não
+resolve o comum: *quero publicar a capa agora e ainda não sei quando abro*.
+
+Com só a data, esse caso obrigava a inventar uma. **Data inventada é pior que
+nenhuma: ela chega.** O curso abriria sozinho num dia que ninguém escolheu.
+
+Então são dois, e a diferença entre eles é QUEM desliga:
+
+- `coming_soon` — o interruptor. Espera uma **pessoa**.
+- `available_at` — a data. Espera o **relógio**.
+
+Dois caminhos para o mesmo estado costuma ser cheiro de má modelagem. Aqui não
+é, e o teste que prova está escrito: **o interruptor vence uma data vencida.**
+Quem está esperando uma decisão humana não pode ser destravado pelo calendário.
+
+**E o selo virou véu.** Era um chip de doze pixels num canto, competindo com
+os outros chips e sumindo na varredura — a pessoa clicava, chegava numa página
+que não deixava entrar, e só então entendia. Agora a capa inteira diz, com
+cadeado.
+
+O cadeado vem antes do texto de propósito: símbolo de "fechado" não precisa de
+tradução, e funciona na miniatura pequena da busca do mesmo jeito que no
+cartão grande.

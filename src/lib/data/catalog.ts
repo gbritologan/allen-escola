@@ -67,7 +67,7 @@ export const listCourses = cache(async (filters: CourseFilters = {}): Promise<Co
   let query = supabase
     .from('courses')
     .select(
-      'id, slug, title, summary, cover_url, format, status, duration_seconds, lesson_count, instructor_id, published_at, available_at',
+      'id, slug, title, summary, cover_url, format, status, duration_seconds, lesson_count, instructor_id, published_at, available_at, coming_soon',
     )
     .order('published_at', { ascending: false, nullsFirst: false })
 
@@ -107,6 +107,7 @@ export const listCourses = cache(async (filters: CourseFilters = {}): Promise<Co
     coverUrl: c.cover_url,
     availableAt: c.available_at ?? null,
     rascunho: c.status !== 'published',
+    comingSoon: Boolean(c.coming_soon),
     format: c.format,
     durationSeconds: c.duration_seconds,
     lessonCount: c.lesson_count,

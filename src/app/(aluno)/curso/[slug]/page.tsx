@@ -66,7 +66,7 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
   const { data: course } = await supabase
     .from('courses')
     .select(
-      'id, slug, title, summary, description, format, duration_seconds, lesson_count, instructor_id, cover_url, banner_url, learning_points, available_at, intro_video_asset_id',
+      'id, slug, title, summary, description, format, duration_seconds, lesson_count, instructor_id, cover_url, banner_url, learning_points, available_at, coming_soon, intro_video_asset_id',
     )
     .eq('slug', slug)
     .maybeSingle()
@@ -111,7 +111,10 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
   )
 
   const masterclass = course.format === 'masterclass'
-  const aguardando = emBreve({ availableAt: course.available_at ?? null })
+  const aguardando = emBreve({
+    availableAt: course.available_at ?? null,
+    comingSoon: Boolean(course.coming_soon),
+  })
   const pontos: string[] = course.learning_points ?? []
   const todas = lessons ?? []
   const podeVideo = videoConfigurado()
@@ -261,8 +264,9 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
 
             {aguardando ? (
               <p className="rounded-[var(--radius-card)] border border-line px-5 py-4 text-body text-ink-2">
-                Abre em {porExtenso(new Date(course.available_at as string))}. Já está no seu
-                catálogo — no dia, as aulas aparecem aqui sozinhas.
+                {course.available_at
+                  ? `Abre em ${porExtenso(new Date(course.available_at))}. Já está no seu catálogo — no dia, as aulas aparecem aqui sozinhas.`
+                  : 'Este curso ainda não abriu. Ele já está no seu catálogo, e as aulas aparecem aqui assim que a escola liberar.'}
               </p>
             ) : proxima ? (
               <Link
