@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Banner, type BannerHome } from '@/components/domain/banner'
 import { ContinueCard } from '@/components/domain/continue-card'
 import { CourseCard } from '@/components/domain/course-card'
+import { SeloDoTema } from '@/components/domain/selo-do-tema'
 import type { CourseSummary } from '@/core/catalog/types'
 import type { HomeBlock } from '@/core/home/resolve-home'
 import { cn } from '@/lib/utils'
@@ -138,26 +139,37 @@ export function BlocosDaHome({
 
           case 'themes':
             return (
-              <section key="themes" className="flex flex-col gap-4">
+              <section key="themes" className="flex flex-col gap-5">
                 <SectionLabel>Explorar por tema</SectionLabel>
-                {/* Seis temas cabem numa linha só no monitor grande. Tema é
-                    porta, e porta em fila única se lê de uma olhada. */}
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6">
+                {/*
+                  SEM CAIXA, SEM DESCRIÇÃO, COM COR.
+
+                  Antes eram oito retângulos de vidro idênticos, cada um com
+                  nome e duas linhas de descrição. O Gabriel disse que não
+                  criava identificação nenhuma, e a razão é geométrica: oito
+                  formas iguais do mesmo tamanho e da mesma cor não são oito
+                  coisas, são uma textura. O olho não distingue, então não
+                  escolhe.
+
+                  A caixa saiu. Sobrou o que identifica: o ÍCONE, grande, na
+                  COR do tema. A descrição saiu junto — numa grade de oito, ela
+                  não era informação, era ruído que fazia tudo parecer igual de
+                  novo.
+                */}
+                <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8">
                   {block.themes.map((t) => (
-                    <Link
+                    <SeloDoTema
                       key={t.id}
                       href={`/tema/${t.slug}`}
-                      className="glass-card group flex flex-col gap-1 rounded-[var(--radius-card)] px-5 py-4 transition-[border-color,box-shadow] duration-200 hover:glass-card-hover"
-                    >
-                      <span className="text-lead font-light text-ink">{t.name}</span>
-                      {t.description && (
-                        <span className="line-clamp-2 text-label text-ink-4">{t.description}</span>
-                      )}
-                    </Link>
+                      nome={t.name}
+                      icone={t.icon}
+                      cor={t.accent}
+                    />
                   ))}
                 </div>
               </section>
             )
+
         }
       })}
 

@@ -127,6 +127,19 @@ export interface TemaEntrada {
   name: string
   description?: string | null
   icon?: string | null
+  /**
+   * A cor do tema, vinda do banco (`themes.accent`, 0031).
+   *
+   * Antes o Mapa inventava a própria cor, distribuindo matizes num arco de
+   * 196° a 292° pela POSIÇÃO do tema. Funcionava como paleta e falhava como
+   * identidade: a cor de Vendas mudava quando um tema novo entrava antes
+   * dele, e não era a mesma cor que Vendas tinha na Home.
+   *
+   * Cor de tema é identidade, e identidade não pode depender de quantos
+   * vizinhos existem. Agora ela vem do banco, e é a MESMA nas duas telas —
+   * que é o que faz o aluno reconhecer o tema sem ler o nome.
+   */
+  accent?: string | null
 }
 
 export interface CursoEntrada {
@@ -165,6 +178,39 @@ const HUE_FIM = 292
 export function hueDoTema(indice: number, total: number): number {
   if (total <= 1) return 244
   return HUE_INICIO + (indice / (total - 1)) * (HUE_FIM - HUE_INICIO)
+}
+
+/**
+ * O matiz de um hex, para o Mapa continuar falando em HSL.
+ *
+ * O canvas monta as cores com `hsl(matiz ...)` variando saturação e luz por
+ * ESTADO (apagado, visto, aceso). Guardar só o matiz preserva esse mecanismo
+ * inteiro e troca apenas a origem do número: era posição na roda, passa a ser
+ * a cor que o tema tem no banco.
+ *
+ * Sem `accent`, cai no arco antigo — tema sem cor definida continua ganhando
+ * uma que não colide com as outras.
+ */
+export function matizDoHex(hex: string): number | null {
+  const limpo = hex.trim().replace('#', '')
+  if (limpo.length !== 6) return null
+
+  const r = parseInt(limpo.slice(0, 2), 16) / 255
+  const g = parseInt(limpo.slice(2, 4), 16) / 255
+  const b = parseInt(limpo.slice(4, 6), 16) / 255
+  if ([r, g, b].some(Number.isNaN)) return null
+
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  const d = max - min
+  if (d === 0) return 0
+
+  let h: number
+  if (max === r) h = ((g - b) / d) % 6
+  else if (max === g) h = (b - r) / d + 2
+  else h = (r - g) / d + 4
+
+  return ((h * 60) % 360 + 360) % 360
 }
 
 /**
@@ -289,7 +335,8 @@ export function montarMapa(
   const passo = temas.length > 0 ? (Math.PI * 2) / temas.length : 0
 
   temas.forEach((tema, i) => {
-    const hue = hueDoTema(i, temas.length)
+    const hue =
+      (tema.accent ? matizDoHex(tema.accent) : null) ?? hueDoTema(i, temas.length)
     const ang = i * passo - Math.PI / 2
     const raio = RAIO_TEMA + ruido(tema.id, 70)
     const tx = Math.cos(ang) * raio

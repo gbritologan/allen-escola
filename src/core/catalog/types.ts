@@ -10,8 +10,13 @@ export interface Theme {
   slug: string
   name: string
   description: string | null
-  /** Acento opcional do tema. Não substitui o azul da Allen — apenas identifica. */
+  /**
+   * A cor do tema. Desde 0031 cada um tem a sua, e ela é o que faz o aluno
+   * reconhecer o tema antes de ler o nome — no cartão, no Mapa, no ícone.
+   */
   accent: string | null
+  /** Chave em `ICONES_TEMA`. Nulo = o tema aparece só pelo nome. */
+  icon: string | null
   position: number
   status: ContentStatus
 }

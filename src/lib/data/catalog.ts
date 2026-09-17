@@ -20,7 +20,7 @@ export const listThemes = cache(async (): Promise<Theme[]> => {
   const supabase = await createClient()
   const { data } = await supabase
     .from('themes')
-    .select('id, slug, name, description, accent, position, status')
+    .select('id, slug, name, description, accent, icon, position, status')
     .order('position')
 
   return (data ?? []).map((t) => ({
@@ -29,6 +29,7 @@ export const listThemes = cache(async (): Promise<Theme[]> => {
     name: t.name,
     description: t.description,
     accent: t.accent,
+    icon: t.icon,
     position: t.position,
     status: t.status,
   }))
@@ -117,7 +118,7 @@ export const getThemeBySlug = cache(async (slug: string): Promise<Theme | null> 
   const supabase = await createClient()
   const { data } = await supabase
     .from('themes')
-    .select('id, slug, name, description, accent, position, status')
+    .select('id, slug, name, description, accent, icon, position, status')
     .eq('slug', slug)
     .maybeSingle()
 
@@ -128,6 +129,7 @@ export const getThemeBySlug = cache(async (slug: string): Promise<Theme | null> 
         name: data.name,
         description: data.description,
         accent: data.accent,
+        icon: data.icon,
         position: data.position,
         status: data.status,
       }
