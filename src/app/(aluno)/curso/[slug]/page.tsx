@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { MiniaturaAula } from '@/components/domain/miniatura-aula'
+import { OQueAprende } from '@/components/domain/o-que-aprende'
 import { Player } from '@/components/domain/player'
 import { Chip } from '@/components/primitives/chip'
 import { emBreve } from '@/core/catalog/types'
@@ -359,34 +360,42 @@ export default async function CursoPage({ params }: { params: Promise<{ slug: st
         </section>
       )}
 
-      {/* ═══ A LEITURA LONGA, NO FIM ═══════════════════════════════════════
-          Quem quer ler desce até aqui. Quem quer assistir já assistiu. */}
-      {(pontos.length > 0 || course.description) && (
-        <section className="largura-catalogo relative grid gap-12 px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          {pontos.length > 0 && (
-            <div className="flex flex-col gap-5">
-              <h2 className="text-caption font-medium uppercase tracking-[0.16em] text-ink-3">
-                O que você vai aprender
-              </h2>
-              <ul className="flex flex-col gap-3">
-                {pontos.map((ponto) => (
-                  <li key={ponto} className="flex gap-3">
-                    <span aria-hidden className="mt-[0.7em] h-px w-4 shrink-0 bg-blue-light" />
-                    <span className="text-body text-ink-2">{ponto}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+      {/* ═══ A PROMESSA, EM DESTAQUE ══════════════════════════════════════
+          Antes isto e a descrição eram duas colunas gêmeas de texto — o
+          Gabriel chamou de "página documental", e estava certo: dois blocos
+          do mesmo tamanho e do mesmo tom não têm hierarquia, e sem hierarquia
+          o olho não escolhe por onde entrar. Então não entra.
 
-          {course.description && (
-            <div className="flex flex-col gap-5">
-              <h2 className="text-caption font-medium uppercase tracking-[0.16em] text-ink-3">
-                Sobre o curso
-              </h2>
-              <p className="whitespace-pre-line text-body text-ink-3">{course.description}</p>
-            </div>
-          )}
+          Agora a promessa é uma seção com peso próprio e interação, e a
+          descrição virou o que ela sempre foi: texto de apoio, discreto,
+          para quem quiser. */}
+      {pontos.length > 0 && (
+        <section className="largura-catalogo relative flex flex-col gap-7 px-6">
+          <h2 className="text-caption font-medium uppercase tracking-[0.16em] text-ink-3">
+            O que você vai aprender
+          </h2>
+          <OQueAprende pontos={pontos} />
+        </section>
+      )}
+
+      {/* A descrição, recuada e estreita: largura de leitura, tom mais baixo,
+          e um título que diz que é contexto — não a atração principal. */}
+      {course.description && (
+        <section className="largura-catalogo relative px-6">
+          <details className="group max-w-[68ch]">
+            <summary className="flex cursor-pointer list-none items-center gap-2 text-caption font-medium uppercase tracking-[0.16em] text-ink-4 transition-colors hover:text-ink-3">
+              Sobre o curso
+              <span
+                aria-hidden
+                className="text-caption transition-transform duration-200 group-open:rotate-90"
+              >
+                ▸
+              </span>
+            </summary>
+            <p className="whitespace-pre-line pt-5 text-body text-ink-3">
+              {course.description}
+            </p>
+          </details>
         </section>
       )}
 

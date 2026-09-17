@@ -144,3 +144,18 @@
     opacity: 0.5;
   }
 }
+
+/* A frase que entra: sobe dois pixels e ganha opacidade. Curto de propósito —
+   320ms é o limite entre "respondeu" e "está me fazendo esperar", e num
+   elemento que a pessoa vai trocar dezesseis vezes seguidas esse limite
+   aparece rápido. */
+@keyframes surgir {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
