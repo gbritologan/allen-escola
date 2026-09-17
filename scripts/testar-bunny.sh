@@ -37,35 +37,30 @@ fi
 echo "Biblioteca $LIB"
 echo "Na área de transferência: ${#CHAVE} caracteres"
 
-# A chave do Bunny é um UUID: 8-4-4-4-12 em hexadecimal, 36 caracteres, QUATRO
-# hifens. Conferir o FORMATO antes de perguntar ao Bunny é o que separa "você
-# colou a coisa errada" de "o Bunny recusou" — problemas diferentes, com
-# soluções diferentes. Um 401 que na verdade era erro de cópia manda a pessoa
-# procurar chave nova quando a chave nunca saiu do painel.
-if printf '%s' "$CHAVE" | grep -Eqi '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'; then
-  : # formato certo, segue
-elif [ "$(printf '%s' "$CHAVE" | tr -cd - | wc -c)" -eq 5 ]; then
-  # 5 hifens com o bloco longo no MEIO é a versão mascarada que o painel
-  # mostra antes de você clicar no olho. Aconteceu três vezes seguidas aqui.
+# CONFERÊNCIA DE FORMATO — e uma lição cara.
+#
+# Eu presumi que a chave do Bunny fosse um UUID (8-4-4-4-12, quatro hifens) e
+# fiz o script REJEITAR o que não tivesse essa cara. O Gabriel colou a chave
+# certa seis vezes e seis vezes o script disse que ela era uma "máscara".
+#
+# A chave do Bunny tem CINCO hifens. Ele me disse isso, olhando para a tela, e
+# eu não voltei aqui para desfazer a regra — o script seguiu ensinando o meu
+# palpite como se fosse fato.
+#
+# Agora a conferência só faz o que tem base: barra o que claramente não é
+# chave (página inteira colada, área vazia, texto com espaço no meio). O
+# formato quem julga é o Bunny, que é quem sabe.
+if [ "${#CHAVE}" -lt 20 ] || [ "${#CHAVE}" -gt 80 ]; then
   echo
-  echo "❌ ISSO É A CHAVE MASCARADA, NÃO A CHAVE."
-  echo "   ${#CHAVE} caracteres e 5 hifens. Uma chave de verdade tem 36 e QUATRO."
-  echo
-  echo "   O painel do Bunny esconde o valor até você revelar."
-  echo "   Clique no ícone do OLHO (👁) na linha API Key, confirme que o"
-  echo "   bloco longo passou para o FIM, e só então copie."
-  echo
-  echo "   mascarada: xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxx-xxxx"
-  echo "   de verdade: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  echo "❌ ISSO NÃO TEM CARA DE CHAVE: ${#CHAVE} caracteres."
+  echo "   Uma chave do Bunny tem entre 36 e 41. O que costuma acontecer:"
+  echo "   copiou um pedaço da página, ou a saída do terminal."
   exit 1
-else
+fi
+
+if ! printf '%s' "$CHAVE" | grep -Eq '^[0-9A-Za-z-]+$'; then
   echo
-  echo "❌ ISSO NÃO TEM CARA DE CHAVE."
-  echo "   Uma API Key do Bunny tem 36 caracteres e 4 hifens. Esta tem ${#CHAVE}."
-  echo
-  echo "   O que costuma estar na área de transferência nesse caso:"
-  echo "   um pedaço da página, a saída do terminal, ou a chave colada duas vezes."
-  echo "   Copie de novo, só o campo API Key, e rode outra vez."
+  echo "❌ Há caracteres estranhos no meio. Copie de novo, só o campo da chave."
   exit 1
 fi
 

@@ -1935,3 +1935,33 @@ o script terminou (`zsh: command not found: <a chave>`), e de lá foi parar no
 histórico e num print. Duas exposições que existiram porque o campo não dava
 sinal de vida. Segurança que atrapalha o uso não é segurança — ela empurra a
 pessoa para o caminho inseguro.
+
+## D-86 · Eu transformei um palpite meu em regra do programa
+
+A chave do Bunny tem CINCO hifens. Eu presumi que fosse um UUID — quatro — e
+escrevi no script uma conferência que REJEITAVA qualquer coisa fora do meu
+palpite, com uma mensagem afirmativa: *"ISSO É A CHAVE MASCARADA, NÃO A
+CHAVE"*.
+
+O Gabriel colou a chave certa seis vezes. Seis vezes o programa disse que ela
+era falsa. Ele chegou a girar a chave no painel por causa disso, e a dizer
+"insanidade é fazer a mesma coisa e esperar resultados diferentes" — estava
+certo, e a insanidade era minha.
+
+Quando ele finalmente escreveu *"a api key da bunny tem 5 hifens"*, eu
+concordei no chat e **não voltei ao código**. O script seguiu ensinando o meu
+palpite como se fosse fato por mais três rodadas.
+
+Duas lições, e a segunda é a que dói:
+
+1. **Validação de entrada só pode conferir o que se sabe.** Eu não tinha base
+   para afirmar o formato de uma chave de terceiro. O que sabe o formato é o
+   Bunny — o papel do script era perguntar, não julgar.
+
+2. **Corrigir a conversa não corrige o produto.** Admitir o erro em texto e
+   deixar o código errado é pior que não admitir: agora existem duas verdades,
+   e a que a pessoa encontra sozinha, às duas da manhã, é a do código.
+
+A conferência agora só barra o que claramente não é chave — tamanho absurdo,
+caractere no meio. O julgamento de formato voltou para quem tem competência
+para fazê-lo.
