@@ -18,7 +18,7 @@ import sys
 import urllib.error
 import urllib.request
 
-LIB = sys.argv[1] if len(sys.argv) > 1 else "735837"
+LIB = sys.argv[1] if len(sys.argv) > 1 else "755323"
 
 bruto = subprocess.run(["pbpaste"], capture_output=True, text=True).stdout
 valor = "".join(bruto.split())

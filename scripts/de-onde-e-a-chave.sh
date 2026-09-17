@@ -13,7 +13,7 @@
 # Nenhum segredo aparece na saída: só nomes de endpoint e códigos HTTP.
 #
 set -uo pipefail
-LIB="${1:-735837}"
+LIB="${1:-755323}"
 
 CHAVE=$(pbpaste | tr -d '[:space:]"'"'"'')
 if [ -z "$CHAVE" ]; then

@@ -18,7 +18,7 @@
 #
 set -uo pipefail
 
-LIB="${1:-735837}"
+LIB="${1:-755323}"
 
 if ! command -v pbpaste >/dev/null 2>&1; then
   echo "Este script usa a área de transferência do macOS (pbpaste) e não achei ela."

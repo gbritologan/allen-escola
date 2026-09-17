@@ -15,7 +15,7 @@
 #   bash scripts/diagnostico-bunny.sh [idDaBiblioteca]
 #
 set -uo pipefail
-LIB="${1:-735837}"
+LIB="${1:-755323}"
 
 echo "════════ ÁREA DE TRANSFERÊNCIA ════════"
 BRUTO=$(pbpaste)
@@ -98,8 +98,8 @@ rm -f "$CONTA"
 
 echo
 echo "════════ O CDN DA BIBLIOTECA ════════"
-curl -s -o /dev/null -w 'vz-057393d5-4e6.b-cdn.net -> HTTP %{http_code}\n' \
-  "https://vz-057393d5-4e6.b-cdn.net/"
+curl -s -o /dev/null -w 'vz-8031bfb5-dc2.b-cdn.net -> HTTP %{http_code}\n' \
+  "https://vz-8031bfb5-dc2.b-cdn.net/"
 
 echo
 echo "Pode colar esta saída no chat — não há chave nenhuma nela."
