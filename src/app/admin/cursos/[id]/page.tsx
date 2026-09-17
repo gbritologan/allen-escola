@@ -383,27 +383,26 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
                         kind: m.kind,
                       })),
                     }}
-                    moverPara={(direcao) => (
-                      <form action={moverAula}>
-                        <input type="hidden" name="id" value={lesson.id} />
-                        <input type="hidden" name="module_id" value={mod.id} />
-                        <input type="hidden" name="course_id" value={course.id} />
-                        <input type="hidden" name="direction" value={direcao} />
-                        <button
-                          type="submit"
-                          className={iconButton}
-                          disabled={
-                            direcao === 'up' ? index === 0 : index === mod.lessons.length - 1
-                          }
-                          aria-label={`Mover ${lesson.title} para ${direcao === 'up' ? 'cima' : 'baixo'}`}
-                        >
-                          <IconeMover
-                            direcao={direcao === 'up' ? 'cima' : 'baixo'}
-                            className="size-3"
-                          />
-                        </button>
-                      </form>
-                    )}
+                    mover={
+                      <>
+                        <BotaoMover
+                          lessonId={lesson.id}
+                          moduleId={mod.id}
+                          courseId={course.id}
+                          direcao="up"
+                          titulo={lesson.title}
+                          desabilitado={index === 0}
+                        />
+                        <BotaoMover
+                          lessonId={lesson.id}
+                          moduleId={mod.id}
+                          courseId={course.id}
+                          direcao="down"
+                          titulo={lesson.title}
+                          desabilitado={index === mod.lessons.length - 1}
+                        />
+                      </>
+                    }
                   />
                 ))}
 
@@ -435,5 +434,46 @@ export default async function CursoStudioPage({ params }: { params: Promise<{ id
         </Surface>
       </section>
     </div>
+  )
+}
+
+/**
+ * Um botão de reordenar aula.
+ *
+ * Existe como componente para o `mover` do `AulaExpansivel` poder ser um NÓ
+ * pronto em vez de uma função — função não atravessa a fronteira
+ * servidor→cliente, e passar uma derrubava a página inteira do curso assim
+ * que um módulo tinha aula.
+ */
+function BotaoMover({
+  lessonId,
+  moduleId,
+  courseId,
+  direcao,
+  titulo,
+  desabilitado,
+}: {
+  lessonId: string
+  moduleId: string
+  courseId: string
+  direcao: 'up' | 'down'
+  titulo: string
+  desabilitado: boolean
+}) {
+  return (
+    <form action={moverAula}>
+      <input type="hidden" name="id" value={lessonId} />
+      <input type="hidden" name="module_id" value={moduleId} />
+      <input type="hidden" name="course_id" value={courseId} />
+      <input type="hidden" name="direction" value={direcao} />
+      <button
+        type="submit"
+        className={iconButton}
+        disabled={desabilitado}
+        aria-label={`Mover ${titulo} para ${direcao === 'up' ? 'cima' : 'baixo'}`}
+      >
+        <IconeMover direcao={direcao === 'up' ? 'cima' : 'baixo'} className="size-3" />
+      </button>
+    </form>
   )
 }

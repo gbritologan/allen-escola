@@ -1879,3 +1879,33 @@ o que a pessoa veio fazer.
 
 O banner do curso acompanhou (2000×400): página mais estreita, mesma lição de
 densidade.
+
+## D-84 · Função não atravessa a fronteira servidor→cliente
+
+O Gabriel soltou um vídeo no Studio e viu "alguma coisa quebrou" de novo. Nos
+logs da Vercel, digest `3151342971`:
+
+    Functions cannot be passed directly to Client Components
+    {courseId: …, indice: 0, total: 1, aula: …, moverPara: function moverPara}
+
+`AulaExpansivel` é componente de cliente e recebia `moverPara` — uma função
+que devolvia os botões de subir e descer. O React precisa SERIALIZAR o que
+cruza a fronteira, e não há como serializar código. O resultado era 500 na
+página inteira do curso.
+
+Agora ele recebe `mover`: os botões JÁ RENDERIZADOS pelo servidor. Nó pronto
+atravessa; função, não.
+
+**Por que isto passou pelo build, pelos testes e por mim.** O TypeScript aceita
+`(direcao) => ReactNode` como prop — é tipo válido; a regra violada é de
+runtime do React, não de tipo. E o `next build` compila a página sem montá-la
+com dados.
+
+Mas o furo real é outro: **o componente só quebrava quando um módulo tinha
+aula.** Sem aula, ele nunca era montado e a fronteira nunca era cruzada. Eu
+liguei o `AulaExpansivel` e nunca abri a página com uma aula dentro — o único
+estado em que ele existe. O Studio funcionou até o primeiro curso de verdade e
+quebrou exatamente quando começou a ser usado.
+
+A lição não é "testar mais". É que componente com renderização condicional tem
+mais de um estado, e o estado que importa é aquele em que ele aparece.

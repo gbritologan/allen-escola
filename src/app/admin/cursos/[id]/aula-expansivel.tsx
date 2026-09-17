@@ -43,20 +43,34 @@ export function AulaExpansivel({
   courseId,
   indice,
   total,
-  moverPara,
+  mover,
 }: {
   aula: AulaDoStudio
   courseId: string
   indice: number
   total: number
-  moverPara: (direcao: 'up' | 'down') => React.ReactNode
+  /**
+   * Os botões de subir e descer, JÁ RENDERIZADOS pelo servidor.
+   *
+   * Antes isto era `(direcao) => ReactNode` — uma função. E função não
+   * atravessa a fronteira servidor→cliente: o React precisa SERIALIZAR o que
+   * passa, e ele não tem como serializar código.
+   *
+   * O resultado era um 500 na página inteira do curso, mas só quando algum
+   * módulo tinha aula — sem aula, o componente nunca era montado e a
+   * fronteira nunca era cruzada. O Studio funcionou até o primeiro curso de
+   * verdade, e quebrou exatamente quando começou a ser usado.
+   *
+   * Nó pronto atravessa. Função, não.
+   */
+  mover: React.ReactNode
 }) {
   const [aberta, setAberta] = useState(false)
 
   return (
     <div className="flex flex-col">
       <div className="flex items-center gap-3 px-4 py-2.5">
-        <div className="flex flex-col gap-0.5">{moverPara('up')}{moverPara('down')}</div>
+        <div className="flex flex-col gap-0.5">{mover}</div>
 
         <button
           type="button"
